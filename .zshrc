@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/ziyunli/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -49,7 +49,7 @@ plugins=(brew brew-cask git vagrant node npm nvm python rust cargo t)
 
 # User configuration
 
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}"
+export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}
 # export MANPATH="/usr/local/man:$MANPATH"
 export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
 
@@ -111,7 +111,7 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
 # OCaml
-. /Users/ziyunli/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+. ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 # Python
 export WORKON_HOME=~/virtualenv
