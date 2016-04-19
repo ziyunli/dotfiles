@@ -167,6 +167,7 @@ before layers configuration."
    dotspacemacs-default-package-repository nil
    )
   ;; User initialization goes here
+  rust-enable-racer t
   )
 
 (defun dotspacemacs/config ()
