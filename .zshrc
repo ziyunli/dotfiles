@@ -135,4 +135,4 @@ export ANDROID_HOME=/usr/local/opt/android-sdk
 
 export GIT_CEILING_DIRECTORIES=~
 
-[ -s "/Users/ziyunli/.dnx/dnvm/dnvm.sh" ] && . "/Users/ziyunli/.dnx/dnvm/dnvm.sh" # Load dnvm
+[ -s ~/.dnx/dnvm/dnvm.sh ] && . ~/.dnx/dnvm/dnvm.sh # Load dnvm
