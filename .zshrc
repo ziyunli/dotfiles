@@ -122,7 +122,7 @@ export PATH=~/.cabal/bin/:$PATH
 
 # Rust racer
 export RUST_SRC_PATH=~/codebase/rust/src
-export PATH=$PATH:~/codebase/racer/target/release:~/.multirust/toolchains/nightly/cargo/bin
+export PATH=$PATH:~/codebase/racer/target/release:~/.cargo/bin
 export OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 export DEP_OPENSSL_INCLUDE=/usr/local/opt/openssl/include
 
