@@ -137,3 +137,8 @@ export ANDROID_HOME=/usr/local/opt/android-sdk
 export GIT_CEILING_DIRECTORIES=~
 
 [ -s ~/.dnx/dnvm/dnvm.sh ] && . ~/.dnx/dnvm/dnvm.sh # Load dnvm
+
+# conscript
+export CONSCRIPT_HOME="$HOME/.conscript"
+export CONSCRIPT_OPTS="-XX:MaxPermSize=512M -Dfile.encoding=UTF-8"
+export PATH=$CONSCRIPT_HOME/bin:$PATH
