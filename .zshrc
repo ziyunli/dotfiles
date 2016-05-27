@@ -118,7 +118,7 @@ export WORKON_HOME=~/virtualenv
 source /usr/local/bin/virtualenvwrapper.sh
 
 # Haskell
-export PATH=~/.cabal/bin/:$PATH
+export PATH=~/.cabal/bin:$PATH
 
 # Rust racer
 export RUST_SRC_PATH=~/codebase/rust/src
