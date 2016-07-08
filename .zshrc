@@ -79,44 +79,9 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Create CMD link for Visual Studio Code
-code () {
-    if [[ $# = 0 ]]
-    then
-        open -a "Visual Studio Code"
-    else
-        [[ $1 = /* ]] && F="$1" || F="$PWD/${1#./}"
-        open -a "Visual Studio Code" --args "$F"
-    fi
-}
-
-# read the EXAMPLES section only for a command
-# from https://news.ycombinator.com/item?id=10025216
-# `brew install gnu-sed` beforehand
-eg () {
-    MAN_KEEP_FORMATTING=1 man "$@" 2>/dev/null \
-        | gsed --quiet --expression='/^E\(\x08.\)X\(\x08.\)\?A\(\x08.\)\?M\(\x08.\)\?P\(\x08.\)\?L\(\x08.\)\?E/{:a;p;n;/^[^ ]/q;ba}' \
-        | ${MANPAGER:-${PAGER:-pager -s}}
-}
-
-# https://news.ycombinator.com/item?id=11806767
-precmd() {
-    eval 'if [ "$(id -u)" -ne 0 ]; then echo "$(date "+%Y-%m-%d.%H:%M:%S") $(pwd) $(history | tail -n 1)" >>! ~/Dropbox/Logs/Bash/bash-history-$(date "+%Y-%m-%d").log; fi'
-}
-
 # Init NVM
 export NVM_DIR=~/.nvm
 source $(brew --prefix nvm)/nvm.sh
-
-# Trick Emacs into GUI mode
-alias gemacs=/Applications/Emacs.app/Contents/MacOS/Emacs
-
-# Golang
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-
-# OCaml
-. ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 # Python
 export WORKON_HOME=~/virtualenv
@@ -132,16 +97,7 @@ export OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 export DEP_OPENSSL_INCLUDE=/usr/local/opt/openssl/include
 source $HOME/.cargo/env
 
-# The next line updates PATH for the Google Cloud SDK.
-source ~/google-cloud-sdk/path.zsh.inc
-# The next line enables shell command completion for gcloud.
-source ~/google-cloud-sdk/completion.zsh.inc
-
-export ANDROID_HOME=/usr/local/opt/android-sdk
-
 export GIT_CEILING_DIRECTORIES=~
-
-[ -s ~/.dnx/dnvm/dnvm.sh ] && . ~/.dnx/dnvm/dnvm.sh # Load dnvm
 
 # conscript
 export CONSCRIPT_HOME="$HOME/.conscript"
