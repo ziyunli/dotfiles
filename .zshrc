@@ -79,6 +79,11 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# https://news.ycombinator.com/item?id=11806767
+precmd() {
+    eval 'if [ "$(id -u)" -ne 0 ]; then echo "$(date "+%Y-%m-%d.%H:%M:%S") $(pwd) $(history | tail -n 1)" >>! ~/Dropbox/Logs/Zsh/zsh-history-$(date "+%Y-%m-%d").log; fi'
+}
+
 # Init NVM
 export NVM_DIR=~/.nvm
 source $(brew --prefix nvm)/nvm.sh
