@@ -106,14 +106,14 @@ export OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 export DEP_OPENSSL_INCLUDE=/usr/local/opt/openssl/include
 source $HOME/.cargo/env
 
-export GIT_CEILING_DIRECTORIES=~
-
 # conscript
 export CONSCRIPT_HOME="$HOME/.conscript"
 export CONSCRIPT_OPTS="-XX:MaxPermSize=512M -Dfile.encoding=UTF-8"
 export PATH=$CONSCRIPT_HOME/bin:$PATH
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
 # OPAM configuration
 . ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+export GIT_CEILING_DIRECTORIES=~
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
