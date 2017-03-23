@@ -45,7 +45,7 @@ ZSH_THEME="cobalt2"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew brew-cask git vagrant docker node npm nvm python rust cargo t)
+plugins=(brew brew-cask git vagrant docker node npm nvm python)
 
 # User configuration
 
@@ -76,7 +76,8 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# alias zshconfig="mate ~/.zshrc"
+alias vim='mvim -v'
+alias zshconfig="vim ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # https://news.ycombinator.com/item?id=11806767
@@ -96,28 +97,7 @@ if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 # To enable auto-activation add to your profile:
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
-# Golang
-export GOPATH=$HOME/goprojects
-export PATH=$PATH:$GOPATH/bin
-
 # Haskell
 export PATH=~/.cabal/bin:$PATH
 
-# Rust racer
-export RUST_SRC_PATH=~/codebase/rust/src
-export PATH=$PATH:~/codebase/racer/target/release
-export OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
-export DEP_OPENSSL_INCLUDE=/usr/local/opt/openssl/include
-source $HOME/.cargo/env
-
-# conscript
-export CONSCRIPT_HOME="$HOME/.conscript"
-export CONSCRIPT_OPTS="-XX:MaxPermSize=512M -Dfile.encoding=UTF-8"
-export PATH=$CONSCRIPT_HOME/bin:$PATH
-
-# OPAM configuration
-. ~/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
 export GIT_CEILING_DIRECTORIES=~
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
