@@ -78,7 +78,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 alias vim='mvim -v'
 alias zshconfig="vim ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
 # https://news.ycombinator.com/item?id=11806767
 precmd() {
