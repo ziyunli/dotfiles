@@ -100,4 +100,8 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 # Haskell
 export PATH=~/.cabal/bin:$PATH
 
+# Racer
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+
 export GIT_CEILING_DIRECTORIES=~
+
