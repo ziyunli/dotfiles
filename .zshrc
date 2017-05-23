@@ -105,5 +105,10 @@ export PATH=~/.cabal/bin:$PATH
 # Racer
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
+# Exercism
+if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
+  . ~/.config/exercism/exercism_completion.zsh
+fi
+
 export GIT_CEILING_DIRECTORIES=~
 
