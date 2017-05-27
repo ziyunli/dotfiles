@@ -45,7 +45,7 @@ ZSH_THEME="cobalt2"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew brew-cask git vagrant docker node npm nvm python)
+plugins=(brew brew-cask git git-extras node npm yarn nvm python)
 
 # User configuration
 
@@ -78,7 +78,8 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias vim='mvim -v'
+export EDITOR='nvim'
+alias vim='nvim -v'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
@@ -90,6 +91,10 @@ precmd() {
 # Init NVM
 export NVM_DIR=~/.nvm
 source $(brew --prefix nvm)/nvm.sh
+
+# Yarn global install into nvm directory
+alias yga='yarn global add --global-folder=`yarn global bin` '
+alias ygr='yarn global remove --global-folder=`yarn global bin` '
 
 # Python
 # To use Homebrew's directories rather than ~/.pyenv add to your profile:
@@ -109,6 +114,9 @@ export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh
 fi
+
+# git wizard
+alias co='select br in $(git recent); do git co $br; break; done'
 
 export GIT_CEILING_DIRECTORIES=~
 

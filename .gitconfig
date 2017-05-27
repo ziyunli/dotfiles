@@ -1,0 +1,20 @@
+[user]
+	name = Stephen (Ziyun) Li
+	email = stephen.liziyun@gmail.com
+	signingkey = BF70CBBC
+[core]
+	excludesfile = /Users/ziyunli/.gitignore_global
+[commit]
+	gpgsign = true
+[push]
+	default = current
+[alias]
+	co = checkout
+	praise = blame
+	recent = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname:short)"
+	overview = log --all --since="2 weeks" --oneline --no-merges
+	recap = log --all --oneline --no-merges --author="stephen.liziyun@gmail.com" --author="sliz1@users.noreply.github.com"
+	upstream = log --oneline --no-merges HEAD..origin/develop
+	graph = log --graph --all --decorate --stat --date=iso
+[credential]
+	helper = osxkeychain
