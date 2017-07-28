@@ -1,6 +1,6 @@
 [user]
 	name = Stephen (Ziyun) Li
-	email = sliz1@users.noreply.github.com
+	email = stephen.liziyun@gmail.com
 	signingkey = BF70CBBC
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
@@ -13,7 +13,7 @@
 	praise = blame
 	recent = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname:short)"
 	overview = log --all --since="2 weeks" --oneline --no-merges
-	recap = log --all --oneline --no-merges --author="sliz1@users.noreply.github.com"
+	recap = log --all --oneline --no-merges --author="stephen.liziyun@gmail.com"
 	upstream = log --oneline --no-merges HEAD..origin/develop
 	graph = log --graph --all --decorate --stat --date=iso
 [credential]
