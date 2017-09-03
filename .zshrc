@@ -124,4 +124,3 @@ eval $(thefuck --alias)
 alias co='select br in $(git recent); do git co $br; break; done'
 
 export GIT_CEILING_DIRECTORIES=~
-
