@@ -110,10 +110,15 @@ export PATH=~/.cabal/bin:$PATH
 # Racer
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
+# Golang
+export PATH=$PATH:/usr/local/opt/go/libexec/bin
+
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh
 fi
+
+eval $(thefuck --alias)
 
 # git wizard
 alias co='select br in $(git recent); do git co $br; break; done'
