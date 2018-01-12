@@ -96,14 +96,6 @@ source $(brew --prefix nvm)/nvm.sh
 alias yga='yarn global add --global-folder=`yarn global bin` '
 alias ygr='yarn global remove --global-folder=`yarn global bin` '
 
-# Python
-# To use Homebrew's directories rather than ~/.pyenv add to your profile:
-export PYENV_ROOT=/usr/local/var/pyenv
-# To enable shims and autocompletion add to your profile:
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-# To enable auto-activation add to your profile:
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
 # Haskell
 export PATH=~/.cabal/bin:$PATH
 
