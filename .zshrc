@@ -96,6 +96,9 @@ source $(brew --prefix nvm)/nvm.sh
 alias yga='yarn global add --global-folder=`yarn global bin` '
 alias ygr='yarn global remove --global-folder=`yarn global bin` '
 
+export PYTHONUSERBASE=~/.local
+export PATH=$PATH:$PYTHONUSERBASE
+
 # Haskell
 export PATH=~/.cabal/bin:$PATH
 
