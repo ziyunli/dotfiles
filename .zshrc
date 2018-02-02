@@ -98,6 +98,8 @@ alias ygr='yarn global remove --global-folder=`yarn global bin` '
 
 export PYTHONUSERBASE=~/.local
 export PATH=$PATH:$PYTHONUSERBASE
+source /usr/local/opt/autoenv/activate.sh
+eval "$(pipenv --completion)"
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
