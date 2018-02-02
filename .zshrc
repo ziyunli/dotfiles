@@ -79,7 +79,7 @@ source $ZSH/oh-my-zsh.sh
 #
 # Example aliases
 export EDITOR='nvim'
-alias vim='nvim -v'
+alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
