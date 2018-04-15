@@ -95,6 +95,7 @@ source $(brew --prefix nvm)/nvm.sh
 # Yarn global install into nvm directory
 alias yga='yarn global add --global-folder=`yarn global bin` '
 alias ygr='yarn global remove --global-folder=`yarn global bin` '
+alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
 
 export PYTHONUSERBASE=~/.local
 export PATH=$PATH:$PYTHONUSERBASE
