@@ -89,8 +89,8 @@ precmd() {
 }
 
 # Init NVM
-export NVM_DIR=~/.nvm
-source $(brew --prefix nvm)/nvm.sh
+export NVM_DIR="$HOME/.nvm"
+. "/usr/local/opt/nvm/nvm.sh"
 
 # Yarn global install into nvm directory
 alias yga='yarn global add --global-folder=`yarn global bin` '
@@ -126,3 +126,4 @@ export GIT_CEILING_DIRECTORIES=~
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 source /Users/ziyunli/.rvm/scripts/rvm
+function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
