@@ -127,3 +127,5 @@ export GIT_CEILING_DIRECTORIES=~
 export PATH="$PATH:$HOME/.rvm/bin"
 source /Users/ziyunli/.rvm/scripts/rvm
 function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
