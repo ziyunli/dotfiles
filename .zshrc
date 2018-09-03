@@ -83,6 +83,8 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
+export PATH="/usr/local/opt/curl/bin:$PATH"
+
 # https://news.ycombinator.com/item?id=11806767
 precmd() {
     eval 'if [ "$(id -u)" -ne 0 ]; then echo "$(date "+%Y-%m-%d.%H:%M:%S") $(pwd) $(history | tail -n 1)" >>! ~/Dropbox/Logs/Zsh/zsh-history-$(date "+%Y-%m-%d").log; fi'
@@ -109,7 +111,7 @@ export PATH=~/.cabal/bin:$PATH
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
 # Golang
-export PATH=$PATH:/usr/local/opt/go/libexec/bin
+export PATH=/usr/local/opt/go/libexec/bin:$PATH
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
