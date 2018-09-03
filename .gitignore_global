@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/macos,jetbrains,visualstudiocode
 
 ### JetBrains ###
@@ -145,3 +144,5 @@ pip-selfcheck.json
 # End of https://www.gitignore.io/api/virtualenv
 misc.xml
 python.iml
+
+.idea/
