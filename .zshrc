@@ -131,6 +131,7 @@ source /Users/ziyunli/.rvm/scripts/rvm
 function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# https://remysharp.com/2018/08/23/cli-improved
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
@@ -140,3 +141,9 @@ if [ -f '/Users/ziyunli/google-cloud-sdk/path.zsh.inc' ]; then source '/Users/zi
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/ziyunli/google-cloud-sdk/completion.zsh.inc' ]; then source '/Users/ziyunli/google-cloud-sdk/completion.zsh.inc'; fi
+
+# https://remysharp.com/2018/08/23/cli-improved
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+alias ping='prettyping --nolegend'
+alias top="sudo htop" # alias top and fix high sierra bug
+[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
