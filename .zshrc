@@ -107,9 +107,6 @@ eval "$(pipenv --completion)"
 # Haskell
 export PATH=~/.cabal/bin:$PATH
 
-# Racer
-export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
-
 # Golang
 export PATH=/usr/local/opt/go/libexec/bin:$PATH
 
@@ -120,9 +117,6 @@ fi
 
 eval $(thefuck --alias)
 
-# git wizard
-alias co='select br in $(git recent); do git co $br; break; done'
-
 export GIT_CEILING_DIRECTORIES=~
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
@@ -130,11 +124,30 @@ export PATH="$PATH:$HOME/.rvm/bin"
 source /Users/ziyunli/.rvm/scripts/rvm
 function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
 
+
+# FZF
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # https://remysharp.com/2018/08/23/cli-improved
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
+# Use fd (https://github.com/sharkdp/fd) instead of the default find
+# command for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
+# Follow symbolic links, and don't want it to exclude hidden files
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+# To apply the command to CTRL-T as well
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/ziyunli/google-cloud-sdk/path.zsh.inc' ]; then source '/Users/ziyunli/google-cloud-sdk/path.zsh.inc'; fi
