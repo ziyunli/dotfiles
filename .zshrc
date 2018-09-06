@@ -45,7 +45,7 @@ ZSH_THEME="cobalt2"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew brew-cask git git-extras node npm yarn nvm python taskwarrior)
+plugins=(brew brew-cask git git-extras node npm yarn nvm python taskwarrior fasd)
 
 # User configuration
 
@@ -123,7 +123,7 @@ export GIT_CEILING_DIRECTORIES=~
 export PATH="$PATH:$HOME/.rvm/bin"
 source /Users/ziyunli/.rvm/scripts/rvm
 
-function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
+function gi() { curl -L -s https://www.gitignore.io/api/$@ ;} 
 
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -157,4 +157,5 @@ if [ -f '/Users/ziyunli/google-cloud-sdk/completion.zsh.inc' ]; then source '/Us
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias ping='prettyping --nolegend'
 alias top="sudo htop" # alias top and fix high sierra bug
-[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+eval "$(fasd --init auto)"
+
