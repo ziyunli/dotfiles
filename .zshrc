@@ -108,7 +108,7 @@ eval "$(pipenv --completion)"
 export PATH=~/.cabal/bin:$PATH
 
 # Golang
-export PATH=/usr/local/opt/go/libexec/bin:$PATH
+export PATH=~/go/bin:/usr/local/opt/go/libexec/bin:$PATH
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
