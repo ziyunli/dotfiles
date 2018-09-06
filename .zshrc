@@ -92,7 +92,7 @@ precmd() {
 
 # Init NVM
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # Yarn global install into nvm directory
 alias yga='yarn global add --global-folder=`yarn global bin` '
