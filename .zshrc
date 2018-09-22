@@ -45,7 +45,7 @@ ZSH_THEME="cobalt2"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew brew-cask git git-extras node npm yarn nvm python taskwarrior fasd)
+plugins=(brew brew-cask git git-extras node npm yarn nvm python taskwarrior fasd opam)
 
 # User configuration
 
@@ -93,6 +93,9 @@ precmd() {
 # Init NVM
 export NVM_DIR="$HOME/.nvm"
 . "/usr/local/opt/nvm/nvm.sh"
+
+# Init OPAM
+test -r /Users/ziyunli/.opam/opam-init/init.zsh && . /Users/ziyunli/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 # Yarn global install into nvm directory
 alias yga='yarn global add --global-folder=`yarn global bin` '
