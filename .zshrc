@@ -122,10 +122,6 @@ eval $(thefuck --alias)
 
 export GIT_CEILING_DIRECTORIES=~
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-source /Users/ziyunli/.rvm/scripts/rvm
-
 function gi() { curl -L -s https://www.gitignore.io/api/$@ ;} 
 
 # FZF
@@ -162,3 +158,5 @@ alias ping='prettyping --nolegend'
 alias top="sudo htop" # alias top and fix high sierra bug
 eval "$(fasd --init auto)"
 
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
