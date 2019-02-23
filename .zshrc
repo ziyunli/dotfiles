@@ -122,11 +122,6 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-# https://news.ycombinator.com/item?id=11806767
-precmd() {
-    eval 'if [ "$(id -u)" -ne 0 ]; then echo "$(date "+%Y-%m-%d.%H:%M:%S") $(pwd) $(history | tail -n 1)" >>! ~/Dropbox/Logs/Zsh/zsh-history-$(date "+%Y-%m-%d").log; fi'
-}
-
 # Init NVM
 export NVM_DIR="$HOME/.nvm"
 . "/usr/local/opt/nvm/nvm.sh"
@@ -199,3 +194,6 @@ eval "$(fasd --init auto)"
 export PATH="$PATH:$HOME/.rvm/bin"
 
 fortune | ponysay
+
+# https://github.com/zsh-users/zsh-syntax-highlighting
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
