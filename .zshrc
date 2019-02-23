@@ -45,7 +45,44 @@ ZSH_THEME="cobalt2"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew brew-cask git git-extras node npm yarn nvm python taskwarrior fasd opam docker)
+plugins=(
+  # system
+  osx   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/osx
+  brew  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
+  git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
+  gitignore   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitignore
+  colored-man # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
+  # tools
+  aws         # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/aws
+  docker      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker
+  rand-quote  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rand-quote
+  thefuck     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/thefuck
+  fasd        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
+  tmux        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
+  vscode      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vscode
+  heroku      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/heroku
+  httpie      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/httpie
+  tig	        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
+  taskwarrior 
+  # Python
+  pip     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/pip
+  python  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/python
+  # Javascript
+  node  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/node
+  yarn  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/yarn
+  npm   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/npm
+  nvm   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/nvm
+  # Ruby
+  ruby    # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/ruby
+  rbenv   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rbenv
+  bundler # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/bundler
+  rails   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rails
+  # Rust
+  rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
+  cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
+  # Ocaml
+  opam
+)
 
 # User configuration
 
