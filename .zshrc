@@ -191,7 +191,7 @@ alias top="sudo htop" # alias top and fix high sierra bug
 eval "$(fasd --init auto)"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
+# export PATH="$PATH:$HOME/.rvm/bin"
 
 fortune | ponysay
 
@@ -200,3 +200,4 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # rbenv
 eval "$(rbenv init -)"
+alias ri='ri -f ansi'
