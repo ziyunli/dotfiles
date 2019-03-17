@@ -86,7 +86,7 @@ plugins=(
 
 # User configuration
 
-export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}
+export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:${PATH}
 # export MANPATH="/usr/local/man:$MANPATH"
 export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
 
