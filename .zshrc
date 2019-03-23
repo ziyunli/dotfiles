@@ -51,7 +51,7 @@ plugins=(
   brew  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
   git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   gitignore   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitignore
-  colored-man # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
+  colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
   # tools
   aws         # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/aws
   docker      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker
@@ -80,8 +80,6 @@ plugins=(
   # Rust
   rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
   cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
-  # Ocaml
-  opam
 )
 
 # User configuration
