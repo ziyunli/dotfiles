@@ -124,9 +124,6 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 . "/usr/local/opt/nvm/nvm.sh"
 
-# Init OPAM
-test -r /Users/ziyunli/.opam/opam-init/init.zsh && . /Users/ziyunli/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
 # Yarn global install into nvm directory
 alias yga='yarn global add --global-folder=`yarn global bin` '
 alias ygr='yarn global remove --global-folder=`yarn global bin` '
@@ -142,6 +139,10 @@ export PATH=~/.cabal/bin:$PATH
 
 # Golang
 export PATH=~/go/bin:/usr/local/opt/go/libexec/bin:$PATH
+
+# Ruby
+eval "$(rbenv init -)"
+alias ri='ri -f ansi'
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
@@ -196,6 +197,3 @@ fortune | ponysay
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# rbenv
-eval "$(rbenv init -)"
-alias ri='ri -f ansi'
