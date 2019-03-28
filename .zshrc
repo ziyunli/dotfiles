@@ -131,7 +131,6 @@ alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
 
 export PYTHONUSERBASE=~/.local
 export PATH=$PATH:$PYTHONUSERBASE
-source /usr/local/opt/autoenv/activate.sh
 eval "$(pipenv --completion)"
 
 # Haskell
