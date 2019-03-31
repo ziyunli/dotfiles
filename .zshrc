@@ -55,6 +55,7 @@ plugins=(
   # tools
   aws         # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/aws
   docker      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker
+  docker-compose # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker-compose
   rand-quote  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rand-quote
   thefuck     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/thefuck
   fasd        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
