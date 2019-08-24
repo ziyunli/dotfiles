@@ -50,6 +50,7 @@ Install:andUse('ToggleScreenRotation', {hotkeys = {first = {hyper, 'f15'}}})
 Install:andUse('TextClipboardHistory', {
     config = {show_in_menubar = false},
     hotkeys = {toggle_clipboard = {{'cmd', 'shift'}, 'v'}},
+    disable = true,
     start = true
 })
 
@@ -101,6 +102,9 @@ Install:andUse('PopupTranslateSelection', {
         -- translate_en_de = {shift_hyper, 'd'}
     }
 })
+
+-- http://www.hammerspoon.org/Spoons/UnsplashZ.html
+Install:andUse('UnsplashZ')
 
 -- https://www.hammerspoon.org/Spoons/FadeLogo.html
 Install:andUse('FadeLogo', {start = true})
