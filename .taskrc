@@ -29,6 +29,33 @@ include /usr/local/Cellar/task/2.5.1/share/doc/task/rc/solarized-dark-256.theme
 #include /usr/local/Cellar/task/2.5.1/share/doc/task/rc/solarized-light-256.theme
 #include /usr/local/Cellar/task/2.5.1/share/doc/task/rc/no-color.theme
 
+# Holidays
+calendar.holidays=full
+
+## 2019
+holiday.en-CA1.name=New Year's Day
+holiday.en-CA1.date=20190101
+holiday.en-CA2.name=Family Day
+holiday.en-CA2.date=20190218
+holiday.en-CA3.name=Good Friday
+holiday.en-CA3.date=20190419
+holiday.en-CA5.name=Victoria Day
+holiday.en-CA5.date=20190520
+holiday.en-CA6.name=Canada Day
+holiday.en-CA6.date=20190701
+holiday.en-CA7.name=Civic Holiday
+holiday.en-CA7.date=20190805
+holiday.en-CA8.name=Labour Day
+holiday.en-CA8.date=20190902
+holiday.en-CA9.name=Thanksgiving Day
+holiday.en-CA9.date=20191014
+holiday.en-CA11.name=Christmas Day
+holiday.en-CA11.date=20191225
+holiday.en-CA12.name=Boxing Day
+holiday.en-CA12.date=20191226
+
+uda.priority.values=H,M,,L
+
 uda.reviewed.type=date
 uda.reviewed.label=Reviewed
 report._reviewed.description=Tasksh review report.  Adjust the filter to your needs.
