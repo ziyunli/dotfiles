@@ -138,7 +138,8 @@ eval "$(pipenv --completion)"
 export PATH=~/.cabal/bin:$PATH
 
 # Golang
-export PATH=~/go/bin:/usr/local/opt/go/libexec/bin:$PATH
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
 
 # Ruby
 eval "$(rbenv init -)"
