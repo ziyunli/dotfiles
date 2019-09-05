@@ -1,13 +1,14 @@
 [user]
-	name = Ziyun Li
-	email = me@ziyunli.dev
+	name = Stephen Li
+	email = stephen.li@instacart.com
 	signingkey = BF70CBBC
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
+	whitespace = trailing-space,space-before-tab
 [commit]
 	gpgsign = false
 [push]
-	default = current
+	default = simple
 [alias]
 	co = checkout
 	praise = blame
@@ -76,3 +77,11 @@
 	insteadOf = https://bitbucket.org/
 [url "git@gitlab.com:"]
 	insteadOf = https://gitlab.com/
+[http]
+	postBuffer = 524288000
+[mergetool]
+	keepBackup = false
+[diff]
+	mnemonicprefix = true
+[merge]
+	stat = true

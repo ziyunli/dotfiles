@@ -198,3 +198,11 @@ fortune | ponysay
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+
+
+### BEGIN--Instacart Shell Settings. (Updated: Thu  5 Sep 2019 09:27:31 EDT. [Script Version 1.1.0])
+# This Line Added Automatically by Instacart Setup Script
+# The sourced file contains all of the instacart utilities and shell settings
+# To remove this functionality, leave the block, and enter "NO-TOUCH" in the BEGIN line, and comment the line below:
+source /Users/ziyunli/.instacart_shell_profile
+### END--Instacart Shell Settings.
