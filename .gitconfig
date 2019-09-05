@@ -1,11 +1,11 @@
 [user]
-	name = Stephen (Ziyun) Li
-	email = stephen.liziyun@gmail.com
+	name = Ziyun Li
+	email = me@ziyunli.dev
 	signingkey = BF70CBBC
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
 [commit]
-	gpgsign = true
+	gpgsign = false
 [push]
 	default = current
 [alias]
