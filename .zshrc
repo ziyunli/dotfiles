@@ -192,12 +192,11 @@ eval "$(fasd --init auto)"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 # export PATH="$PATH:$HOME/.rvm/bin"
 
-fortune | ponysay
+# ~/bin overrides everything else
+export PATH=$HOME/bin:$PATH
 
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-
 
 ### BEGIN--Instacart Shell Settings. (Updated: Thu  5 Sep 2019 09:27:31 EDT. [Script Version 1.1.0])
 # This Line Added Automatically by Instacart Setup Script
