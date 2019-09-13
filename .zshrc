@@ -132,7 +132,6 @@ alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
 
 export PYTHONUSERBASE=~/.local
 export PATH=$PATH:$PYTHONUSERBASE
-eval "$(pipenv --completion)"
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
