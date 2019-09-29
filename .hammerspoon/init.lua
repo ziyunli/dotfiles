@@ -47,15 +47,15 @@ Install:andUse('ToggleScreenRotation', {hotkeys = {first = {hyper, 'f15'}}})
 
 -- TextClipboardHistory: a clipboard history only for text items.
 -- http://www.hammerspoon.org/Spoons/TextClipboardHistory.html
-Install:andUse('TextClipboardHistory', {
-    config = {show_in_menubar = false},
-    hotkeys = {toggle_clipboard = {{'cmd', 'shift'}, 'v'}},
-    disable = true,
-    start = true
-})
+-- Install:andUse('TextClipboardHistory', {
+--     config = {show_in_menubar = false},
+--     hotkeys = {toggle_clipboard = {{'cmd', 'shift'}, 'v'}},
+--     disable = true,
+--     start = true
+-- })
 
 -- http://www.hammerspoon.org/Spoons/Caffeine.html
-Install:andUse('Caffeine', {start = true, hotkeys = {toggle = {hyper, '1'}}})
+-- Install:andUse('Caffeine', {start = true, hotkeys = {toggle = {hyper, '1'}}})
 
 -- http://www.hammerspoon.org/Spoons/MenubarFlag.html
 Install:andUse('MenubarFlag', {

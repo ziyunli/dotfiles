@@ -85,6 +85,7 @@ plugins=(
 )
 
 # User configuration
+export TERM="xterm-256color"
 
 export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:${PATH}
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -196,6 +197,8 @@ eval "$(fasd --init auto)"
 
 # fortune | ponysay
 
+# ~/bin overrides everything else
+export PATH=$HOME/bin:$PATH
+
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-

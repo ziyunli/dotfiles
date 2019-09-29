@@ -11,7 +11,9 @@
 # Use the command 'task show' to see all defaults and overrides
 
 # Files
-data.location=~/Library/Mobile Documents/com~apple~CloudDocs/taskwarrior
+data.location=~/Documents/taskwarrior
+# data.location=~/Library/Mobile Documents/com~apple~CloudDocs/taskwarrior
+# data.location=~/taskwarrior
 
 # Color theme (uncomment one to use)
 #include /usr/local/Cellar/task/2.5.1/share/doc/task/rc/light-16.theme
