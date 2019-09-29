@@ -5,7 +5,8 @@ export ZSH=~/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="cobalt2"
+# ZSH_THEME="powerlevel9k/powerlevel9k"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -132,7 +133,7 @@ alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
 
 export PYTHONUSERBASE=~/.local
 export PATH=$PATH:$PYTHONUSERBASE
-eval "$(pipenv --completion)"
+# eval "$(pipenv --completion)"
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
@@ -193,7 +194,7 @@ eval "$(fasd --init auto)"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 # export PATH="$PATH:$HOME/.rvm/bin"
 
-fortune | ponysay
+# fortune | ponysay
 
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
