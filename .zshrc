@@ -6,6 +6,7 @@ export ZSH=~/.oh-my-zsh
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
 ZSH_THEME="powerlevel9k/powerlevel9k"
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs virtualenv)
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -132,8 +133,10 @@ alias yga='yarn global add --global-folder=`yarn global bin` '
 alias ygr='yarn global remove --global-folder=`yarn global bin` '
 alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
 
+# Python
 export PYTHONUSERBASE=~/.local
-export PATH=$PATH:$PYTHONUSERBASE
+export PATH="$PYENV_ROOT/bin:$PATH:$PYTHONUSERBASE"
+export PYENV_ROOT="$HOME/.pyenv"
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
