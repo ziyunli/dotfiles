@@ -68,6 +68,7 @@ plugins=(
   # Python
   pip     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/pip
   python  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/python
+  pyenv   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/pyenv
   # Javascript
   node  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/node
   yarn  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/yarn
