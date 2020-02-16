@@ -146,6 +146,7 @@ export PATH=$PATH:$GOPATH/bin
 # Ruby
 eval "$(rbenv init -)"
 alias ri='ri -f ansi'
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
