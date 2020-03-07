@@ -5,8 +5,8 @@ export ZSH=~/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="cobalt2"
-# ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel9k/powerlevel9k"
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs virtualenv)
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -51,17 +51,14 @@ plugins=(
   osx   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/osx
   brew  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
   git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
-  gitignore   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitignore
   colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
   # tools
   aws         # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/aws
   docker      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker
   docker-compose # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/docker-compose
-  rand-quote  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rand-quote
   thefuck     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/thefuck
   fasd        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tmux        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
-  vscode      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vscode
   heroku      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/heroku
   httpie      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/httpie
   tig	        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
@@ -73,10 +70,8 @@ plugins=(
   node  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/node
   yarn  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/yarn
   npm   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/npm
-  nvm   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/nvm
   # Ruby
   ruby    # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/ruby
-  rbenv   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rbenv
   bundler # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/bundler
   rails   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rails
   # Rust
@@ -123,18 +118,32 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-# Init NVM
+# NVM
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+nvm() {  # Defer loading NVM
+  unset nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+  nvm "$@"
+}
 
-# Yarn global install into nvm directory
-alias yga='yarn global add --global-folder=`yarn global bin` '
-alias ygr='yarn global remove --global-folder=`yarn global bin` '
-alias ygu='yarn global upgrade --global-folder=`yarn global bin` '
+# Python
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+pyenv() {
+  unset pyenv
+  eval "$(/usr/local/bin/pyenv init -)"
+  # if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+  pyenv "$@"
+}
 
-export PYTHONUSERBASE=~/.local
-export PATH=$PATH:$PYTHONUSERBASE
-# eval "$(pipenv --completion)"
+# rbenv
+export PATH=$HOME/.rbenv/shims:$PATH
+rbenv() {
+  unset rbenv
+  eval "$(/usr/local/bin/rbenv init -)"
+  rbenv "$@"
+}
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
@@ -142,11 +151,6 @@ export PATH=~/.cabal/bin:$PATH
 # Golang
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
-
-# Ruby
-eval "$(rbenv init -)"
-alias ri='ri -f ansi'
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
