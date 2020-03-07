@@ -69,7 +69,6 @@ plugins=(
   # Javascript
   node  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/node
   yarn  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/yarn
-  npm   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/npm
   # Ruby
   ruby    # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/ruby
   bundler # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/bundler
@@ -120,30 +119,18 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-nvm() {  # Defer loading NVM
-  unset nvm
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-  nvm "$@"
-}
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 # Python
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-pyenv() {
-  unset pyenv
-  eval "$(/usr/local/bin/pyenv init -)"
-  # if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-  pyenv "$@"
-}
+eval "$(/usr/local/bin/pyenv init -)"
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
 # rbenv
 export PATH=$HOME/.rbenv/shims:$PATH
-rbenv() {
-  unset rbenv
-  eval "$(/usr/local/bin/rbenv init -)"
-  rbenv "$@"
-}
+eval "$(/usr/local/bin/rbenv init -)"
 
 # Haskell
 export PATH=~/.cabal/bin:$PATH
