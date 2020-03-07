@@ -161,8 +161,6 @@ eval $(thefuck --alias)
 
 export GIT_CEILING_DIRECTORIES=~
 
-function gi() { curl -L -s https://www.gitignore.io/api/$@ ;} 
-
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # https://remysharp.com/2018/08/23/cli-improved
@@ -196,11 +194,6 @@ alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias ping='prettyping --nolegend'
 alias top="sudo htop" # alias top and fix high sierra bug
 eval "$(fasd --init auto)"
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-# export PATH="$PATH:$HOME/.rvm/bin"
-
-# fortune | ponysay
 
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$PATH
