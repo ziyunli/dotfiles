@@ -85,7 +85,7 @@ values."
           org-want-todo-bindings t
           org-enable-org-journal-support t
           org-journal-dir "~/orgs/journal"
-          org-journal-file-format "%Y-%m-%d"
+          org-journal-file-format "%Y-%m-%d.org"
           org-journal-date-prefix "#+TITLE: "
           org-journal-date-format "%A, %B %d %Y"
           org-journal-time-prefix "* "
