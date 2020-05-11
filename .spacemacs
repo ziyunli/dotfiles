@@ -84,7 +84,7 @@ values."
      (org :variables
           org-want-todo-bindings t
           org-enable-org-journal-support t
-          org-journal-dir "~/Library/Mobile Documents/com~apple~CloudDocs/Journal"
+          org-journal-dir "~/orgs/journal"
           org-journal-file-format "%Y-%m-%d"
           org-journal-date-prefix "#+TITLE: "
           org-journal-date-format "%A, %B %d %Y"
@@ -104,6 +104,7 @@ values."
      ;; Spell as you type with Flyspell package,
      ;; requires external command - ispell, hunspell, aspell
      ;; SPC S menu, SPC S s to check current word
+     ;; brew install aspell
      spell-checking
 
      ;; Use original flycheck fringe bitmaps
