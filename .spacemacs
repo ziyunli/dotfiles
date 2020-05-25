@@ -412,19 +412,18 @@ you should place your code here."
   ;; Org Agenda and Todo
   (setq org-agenda-window-setup (quote current-window))
   ;; To add all org files in a repository to the agenda
-  (setq org-agenda-files (directory-files-recursively "~/orgs/" "\.org$"))
+  (setq org-agenda-files (directory-files-recursively "~/orgs/" "org$"))
   ;; Set task-related keywords
   (setq org-todo-keywords
         '((sequence "TODO(t)" "RUNNING(r)" "WAITING(w)" "IDEA(i)" "|" "DONE(d)" "CANCELLED(c)" "DEFERRED(f)")
           (sequence "MEETING(m)" "|" "MEETING_DONE(M)")))
-  ;; Ignore scheduled tasks in task list view (SPC m t)
-  (setq org-agenda-todo-ignore-scheduled t)
-  (setq org-agenda-todo-ignore-deadlines t)
-  ;; Skip finished items
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-skip-scheduled-if-done t)
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; < s TAB expands to a ‘src’ code block.
+  (require 'org-tempo)
+  ;; Indent code in org-babel src blocks
+  (setq org-src-tab-acts-natively t)
   )
 
 
@@ -456,7 +455,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("/Users/ziyunli/orgs/journal/2020-05-04.org" "/Users/ziyunli/orgs/journal/2020-05-08.org" "/Users/ziyunli/orgs/journal/2020-05-10.org" "/Users/ziyunli/orgs/l6-gap-analysis.org")))
+    ("/Users/ziyunli/orgs/journal/2020-05-04.org" "/Users/ziyunli/orgs/journal/2020-05-10.org" "/Users/ziyunli/orgs/l6-gap-analysis.org")))
  '(package-selected-packages
    (quote
     (org-journal tide typescript-mode tern web-beautify rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv ranger rake rainbow-mode rainbow-identifiers ox-twbs ox-reveal ox-gfm minitest magit-gh-pulls livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc github-search github-clone github-browse-file git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht flyspell-correct-helm flyspell-correct emoji-cheat-sheet-plus diff-hl company-quickhelp company-emoji command-log-mode color-identifiers-mode coffee-mode chruby bundler inf-ruby auto-dictionary yapfify yaml-mode web-mode toml-mode tagedit slim-mode scss-mode sass-mode racer pyvenv pytest pyenv-mode py-isort pug-mode pip-requirements live-py-mode hy-mode dash-functional helm-pydoc helm-css-scss helm-company helm-c-yasnippet haml-mode fuzzy flycheck-rust flycheck-pos-tip pos-tip flycheck emmet-mode cython-mode company-web web-completion-data company-statistics company-anaconda company cargo rust-mode auto-yasnippet yasnippet anaconda-mode pythonic ac-ispell auto-complete mmm-mode markdown-toc markdown-mode gh-md smeargle reveal-in-osx-finder pbcopy osx-trash osx-dictionary orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download magit-gitflow magit-popup launchctl htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit git-commit with-editor transient ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
