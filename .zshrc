@@ -139,6 +139,9 @@ export PATH=~/.cabal/bin:$PATH
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
+# Flutter
+export PATH=$PATH:$HOME/flutter/bin
+
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh

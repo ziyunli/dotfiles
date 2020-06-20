@@ -61,9 +61,6 @@ values."
      ;; For Spacemacs configuration files and packages
      emacs-lisp
 
-     ;; Include emojis into everything
-     emoji
-
      ;; SPC g s opens Magit git client full screen (q restores previous layout)
      ;; refine hunk 'all highlights characters changed on each line
      (git :variables
