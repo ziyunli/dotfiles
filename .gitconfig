@@ -1,0 +1,5 @@
+[user]
+	email = me@ziyunli.dev
+	name = Ziyun Li
+[push]
+	default = current
