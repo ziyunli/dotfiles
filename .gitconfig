@@ -89,3 +89,5 @@
 	user = ziyun_li
 [pull]
 	ff = only
+[branch]
+	autosetupmerge = true
