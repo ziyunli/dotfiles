@@ -104,7 +104,7 @@ Install:andUse('PopupTranslateSelection', {
 })
 
 -- http://www.hammerspoon.org/Spoons/UnsplashZ.html
-Install:andUse('UnsplashZ')
+-- Install:andUse('UnsplashZ')
 
 -- https://www.hammerspoon.org/Spoons/FadeLogo.html
 Install:andUse('FadeLogo', {start = true})
