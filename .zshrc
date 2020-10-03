@@ -190,3 +190,6 @@ export PATH=$HOME/bin:$PATH
 
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# https://support.1password.com/command-line-getting-started/
+eval $(op signin my)
