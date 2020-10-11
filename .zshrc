@@ -195,3 +195,6 @@ autoload -Uz compinit
 compinit
 # Completion for kitty
 kitty + complete setup zsh | source /dev/stdin
+
+# https://support.1password.com/command-line-getting-started/
+eval $(op signin my)
