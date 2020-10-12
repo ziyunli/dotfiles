@@ -3,8 +3,7 @@ set GOPATH ~/go
 set CARGO_PATH ~/.cargo/bin
 set RBENV_ROOT  ~/.rbenv/shims/
 set FLUTTER_PATH ~/flutter/bin
-set PATH $PATH \
-    ~/bin \
+set PATH ~/bin \
     $FLUTTER_PATH \
     $CARGO_PATH \
     $GOPATH \
@@ -12,11 +11,9 @@ set PATH $PATH \
     $PYENV_ROOT \
     /usr/local/opt/curl/bin \
     /usr/local/bin \
-    /usr/bin \
-    /bin \
-    /usr/local/sbin \
-    /usr/sbin \
-    /sbin
+    $PATH
+
+alias brewski="brew update && brew upgrade && brew cleanup; brew doctor"
 
 # https://github.com/junegunn/fzf#fish-shell
 set -g FZF_CTRL_T_COMMAND "command find -L \$dir -type f 2> /dev/null | sed '1d; s#^\./##'"
