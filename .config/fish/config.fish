@@ -18,6 +18,9 @@ set PATH $PATH \
     /usr/sbin \
     /sbin
 
+# https://github.com/junegunn/fzf#fish-shell
+set -g FZF_CTRL_T_COMMAND "command find -L \$dir -type f 2> /dev/null | sed '1d; s#^\./##'"
+
 # Completion for Kitty
 kitty + complete setup fish | source
 
