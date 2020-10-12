@@ -11,6 +11,7 @@ set PATH ~/bin \
     $PYENV_ROOT \
     /usr/local/opt/curl/bin \
     /usr/local/bin \
+    /usr/local/sbin \
     $PATH
 
 alias brewski="brew update && brew upgrade && brew cleanup; brew doctor"
