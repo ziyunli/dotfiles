@@ -62,7 +62,7 @@ plugins=(
   heroku      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/heroku
   httpie      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/httpie
   tig	        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  taskwarrior 
+  taskwarrior
   # Python
   pip     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/pip
   python  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/python
@@ -197,4 +197,4 @@ compinit
 kitty + complete setup zsh | source /dev/stdin
 
 # https://support.1password.com/command-line-getting-started/
-eval $(op signin my)
+# eval $(op signin my)
