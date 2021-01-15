@@ -79,7 +79,6 @@ plugins=(
     # Rust
     rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
     cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
-
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -142,6 +141,8 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+
+export PATH=$PATH:$HOME/go/bin:/usr/local/go/bin
 
 export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
 export LIBGL_ALWAYS_INDIRECT=1
