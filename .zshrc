@@ -142,7 +142,9 @@ export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-export PATH=$PATH:$HOME/go/bin:/usr/local/go/bin
+export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH
+
+export PATH=$HOME/.local/bin:$PATH
 
 export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
 export LIBGL_ALWAYS_INDIRECT=1
