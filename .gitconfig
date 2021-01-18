@@ -3,3 +3,26 @@
 	name = Ziyun Li
 [push]
 	default = current
+[core]
+	whitespace = trailing-space,space-before-tab
+	excludesfile = $HOME/.gitignore_global
+	pager = delta
+[diff]
+	mnemonicprefix = true
+[push]
+	default = current
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[url "git@bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+[pull]
+	ff = only
+[delta]
+	plus-color = "#012800"
+	minus-color = "#340001"
+	syntax-theme = Monokai Extended
+	line-numbers = true
+[interactive]
+	diffFilter = delta --color-only
