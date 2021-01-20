@@ -129,9 +129,6 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 export PATH=$HOME/.rbenv/shims:$PATH
 eval "$(/usr/local/bin/rbenv init -)"
 
-# Haskell
-export PATH=~/.cabal/bin:$PATH
-
 # Golang
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
@@ -148,7 +145,20 @@ eval $(thefuck --alias)
 
 export GIT_CEILING_DIRECTORIES=~
 
-alias fd=fdfind
+case `uname` in
+  Darwin)
+    # commands for OS X go here
+  ;;
+  Linux)
+    # commands for Linux go here
+    alias fd=fdfind
+  ;;
+  FreeBSD)
+    # commands for FreeBSD go here
+  ;;
+esac
+
+
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
 # - The first argument to the function ($1) is the base path to start traversal
