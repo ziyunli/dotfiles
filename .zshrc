@@ -122,12 +122,9 @@ export NVM_DIR="$HOME/.nvm"
 # Python
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(/usr/local/bin/pyenv init -)"
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
 # rbenv
 export PATH=$HOME/.rbenv/shims:$PATH
-eval "$(/usr/local/bin/rbenv init -)"
 
 # Golang
 export GOPATH=$HOME/go
@@ -141,17 +138,28 @@ if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh
 fi
 
-eval $(thefuck --alias)
-
 export GIT_CEILING_DIRECTORIES=~
 
 case `uname` in
   Darwin)
     # commands for OS X go here
+    eval "$(/usr/local/bin/pyenv init -)"
+    if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+
+    eval "$(/usr/local/bin/rbenv init -)"
+
+    eval $(thefuck --alias)
+
+    # https://github.com/zsh-users/zsh-syntax-highlighting
+    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
   ;;
   Linux)
     # commands for Linux go here
     alias fd=fdfind
+
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+
   ;;
   FreeBSD)
     # commands for FreeBSD go here
@@ -195,10 +203,7 @@ alias top="sudo htop" # alias top and fix high sierra bug
 eval "$(fasd --init auto)"
 
 # ~/bin overrides everything else
-export PATH=$HOME/bin:$PATH
-
-# https://github.com/zsh-users/zsh-syntax-highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
 autoload -Uz compinit
 compinit
