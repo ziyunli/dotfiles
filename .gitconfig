@@ -1,12 +1,10 @@
 [user]
-	name = Stephen Li
+	name = Ziyun Li
 	email = me@ziyunli.dev
-	signingkey = BF70CBBC
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
 	whitespace = trailing-space,space-before-tab
-[commit]
-	gpgsign = false
+	pager = delta
 [push]
 	default = current
 [alias]
@@ -57,37 +55,31 @@
 	delete-merged-branches = "!git co master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 [credential]
 	helper = osxkeychain
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[pager]
-	diff = diff-so-fancy | less --tabs=1,5 -RFX
-	show = diff-so-fancy | less --tabs=1,5 -RFX
+[diff]
+	mnemonicprefix = true
 [url "git@github.com:"]
 	insteadOf = https://github.com/
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
 [url "git@gitlab.com:"]
 	insteadOf = https://gitlab.com/
-[http]
-	postBuffer = 524288000
-[mergetool]
-	keepBackup = false
-[diff]
-	mnemonicprefix = true
 [merge]
 	stat = true
 [github]
-	user = ziyun_li
+	user = ziyunli
 [pull]
 	ff = only
 [branch]
 	autosetupmerge = true
+[delta]
+	plus-color = "#012800"
+	minus-color = "#340001"
+	syntax-theme = Monokai Extended
+	line-numbers = true
+[interactive]
+	diffFilter = delta --color-only

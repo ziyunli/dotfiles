@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
 
@@ -7,16 +8,54 @@ export ZSH=~/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs virtualenv)
+=======
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# Path to your oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time oh-my-zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME=agkozak
+
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+>>>>>>> origin/master
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
+<<<<<<< HEAD
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
 
+=======
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to automatically update without prompting.
+# DISABLE_UPDATE_PROMPT="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
+
+>>>>>>> origin/master
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
 
@@ -36,12 +75,20 @@ POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs virtualenv)
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
+<<<<<<< HEAD
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+=======
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+>>>>>>> origin/master
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
+<<<<<<< HEAD
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
@@ -88,10 +135,41 @@ export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
 fpath+=~/.zfunc
 
 source $ZSH/oh-my-zsh.sh
+=======
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(
+    git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
+    colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
+    # tools
+    fasd        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
+    tmux        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
+    tig        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
+    taskwarrior
+    # Rust
+    rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
+    cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+>>>>>>> origin/master
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
+<<<<<<< HEAD
+=======
+# User configuration
+export TERM="xterm-256color"
+
+>>>>>>> origin/master
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
@@ -102,14 +180,19 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
+<<<<<<< HEAD
 # ssh
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 
+=======
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+>>>>>>> origin/master
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
+<<<<<<< HEAD
 export EDITOR='nvim'
 alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
@@ -157,6 +240,17 @@ export GIT_CEILING_DIRECTORIES=~
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
+=======
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+export EDITOR='nvim'
+alias vim='nvim'
+alias zshconfig="vim ~/.zshrc"
+
+export GIT_CEILING_DIRECTORIES=~
+
+alias fd=fdfind
+>>>>>>> origin/master
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
 # - The first argument to the function ($1) is the base path to start traversal
@@ -164,10 +258,15 @@ export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
 _fzf_compgen_path() {
   fd --hidden --follow --exclude ".git" . "$1"
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 # Use fd to generate the list for directory completion
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
+<<<<<<< HEAD
 # Follow symbolic links, and don't want it to exclude hidden files
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 # To apply the command to CTRL-T as well
@@ -198,3 +297,27 @@ kitty + complete setup zsh | source /dev/stdin
 
 # https://support.1password.com/command-line-getting-started/
 # eval $(op signin my)
+=======
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH=~/idea-IU-202.6397.94/bin:~/adr-tools-3.0.0/src:$PATH
+
+# Load NVM
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+source "$HOME/.cargo/env"
+export PATH=$HOME/.cargo/bin:$PATH
+
+export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH
+
+export PATH=$HOME/.local/bin:$PATH
+
+# export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0
+# export LIBGL_ALWAYS_INDIRECT=1
+>>>>>>> origin/master
