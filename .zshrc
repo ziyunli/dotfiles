@@ -69,16 +69,16 @@ ZSH_THEME=agkozak
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
-    colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
-    # tools
-    fasd        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
-    tmux        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
-    tig        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-    taskwarrior
-    # Rust
-    rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
-    cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
+  git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
+  colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
+  # tools
+  fasd # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
+  tmux # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
+  tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
+  taskwarrior
+  # Rust
+  rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
+  cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -117,8 +117,8 @@ export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"                                       # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
 
 # Python
 export PYENV_ROOT="$HOME/.pyenv"
@@ -141,32 +141,40 @@ fi
 
 export GIT_CEILING_DIRECTORIES=~
 
-case `uname` in
-  Darwin)
-    # commands for OS X go here
-    eval "$(/usr/local/bin/pyenv init -)"
-    if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+case $(uname) in
+Darwin)
+  # commands for OS X go here
+  eval "$(/usr/local/bin/pyenv init -)"
+  if which pyenv-virtualenv-init >/dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
-    eval "$(/usr/local/bin/rbenv init -)"
+  eval "$(/usr/local/bin/rbenv init -)"
 
-    eval $(thefuck --alias)
+  eval $(thefuck --alias)
 
-    # https://github.com/zsh-users/zsh-syntax-highlighting
-    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  # https://github.com/zsh-users/zsh-syntax-highlighting
+  source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
   ;;
-  Linux)
-    # commands for Linux go here
-    alias fd=fdfind
+Linux)
+  # commands for Linux go here
+  alias fd=fdfind
 
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+  eval "$(pyenv init -)"
+  eval "$(pyenv virtualenv-init -)"
 
+  # Syntax highlighting
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  # zsh options
+  setopt notify
+  setopt correct
+  setopt auto_cd
+  setopt auto_list
+  # some nice formatting for you
+  export PROMPT='%B%F{yellow}%~>%b%f '
   ;;
-  FreeBSD)
-    # commands for FreeBSD go here
+FreeBSD)
+  # commands for FreeBSD go here
   ;;
 esac
-
 
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
