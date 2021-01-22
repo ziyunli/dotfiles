@@ -112,6 +112,7 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
+export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # NVM
