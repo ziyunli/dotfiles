@@ -128,6 +128,7 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH=$HOME/.rbenv/shims:$PATH
 
 # Golang
+export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
@@ -170,6 +171,9 @@ Linux)
   setopt auto_list
   # some nice formatting for you
   export PROMPT='%B%F{yellow}%~>%b%f '
+
+  # from apt-file search fontconfig.pc
+  export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/fontconfig.pc
   ;;
 FreeBSD)
   # commands for FreeBSD go here
@@ -216,3 +220,5 @@ export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
 autoload -Uz compinit
 compinit
+
+fpath+=${ZDOTDIR:-~}/.zsh_functions

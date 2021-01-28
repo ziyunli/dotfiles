@@ -1,22 +1,29 @@
 ```shell
-sudo apt install tig zsh tmux neovim fd-find fasd build-essential curl
+sudo apt install tig zsh tmux neovim fd-find fasd build-essential curl zsh-syntax-highlighting cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3
 
+# oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 [[ ! -d $ZSH_CUSTOM/themes ]] && mkdir $ZSH_CUSTOM/themes\
 git clone https://github.com/agkozak/agkozak-zsh-prompt $ZSH_CUSTOM/themes/agkozak\
 ln -s $ZSH_CUSTOM/themes/agkozak/agkozak-zsh-prompt.plugin.zsh $ZSH_CUSTOM/themes/agkozak.zsh-theme
 
+# python
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+# open a new session
 git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
 
-
+# fzf
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ./.fzf/install
 
+# nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 
+# rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-cargo install exa ripgrep delta
+cargo install exa ripgrep git-delta alacritty
+sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/alacritty 50
+sudo update-alternatives --config x-terminal-emulator
 
 curl -sSL https://get.haskellstack.org/ | sh
 
