@@ -174,6 +174,9 @@ Linux)
 
   # from apt-file search fontconfig.pc
   export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/fontconfig.pc
+
+  # adr-tool
+  export PATH=$HOME/adr-tools-3.0.0/src:$PATH
   ;;
 FreeBSD)
   # commands for FreeBSD go here
