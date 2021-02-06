@@ -222,3 +222,5 @@ autoload -Uz compinit
 compinit
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
+
+. /usr/local/opt/asdf/asdf.sh
