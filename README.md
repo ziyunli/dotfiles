@@ -33,4 +33,22 @@ sudo apt-get update; \
   sudo apt-get install -y apt-transport-https && \
   sudo apt-get update && \
   sudo apt-get install -y dotnet-sdk-5.0 aspnetcore-runtime-5.0
+
+# asdf
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.0
+
+sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git
+
+asdf plugin add python
+asdf install python 3.9.1
+
+# Install fcitx input method system
+sudo apt install fcitx-bin
+# Install Google Pinyin Chinese input method
+sudo apt install fcitx-googlepinyin
+# Replace icon
+sudo apt remove fcitx-ui-classic
+sudo apt install fcitx-ui-qimpanel
 ```

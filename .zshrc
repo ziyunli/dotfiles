@@ -154,6 +154,9 @@ Darwin)
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+  # asdf from homebrew
+  . /usr/local/opt/asdf/asdf.sh
   ;;
 Linux)
   # commands for Linux go here
@@ -175,6 +178,9 @@ Linux)
 
   # from apt-file search fontconfig.pc
   export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/fontconfig.pc
+
+  # adr-tool
+  export PATH=$HOME/adr-tools-3.0.0/src:$PATH
 
   # Load asdf
   . $HOME/.asdf/asdf.sh
