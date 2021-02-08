@@ -177,6 +177,9 @@ Linux)
 
   # adr-tool
   export PATH=$HOME/adr-tools-3.0.0/src:$PATH
+
+  # asdf vm
+  . $HOME/.asdf/asdf.sh
   ;;
 FreeBSD)
   # commands for FreeBSD go here
