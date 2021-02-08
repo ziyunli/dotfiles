@@ -43,4 +43,12 @@ xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git
 
 asdf plugin add python
 asdf install python 3.9.1
+
+# Install fcitx input method system
+sudo apt install fcitx-bin
+# Install Google Pinyin Chinese input method
+sudo apt install fcitx-googlepinyin
+# Replace icon
+sudo apt remove fcitx-ui-classic
+sudo apt install fcitx-ui-qimpanel
 ```
