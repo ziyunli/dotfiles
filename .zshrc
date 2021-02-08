@@ -154,6 +154,9 @@ Darwin)
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+  # asdf from homebrew
+  . /usr/local/opt/asdf/asdf.sh
   ;;
 Linux)
   # commands for Linux go here
