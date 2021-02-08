@@ -159,8 +159,9 @@ Linux)
   # commands for Linux go here
   alias fd=fdfind
 
-  eval "$(pyenv init -)"
-  eval "$(pyenv virtualenv-init -)"
+  # Replace pyenv by asdf
+  # eval "$(pyenv init -)"
+  # eval "$(pyenv virtualenv-init -)"
 
   # Syntax highlighting
   source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -174,6 +175,9 @@ Linux)
 
   # from apt-file search fontconfig.pc
   export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/fontconfig.pc
+
+  # Load asdf
+  . $HOME/.asdf/asdf.sh
   ;;
 FreeBSD)
   # commands for FreeBSD go here
