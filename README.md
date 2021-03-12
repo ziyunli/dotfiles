@@ -44,6 +44,12 @@ xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git
 asdf plugin add python
 asdf install python 3.9.1
 
+asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+asdf install erlang latest
+
+asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+asdf install elixir latest
+
 # Install fcitx input method system
 sudo apt install fcitx-bin
 # Install Google Pinyin Chinese input method
