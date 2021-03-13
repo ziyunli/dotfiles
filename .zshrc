@@ -124,9 +124,6 @@ export NVM_DIR="$HOME/.nvm"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-# rbenv
-export PATH=$HOME/.rbenv/shims:$PATH
-
 # Golang
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
@@ -147,8 +144,6 @@ Darwin)
   # commands for OS X go here
   eval "$(/usr/local/bin/pyenv init -)"
   if which pyenv-virtualenv-init >/dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
-  eval "$(/usr/local/bin/rbenv init -)"
 
   eval $(thefuck --alias)
 
