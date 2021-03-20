@@ -115,15 +115,6 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"                                       # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-
-# Python
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
 # Golang
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
@@ -142,9 +133,6 @@ export GIT_CEILING_DIRECTORIES=~
 case $(uname) in
 Darwin)
   # commands for OS X go here
-  eval "$(/usr/local/bin/pyenv init -)"
-  if which pyenv-virtualenv-init >/dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
   eval $(thefuck --alias)
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
