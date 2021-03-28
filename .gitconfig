@@ -83,3 +83,5 @@
 	line-numbers = true
 [interactive]
 	diffFilter = delta --color-only
+[init]
+	defaultBranch = main
