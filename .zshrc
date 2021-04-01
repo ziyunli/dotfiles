@@ -135,6 +135,10 @@ Darwin)
   # commands for OS X go here
   eval $(thefuck --alias)
 
+  # Collection of GNU find, xargs, and locate
+  # brew info findutils
+  PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
+
   # https://github.com/zsh-users/zsh-syntax-highlighting
   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
@@ -210,6 +214,53 @@ eval "$(fasd --init auto)"
 
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
+
+# https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
+function delete-branches() {
+  git branch |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --multi --preview="git log {}" |
+    xargs --no-run-if-empty git branch --delete --force
+}
+
+function activate-venv() {
+  local selected_env
+  selected_env=$(ls ~/.venv/ | fzf)
+
+  if [ -n "$selected_env" ]; then
+    source "$HOME/.venv/$selected_env/bin/activate"
+  fi
+}
+
+function pr-checkout() {
+  local jq_template pr_number
+
+  jq_template='"'\
+'#\(.number) - \(.title)'\
+'\t'\
+'Author: \(.user.login)\n'\
+'Created: \(.created_at)\n'\
+'Updated: \(.updated_at)\n\n'\
+'\(.body)'\
+'"'
+
+  pr_number=$(
+    gh api 'repos/:owner/:repo/pulls' |
+    jq ".[] | $jq_template" |
+    sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+    fzf \
+      --with-nth=1 \
+      --delimiter='\t' \
+      --preview='echo -e {2}' \
+      --preview-window=top:wrap |
+    sed 's/^#\([0-9]\+\).*/\1/'
+  )
+
+  if [ -n "$pr_number" ]; then
+    gh pr checkout "$pr_number"
+  fi
+}
 
 autoload -Uz compinit
 compinit
