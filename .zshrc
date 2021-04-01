@@ -215,7 +215,11 @@ eval "$(fasd --init auto)"
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
+# #####################################################################
+# FZF Functions
+#
 # https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
+# #####################################################################
 function delete-branches() {
   git branch |
     grep --invert-match '\*' |
@@ -261,6 +265,8 @@ function pr-checkout() {
     gh pr checkout "$pr_number"
   fi
 }
+# #####################################################################
+# #####################################################################
 
 autoload -Uz compinit
 compinit
