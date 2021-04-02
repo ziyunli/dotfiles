@@ -272,3 +272,4 @@ autoload -Uz compinit
 compinit
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
+export GPG_TTY=$(tty)
