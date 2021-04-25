@@ -273,3 +273,4 @@ compinit
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
+function gi() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
