@@ -4,3 +4,4 @@ nodejs lts
 yarn 1.22.10
 elixir 1.11.3-otp-23
 erlang 23.2.7
+gleam 0.15.0
