@@ -123,6 +123,7 @@ export PATH=$GOPATH/bin:$PATH
 # Flutter
 export PATH=$PATH:$HOME/flutter/bin
 
+
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh
@@ -141,6 +142,9 @@ Darwin)
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+  # Scala
+  export PATH="$PATH:$HOME/Library/Application Support/Coursier/bin"
 
   # asdf from homebrew
   . /usr/local/opt/asdf/asdf.sh
