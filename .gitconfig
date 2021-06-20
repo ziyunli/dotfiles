@@ -1,5 +1,6 @@
 [user]
 	name = Ziyun Li
+	email = hi@ziyunli.dev
 	# email = me@ziyunli.dev
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
