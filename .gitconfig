@@ -1,6 +1,6 @@
 [user]
 	name = Ziyun Li
-	# email = me@ziyunli.dev
+	email = me@ziyunli.dev
 [core]
 	excludesfile = /Users/ziyunli/.gitignore_global
 	whitespace = trailing-space,space-before-tab
