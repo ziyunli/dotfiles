@@ -76,6 +76,7 @@ plugins=(
   tmux # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   taskwarrior
+  poetry
   # Rust
   rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
   cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
