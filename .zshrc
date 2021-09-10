@@ -76,10 +76,15 @@ plugins=(
   tmux # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   taskwarrior
+  asdf
+  # Python
   poetry
   # Rust
   rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
   cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
+  # ruby
+  ruby
+  rails
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -117,7 +122,6 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # Golang
-export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
