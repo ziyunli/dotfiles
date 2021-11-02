@@ -70,12 +70,10 @@ ZSH_THEME=agkozak
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
-  colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
   # tools
   fasd # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tmux # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  taskwarrior
   asdf
   # Python
   poetry
@@ -118,8 +116,6 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
-export PATH="/usr/local/sbin:$PATH"
-export PATH="/usr/local/opt/curl/bin:$PATH"
 
 # Golang
 export GOPATH=$HOME/go
@@ -139,28 +135,40 @@ export GIT_CEILING_DIRECTORIES=~
 case $(uname) in
 Darwin)
   # commands for OS X go here
-  eval $(thefuck --alias)
+  if [ "$(arch)" = "arm64" ]; then
+    export HOMEBREW_PATH=/opt/homebrew
+  else
+    export HOMEBREW_PATH=/usr/local
+  fi
+
+  eval $($HOMEBREW_PATH/bin/brew shellenv);
 
   # Collection of GNU find, xargs, and locate
   # brew info findutils
-  PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PATH/opt/findutils/libexec/gnubin:$PATH"
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
-  source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-  # Scala
-  export PATH="$PATH:$HOME/Library/Application Support/Coursier/bin"
+  source "$HOMEBREW_PATH/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
   # asdf from homebrew
-  . /usr/local/opt/asdf/asdf.sh
+  . "$HOMEBREW_PATH/opt/asdf/asdf.sh"
+
+  # Setup fzf
+  # ---------
+  export PATH="$PATH:$HOMEBREW_PATH/opt/fzf/bin"
+
+  # Auto-completion
+  # ---------------
+  [[ $- == *i* ]] && source "$HOMEBREW_PATH/opt/fzf/shell/completion.zsh" 2> /dev/null
+
+  # Key bindings
+  # ------------
+  source "$HOMEBREW_PATH/opt/fzf/shell/key-bindings.zsh"
+
   ;;
 Linux)
   # commands for Linux go here
   alias fd=fdfind
-
-  # Replace pyenv by asdf
-  # eval "$(pyenv init -)"
-  # eval "$(pyenv virtualenv-init -)"
 
   # Syntax highlighting
   source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -180,6 +188,9 @@ Linux)
 
   # Load asdf
   . $HOME/.asdf/asdf.sh
+
+  # FZF
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
   ;;
 FreeBSD)
   # commands for FreeBSD go here
@@ -198,8 +209,6 @@ _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
 
-# FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # https://remysharp.com/2018/08/23/cli-improved
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
@@ -208,12 +217,6 @@ export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 # To apply the command to CTRL-T as well
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/ziyunli/google-cloud-sdk/path.zsh.inc' ]; then source '/Users/ziyunli/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/ziyunli/google-cloud-sdk/completion.zsh.inc' ]; then source '/Users/ziyunli/google-cloud-sdk/completion.zsh.inc'; fi
 
 # https://remysharp.com/2018/08/23/cli-improved
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
