@@ -1,3 +1,11 @@
+# MacOS
+
+```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+# Linux (Debian-based)
+
 ```shell
 sudo apt install tig zsh tmux neovim fd-find fasd build-essential curl zsh-syntax-highlighting cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3
 

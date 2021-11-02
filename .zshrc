@@ -116,14 +116,12 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
-
 # Golang
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
-# Flutter
-export PATH=$PATH:$HOME/flutter/bin
-
+# Cargo
+. "$HOME/.cargo/env"
 
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
@@ -141,6 +139,7 @@ Darwin)
     export HOMEBREW_PATH=/usr/local
   fi
 
+  export PATH="$HOMEBREW_PATH/bin:$PATH"
   eval $($HOMEBREW_PATH/bin/brew shellenv);
 
   # Collection of GNU find, xargs, and locate
