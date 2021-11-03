@@ -13,6 +13,7 @@ brew "git"
 brew "git-delta"
 brew "go"
 brew "htop"
+brew "mycli"
 brew "mysql", restart_service: true
 brew "ncdu"
 brew "neovim"
