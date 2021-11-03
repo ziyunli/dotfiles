@@ -72,17 +72,12 @@ plugins=(
   git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   # tools
   fasd # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
-  tmux # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tmux
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  asdf
+  asdf # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   # Python
   poetry
   # Rust
-  rust  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/rust
   cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
-  # ruby
-  ruby
-  rails
 )
 
 source $ZSH/oh-my-zsh.sh
