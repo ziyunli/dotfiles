@@ -76,8 +76,6 @@ plugins=(
   asdf # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   # Python
   poetry
-  # Rust
-  cargo # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/cargo
 )
 
 source $ZSH/oh-my-zsh.sh
