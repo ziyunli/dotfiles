@@ -120,8 +120,7 @@ fi
 
 export GIT_CEILING_DIRECTORIES=~
 
-
-# FZF
+# FZF https://github.com/junegunn/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
@@ -134,9 +133,6 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
-
-# https://remysharp.com/2018/08/23/cli-improved
-alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
 # Follow symbolic links, and don't want it to exclude hidden files
@@ -145,10 +141,10 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # https://remysharp.com/2018/08/23/cli-improved
+alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias ping='prettyping --nolegend'
 alias top="sudo htop" # alias top and fix high sierra bug
-eval "$(fasd --init auto)"
 
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
@@ -208,6 +204,8 @@ function pr-checkout() {
 
 autoload -Uz compinit
 compinit
+
+eval "$(fasd --init auto)"
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
