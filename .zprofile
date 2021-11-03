@@ -2,32 +2,21 @@ case $(uname) in
 Darwin)
   # commands for OS X go here
   if [ "$(arch)" = "arm64" ]; then
-    export HOMEBREW_PATH="/opt/homebrew"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
   else
-    export HOMEBREW_PATH="/usr/local"
+    eval "$(/usr/local/bin/brew shellenv)"
   fi
-
-  eval "$($HOMEBREW_PATH/bin/brew shellenv)"
 
   # Collection of GNU find, xargs, and locate
   # brew info findutils
-  PATH="$HOMEBREW_PATH/opt/findutils/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
 
   # https://github.com/zsh-users/zsh-syntax-highlighting
-  source "$HOMEBREW_PATH/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
   # asdf from homebrew
-  . "$HOMEBREW_PATH/opt/asdf/asdf.sh"
+  . "$HOMEBREW_PREFIX/opt/asdf/asdf.sh"
 
-  # Setup fzf
-  # ---------
-  export PATH="$PATH:$HOMEBREW_PATH/opt/fzf/bin"
-  # Auto-completion
-  # ---------------
-  [[ $- == *i* ]] && source "$HOMEBREW_PATH/opt/fzf/shell/completion.zsh" 2> /dev/null
-  # Key bindings
-  # ------------
-  source "$HOMEBREW_PATH/opt/fzf/shell/key-bindings.zsh"
   ;;
 Linux)
   # commands for Linux go here
@@ -52,8 +41,6 @@ Linux)
   # Load asdf
   . $HOME/.asdf/asdf.sh
 
-  # FZF
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
   ;;
 FreeBSD)
   # commands for FreeBSD go here

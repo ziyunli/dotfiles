@@ -127,6 +127,9 @@ fi
 
 export GIT_CEILING_DIRECTORIES=~
 
+
+# FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
 # - The first argument to the function ($1) is the base path to start traversal
