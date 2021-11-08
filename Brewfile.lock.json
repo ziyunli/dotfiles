@@ -5,7 +5,7 @@
         "revision": "e11704f58688da7e9d0192d08ff2b31c252a2f6b"
       },
       "homebrew/cask": {
-        "revision": "72ddeaa10bed658d5457db1277fee3d2a7b26cc3"
+        "revision": "d7e348c6a871e4572050578a6c3a7c7ef90dfb54"
       },
       "homebrew/core": {
         "revision": "3ea87f0db0c0c7344f1b206e030ffb83f80fa875"
@@ -1004,6 +1004,12 @@
         "version": "2.13",
         "options": {
           "full_name": "fork"
+        }
+      },
+      "iina": {
+        "version": "1.2.0,129",
+        "options": {
+          "full_name": "iina"
         }
       }
     }
