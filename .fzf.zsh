@@ -15,17 +15,17 @@ Linux)
   # commands for Linux go here
   # Setup fzf
   # ---------
-  if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
-    export PATH="$PATH:/usr/local/opt/fzf/bin"
+  if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
+    export PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
   fi
 
   # Auto-completion
   # ---------------
-  [[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.zsh" 2> /dev/null
+  [[ $- == *i* ]] && source "$HOME/.fzf/shell/completion.zsh" 2> /dev/null
 
   # Key bindings
   # ------------
-  source "/usr/local/opt/fzf/shell/key-bindings.zsh"
+  source "$HOME/.fzf/shell/key-bindings.zsh"
   ;;
 FreeBSD)
   # commands for FreeBSD go here
