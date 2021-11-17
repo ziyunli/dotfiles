@@ -7,18 +7,24 @@ asdf install
 
 # Python Poetry
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+mkdir $ZSH_CUSTOM/plugins/poetry
+poetry completions zsh > $ZSH_CUSTOM/plugins/poetry/_poetry
 ```
 
 # Linux (Debian-based)
 
 ```shell
-sudo apt install tig zsh tmux neovim fd-find fasd build-essential curl zsh-syntax-highlighting cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3
+sudo apt install tig zsh tmux neovim fd-find fasd build-essential curl cmake pkg-config libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3
 
 # oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 [[ ! -d $ZSH_CUSTOM/themes ]] && mkdir $ZSH_CUSTOM/themes\
 git clone https://github.com/agkozak/agkozak-zsh-prompt $ZSH_CUSTOM/themes/agkozak\
 ln -s $ZSH_CUSTOM/themes/agkozak/agkozak-zsh-prompt.plugin.zsh $ZSH_CUSTOM/themes/agkozak.zsh-theme
+
+# zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
 
 # python
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
@@ -38,8 +44,10 @@ cargo install exa ripgrep git-delta alacritty
 sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator ~/.cargo/bin/alacritty 50
 sudo update-alternatives --config x-terminal-emulator
 
+# Haskell Stack
 curl -sSL https://get.haskellstack.org/ | sh
 
+# dotnet + F#
 wget https://packages.microsoft.com/config/ubuntu/20.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get update; \
@@ -50,12 +58,18 @@ sudo apt-get update; \
 # asdf
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.0
 
+# Prerequisite for Python
 sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git
 
 asdf plugin add python
 asdf install python 3.9.1
+
+# Python Poetry
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+mkdir $ZSH_CUSTOM/plugins/poetry
+poetry completions zsh > $ZSH_CUSTOM/plugins/poetry/_poetry
 
 asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
 asdf install erlang latest
