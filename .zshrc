@@ -70,7 +70,6 @@ ZSH_THEME=agkozak
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
-  zsh-syntax-highlighting
   # tools
   fasd # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
