@@ -2,8 +2,10 @@ case $(uname) in
 Darwin)
   # commands for OS X go here
   if [ "$(arch)" = "arm64" ]; then
+    export PATH="/opt/homebrew/bin:$PATH"
     eval "$(/opt/homebrew/bin/brew shellenv)"
   else
+    export PATH="/usr/local/bin:$PATH"
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 
