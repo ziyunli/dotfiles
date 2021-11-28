@@ -113,9 +113,7 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# NVM helpers
 # Calling nvm use automatically in a directory with a .nvmrc file; place this after nvm initialization!
 autoload -U add-zsh-hook
 load-nvmrc() {
