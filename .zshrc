@@ -73,7 +73,6 @@ plugins=(
   # tools
   fasd # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  asdf # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/asdf
   poetry
 )
 
