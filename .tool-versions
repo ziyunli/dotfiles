@@ -1,8 +1,4 @@
-python 3.10.0
-ruby 3.0.3
+python 3.10.2
+ruby 3.1.1
 nodejs lts
-yarn 1.22.10
-elixir 1.11.3-otp-23
-erlang 23.2.7
-gleam 0.15.0
-golang 1.17.1
+golang 1.17.7
