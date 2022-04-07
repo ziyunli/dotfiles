@@ -147,11 +147,19 @@ alias top="sudo htop" # alias top and fix high sierra bug
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
-# #####################################################################
-# FZF Functions
-#
-# https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
-# #####################################################################
+######################################################################################
+# FZF functions
+######################################################################################
+
+function branches () {
+  git branch --sort=-committerdate |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --preview="git log {} | bat --style=plain --color=always --line-range :500" |
+    xargs git checkout
+}
+
+# from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
 function delete-branches() {
   git branch |
     grep --invert-match '\*' |
