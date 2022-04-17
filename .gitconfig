@@ -7,8 +7,9 @@
 	pager = delta
 [push]
 	default = current
+[fetch]
+	prune = true
 [alias]
-	co = checkout
 	praise = blame
 	# Get the current branch name (not so useful in itself, but used in
 	# other aliases)
@@ -62,6 +63,7 @@
 	required = true
 [diff]
 	mnemonicprefix = true
+	colorMoved = default
 # Used HTTPS because of Scala/jGit bug
 # [url "git@github.com:"]
 	# insteadOf = https://github.com/
@@ -82,6 +84,8 @@
 	minus-color = "#340001"
 	syntax-theme = Monokai Extended
 	line-numbers = true
+	navigate = true  # use n and N to move between diff sections
+	side-by-side = true
 [interactive]
 	diffFilter = delta --color-only
 [init]
