@@ -144,6 +144,9 @@ alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias ping='prettyping --nolegend'
 alias top="sudo htop" # alias top and fix high sierra bug
 
+alias exa="exa --header --color-scale --time-style=long-iso --group-directories-first"
+alias ls=exa
+
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
