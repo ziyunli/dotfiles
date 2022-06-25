@@ -225,3 +225,6 @@ export GPG_TTY=$(tty)
 function gi() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
 
 export PATH="$HOME/.poetry/bin:$PATH"
+
+# opam configuration
+[[ ! -r /Users/ziyunli/.opam/opam-init/init.zsh ]] || source /Users/ziyunli/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
