@@ -2,3 +2,5 @@ python 3.10.5
 ruby 3.1.1
 nodejs lts
 golang 1.19
+elixir 1.13.4-otp-25
+erlang 25.0.4
