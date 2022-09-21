@@ -243,3 +243,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+fpath+=~/conda-zsh-completion
+compinit conda
