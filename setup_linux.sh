@@ -3,7 +3,8 @@ libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git \
 tig zsh tmux neovim fd-find fasd curl cmake pkg-config \
 libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3 \
-automake autoconf unzip wxWebView
+automake autoconf unzip wxWebView \
+postgresql postgresql-contrib postgresql-client
 
 # oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
