@@ -127,3 +127,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 source "$HOME/.cargo/env"
 . "$HOME/.cargo/env"
+sshd_status=$(service ssh status)
+if [[ $sshd_status = *"is not running"* ]]; then
+  sudo service ssh --full-restart
+fi
