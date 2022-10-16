@@ -73,7 +73,7 @@ plugins=(
   # tools
   fasd      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  poetry
+  poetry    # https://python-poetry.org/docs/#zsh
   asdf      # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/asdf
   # ruby
   bundler   # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bundler
