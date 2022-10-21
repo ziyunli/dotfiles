@@ -30,7 +30,7 @@ Linux)
   alias fd=fdfind
 
   # Syntax highlighting
-  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
   # zsh options
   setopt notify
   setopt correct

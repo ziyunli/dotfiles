@@ -73,7 +73,7 @@ plugins=(
   # tools
   fasd      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  poetry
+  poetry    # https://python-poetry.org/docs/#zsh
   asdf      # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/asdf
   # ruby
   bundler   # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bundler
@@ -231,3 +231,21 @@ export PATH="$HOME/.poetry/bin:$PATH"
 
 # opam configuration
 [[ ! -r /Users/ziyunli/.opam/opam-init/init.zsh ]] || source /Users/ziyunli/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/stephen/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/stephen/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/stephen/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/stephen/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+fpath+=~/conda-zsh-completion
+compinit conda
