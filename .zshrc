@@ -115,6 +115,9 @@ alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
+# Zig
+export PATH=$HOME/zig:$PATH
+
 # Exercism
 if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
   . ~/.config/exercism/exercism_completion.zsh
