@@ -63,7 +63,7 @@
 	required = true
 [diff]
 	mnemonicprefix = true
-	colorMoved = default
+	colorMoved = zebra
 # Used HTTPS because of Scala/jGit bug
 # [url "git@github.com:"]
 	# insteadOf = https://github.com/
@@ -77,6 +77,7 @@
 	user = ziyunli
 [pull]
 	ff = only
+	rebase = true
 [branch]
 	autosetupmerge = true
 [delta]
