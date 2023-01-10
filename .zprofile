@@ -22,7 +22,7 @@ Darwin)
   [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && . "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
   # asdf from homebrew
-  . "$HOMEBREW_PREFIX/opt/asdf/asdf.sh"
+  . "/opt/homebrew/opt/asdf/libexec/asdf.sh"
 
   ;;
 Linux)
