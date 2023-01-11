@@ -154,6 +154,9 @@ alias top="sudo htop" # alias top and fix high sierra bug
 alias exa="exa --header --color-scale --time-style=long-iso --group-directories-first"
 alias ls=exa
 
+# Python Poetry
+export PATH="$HOME/.poetry/bin:$PATH"
+
 # ~/bin overrides everything else
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 
@@ -216,7 +219,6 @@ function pr-checkout() {
   fi
 }
 # #####################################################################
-# #####################################################################
 
 autoload -Uz compinit
 compinit
@@ -225,27 +227,5 @@ eval "$(fasd --init auto)"
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
+
 function gi() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
-
-export PATH="$HOME/.poetry/bin:$PATH"
-
-# opam configuration
-[[ ! -r /Users/ziyunli/.opam/opam-init/init.zsh ]] || source /Users/ziyunli/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/stephen/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/stephen/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/stephen/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/stephen/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-fpath+=~/conda-zsh-completion
-compinit conda
