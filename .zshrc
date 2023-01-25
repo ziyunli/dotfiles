@@ -223,7 +223,7 @@ function pr-checkout() {
 autoload -Uz compinit
 compinit
 
-eval "$(fasd --init auto)"
+eval "$(zoxide init zsh)"
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
