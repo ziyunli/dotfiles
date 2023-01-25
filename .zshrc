@@ -228,4 +228,4 @@ eval "$(zoxide init zsh)"
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
 
-function gi() { curl -sLw n https://www.toptal.com/developers/gitignore/api/$@ ;}
+function gi() { curl -sL https://www.toptal.com/developers/gitignore/api/$@;}
