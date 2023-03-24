@@ -3,7 +3,7 @@ libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev libssl-dev git \
 tig zsh tmux neovim fd-find fasd curl cmake pkg-config \
 libfreetype6-dev libfontconfig1-dev libxcb-xfixes0-dev python3 \
-automake autoconf unzip wxWebView \
+automake autoconf unzip \
 postgresql postgresql-contrib postgresql-client
 
 # oh-my-zsh
@@ -30,7 +30,7 @@ nvm install --lts
 
 # rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-cargo install exa ripgrep git-delta
+cargo install exa ripgrep git-delta zoxide
 
 # asdf
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
