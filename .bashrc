@@ -43,7 +43,7 @@ esac
 # uncomment for a colored prompt, if the terminal has the capability; turned
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
-#force_color_prompt=yes
+force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -85,25 +85,16 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+export EDITOR='nvim'
+alias vim='nvim'
+alias zshconfig="vim ~/.zshrc"
+alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -118,16 +109,48 @@ fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# https://remysharp.com/2018/08/23/cli-improved
+alias preview="fzf --preview 'bat --color \"always\" {}'"
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+alias ping='prettyping --nolegend'
+alias top="sudo htop" # alias top and fix high sierra bug
 
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-source "$HOME/.cargo/env"
-. "$HOME/.cargo/env"
-sshd_status=$(service ssh status)
-if [[ $sshd_status = *"is not running"* ]]; then
-  sudo service ssh --full-restart
-fi
+alias exa="exa --header --color-scale --time-style=long-iso --group-directories-first"
+alias ls=exa
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+######################################################################################
+# FZF functions
+######################################################################################
+
+function branches () {
+  git branch --sort=-committerdate |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --preview="git log {} | bat --style=plain --color=always --line-range :500" |
+    xargs git checkout
+}
+
+# from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
+function delete-branches() {
+  git branch |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --multi --preview="git log {}" |
+    xargs --no-run-if-empty git branch --delete --force
+}
+
+function activate-venv() {
+  local selected_env
+  selected_env=$(ls ~/.venv/ | fzf)
+
+  if [ -n "$selected_env" ]; then
+    source "$HOME/.venv/$selected_env/bin/activate"
+  fi
+}
+
+######################################################################################
+
+eval "$(zoxide init bash)"
