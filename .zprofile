@@ -39,6 +39,3 @@ FreeBSD)
   # commands for FreeBSD go here
   ;;
 esac
-
-# Cargo
-. "$HOME/.cargo/env"
