@@ -71,12 +71,8 @@ ZSH_THEME=agkozak
 plugins=(
   git       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   # tools
-  fasd      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   poetry    # https://python-poetry.org/docs/#zsh
-  # ruby
-  bundler   # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bundler
-  rails     # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/rails
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -200,5 +196,3 @@ fpath+=${ZDOTDIR:-~}/.zsh_functions
 export GPG_TTY=$(tty)
 
 function gi() { curl -sL https://www.toptal.com/developers/gitignore/api/$@;}
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
