@@ -69,12 +69,11 @@ ZSH_THEME=agkozak
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
+  git       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   # tools
   fasd      # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fasd
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   poetry    # https://python-poetry.org/docs/#zsh
-  asdf      # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/asdf
   # ruby
   bundler   # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/bundler
   rails     # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/rails
