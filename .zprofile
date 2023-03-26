@@ -9,13 +9,6 @@ Darwin)
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 
-  # Collection of GNU find, xargs, and locate
-  # brew info findutils
-  PATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
-
-  # https://github.com/zsh-users/zsh-syntax-highlighting
-  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
   ;;
 Linux)
