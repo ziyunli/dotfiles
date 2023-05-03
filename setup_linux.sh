@@ -37,3 +37,4 @@ sudo systemctl status ssh
 # Mamba
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
 conda config --set auto_activate_base false
+curl micro.mamba.pm/install.sh | bash
