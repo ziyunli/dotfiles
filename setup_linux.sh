@@ -29,3 +29,7 @@ cargo install exa ripgrep git-delta zoxide
 curl -sSL https://install.python-poetry.org | python3 -
 [[ ! -d ~/.zfunc ]] && mkdir ~/.zfunc
 poetry completions zsh > ~/.zfunc/_poetry
+
+# SSH Server https://linuxhint.com/enable-ssh-server-pop-os/
+sudo apt install openssh-server
+sudo systemctl status ssh
