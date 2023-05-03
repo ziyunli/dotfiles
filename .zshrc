@@ -105,17 +105,16 @@ export EDITOR='nvim'
 alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 
+# Rust
+export PATH=$HOME/.cargo/bin:$PATH
+
 # Golang
+export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
 
 # Zig
 export PATH=$HOME/zig:$PATH
-
-# Exercism
-if [ -f ~/.config/exercism/exercism_completion.zsh ]; then
-  . ~/.config/exercism/exercism_completion.zsh
-fi
 
 export GIT_CEILING_DIRECTORIES=~
 
