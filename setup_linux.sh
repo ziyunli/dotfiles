@@ -33,3 +33,7 @@ poetry completions zsh > ~/.zfunc/_poetry
 # SSH Server https://linuxhint.com/enable-ssh-server-pop-os/
 sudo apt install openssh-server
 sudo systemctl status ssh
+
+# Mamba
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+conda config --set auto_activate_base false
