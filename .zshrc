@@ -186,16 +186,20 @@ function gi() { curl -sL https://www.toptal.com/developers/gitignore/api/$@;}
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/ziyunli/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/ziyunli/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/ziyunli/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/home/ziyunli/miniforge3/etc/profile.d/conda.sh"
+    if [ -f "/home/ziyunli/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/home/ziyunli/mambaforge/etc/profile.d/conda.sh"
     else
-        export PATH="/home/ziyunli/miniforge3/bin:$PATH"
+        export PATH="/home/ziyunli/mambaforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/home/ziyunli/mambaforge/etc/profile.d/mamba.sh" ]; then
+    . "/home/ziyunli/mambaforge/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 
