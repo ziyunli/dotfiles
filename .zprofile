@@ -7,7 +7,7 @@ Darwin)
   source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
   # For Zig
-  export PATH="${HOME}/bin:$PATH"
+  export PATH="${HOME}/zig:$PATH"
   ;;
 Linux)
   # commands for Linux go here
