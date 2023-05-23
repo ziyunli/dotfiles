@@ -31,7 +31,6 @@ brew "postgresql@14"
 brew "progress"
 brew "pspg"
 brew "python@3.10"
-brew "redis", restart_service: true
 brew "tmux"
 brew "trash"
 brew "upx"
