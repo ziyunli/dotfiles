@@ -1,20 +1,13 @@
 case $(uname) in
 Darwin)
   # commands for OS X go here
-  if [ "$(arch)" = "arm64" ]; then
-    export PATH="/opt/homebrew/bin:$PATH"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  else
-    export PATH="/usr/local/bin:$PATH"
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
-
-  alias brewski='brew update && brew upgrade && brew cleanup; brew doctor'
-
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
   # Added by OrbStack: command-line tools and integration
   source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+
+  # For Zig
+  export PATH="~/bin:$PATH"
   ;;
 Linux)
   # commands for Linux go here
