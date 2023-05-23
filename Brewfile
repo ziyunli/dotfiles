@@ -32,6 +32,7 @@ brew "progress"
 brew "pspg"
 brew "python@3.10"
 brew "redis", restart_service: true
+brew "shadowenv"
 brew "tmux"
 brew "trash"
 brew "upx"
