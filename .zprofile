@@ -8,6 +8,9 @@ Darwin)
 
   # For Zig
   export PATH="${HOME}/zig:$PATH"
+
+  # For Rust
+  export PATH="${HOME}/.cargo/bin:$PATH"
   ;;
 Linux)
   # commands for Linux go here
