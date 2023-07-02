@@ -6,6 +6,9 @@ Darwin)
   # Added by OrbStack: command-line tools and integration
   source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
+  # For Go
+  export PATH="${HOME}/go/bin:$PATH"
+
   # For Zig
   export PATH="${HOME}/zig:$PATH"
 
