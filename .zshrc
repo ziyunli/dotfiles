@@ -73,6 +73,7 @@ plugins=(
   # tools
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
   poetry    # https://python-poetry.org/docs/#zsh
+  asdf
 )
 
 source $ZSH/oh-my-zsh.sh
