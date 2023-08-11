@@ -14,6 +14,11 @@ Darwin)
 
   # For Rust
   export PATH="${HOME}/.cargo/bin:$PATH"
+
+  # For Elixir
+  export PATH="${HOME}/.mix/escripts:$PATH"
+
+  export PATH="${HOME}/.local/bin:$PATH"
   ;;
 Linux)
   # commands for Linux go here
