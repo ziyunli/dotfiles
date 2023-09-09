@@ -117,6 +117,10 @@ export PATH=$GOPATH/bin:$PATH
 # Zig
 export PATH=$HOME/zig:$PATH
 
+# Mojo https://developer.modular.com/download
+export MODULAR_HOME="/home/ziyunli/.modular"
+export PATH="/home/ziyunli/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
+
 export GIT_CEILING_DIRECTORIES=~
 
 # FZF https://github.com/junegunn/fzf
