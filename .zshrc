@@ -189,6 +189,10 @@ export GPG_TTY=$(tty)
 
 function gi() { curl -sL https://www.toptal.com/developers/gitignore/api/$@;}
 
+# miniconda
+# ~/miniconda3/bin/conda init bash
+# ~/miniconda3/bin/conda init zsh
+
 # >>> mamba initialize >>>
 # !! Contents within this block are managed by 'mamba init' !!
 export MAMBA_EXE="/home/ziyunli/.local/bin/micromamba";
