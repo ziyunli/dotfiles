@@ -37,3 +37,8 @@ FreeBSD)
   # commands for FreeBSD go here
   ;;
 esac
+
+
+# Added by Toolbox App
+export PATH="$PATH:/home/ziyunli/.local/share/JetBrains/Toolbox/scripts"
+
