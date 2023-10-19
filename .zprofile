@@ -6,17 +6,21 @@ Darwin)
   # Added by OrbStack: command-line tools and integration
   source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
-  # For Go
+  # Go
   export PATH="${HOME}/go/bin:$PATH"
 
-  # For Zig
+  # Zig
   export PATH="${HOME}/zig:$PATH"
 
-  # For Rust
+  # Rust
   export PATH="${HOME}/.cargo/bin:$PATH"
 
-  # For Elixir
+  # Elixir
   export PATH="${HOME}/.mix/escripts:$PATH"
+
+  # Mojo
+  export MODULAR_HOME="/Users/ziyunli/.modular"
+  export PATH="/Users/ziyunli/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
 
   export PATH="${HOME}/.local/bin:$PATH"
   ;;
