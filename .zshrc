@@ -209,3 +209,4 @@ else
 fi
 unset __mamba_setup
 # <<< mamba initialize <<<
+export MOJO_PYTHON_LIBRARY=/home/ziyunli/.asdf/installs/python/3.12.0/lib/libpython3.so
