@@ -121,6 +121,10 @@ export PATH=$HOME/zig:$PATH
 export MODULAR_HOME="/home/ziyunli/.modular"
 export PATH="/home/ziyunli/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
 
+# Rbenv
+export PATH="/home/ziyunli/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
 export GIT_CEILING_DIRECTORIES=~
 
 # FZF https://github.com/junegunn/fzf
