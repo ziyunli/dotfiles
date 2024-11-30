@@ -72,7 +72,9 @@ plugins=(
   git       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   # tools
   tig       # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  poetry    # https://python-poetry.org/docs/#zsh
+  # Python
+  poetry    # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/poetry
+  uv        # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/uv
   asdf
 )
 
