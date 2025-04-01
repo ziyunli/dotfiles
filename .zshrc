@@ -125,7 +125,7 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source <(fzf --zsh)
 # https://remysharp.com/2018/08/23/cli-improved
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 # add support for ctrl+o to open selected file in VS Code
@@ -154,28 +154,11 @@ alias top="sudo htop" # alias top and fix high sierra bug
 alias eza="eza --header --color-scale --time-style=long-iso --group-directories-first"
 alias ls=eza
 
-export PATH="/usr/local/opt/ncurses/bin:$PATH"
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # for gnu-sed
-export PATH=$PATH:$HOME/go/bin:/usr/local/opt/go/libexec/bin
-export PATH=$PATH:$GOPATH/bin
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/.docker/bin:$PATH
-
-# export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES  # local Snowflake connect hack
-
-export PATH=$HOME/zig:$PATH
-
-# ~/bin overrides everything else
-export PATH=$HOME/bin:$PATH
-
 # https://github.com/zsh-users/zsh-syntax-highlighting
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # https://github.com/not-an-aardvark/git-delete-squashed
 alias git_delete_squashed='git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse $branch\^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
-
-# 1password CLI
-# eval $(op signin instacart)
 
 ######################################################################################
 # FZF functions
@@ -189,15 +172,7 @@ function branches () {
     xargs git checkout
 }
 
-# from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
-function activate-venv() {
-  local selected_env
-  selected_env=$(ls ~/.venv/ | fzf)
 
-  if [ -n "$selected_env" ]; then
-    source "$HOME/.venv/$selected_env/bin/activate"  # commented out by conda initialize
-  fi
-}
 
 function delete-branches() {
   git branch |
@@ -233,5 +208,19 @@ function pr-checkout() {
 
   if [ -n "$pr_number" ]; then
     gh pr checkout "$pr_number"
+  fi
+}
+
+######################################################################################
+# Python
+######################################################################################
+
+# from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
+function activate-venv() {
+  local selected_env
+  selected_env=$(ls ~/.venv/ | fzf)
+
+  if [ -n "$selected_env" ]; then
+    source "$HOME/.venv/$selected_env/bin/activate"  # commented out by conda initialize
   fi
 }
