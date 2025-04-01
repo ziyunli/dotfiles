@@ -1,28 +1,14 @@
 case $(uname) in
 Darwin)
-  # commands for OS X go here
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-  # Added by OrbStack: command-line tools and integration
-  source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-
   # Go
   export PATH="${HOME}/go/bin:$PATH"
-
-  # Zig
-  export PATH="${HOME}/zig:$PATH"
 
   # Rust
   export PATH="${HOME}/.cargo/bin:$PATH"
 
-  # Elixir
-  export PATH="${HOME}/.mix/escripts:$PATH"
-
-  # Mojo
-  export MODULAR_HOME="/Users/ziyunli/.modular"
-  export PATH="/Users/ziyunli/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
-
   export PATH="${HOME}/.local/bin:$PATH"
+
+  eval "$(/opt/homebrew/bin/brew shellenv)"
   ;;
 Linux)
   # commands for Linux go here
