@@ -234,5 +234,5 @@ alias claudex='docker run -it --rm \
   -v $(pwd):/workspace \
   -v ~/.claude:/home/user/.claude \
   -v ~/.claude.json:/home/user/.claude.json \
-  -v ~/.config/gh:/home/user/.config/gh
-  ziyun-dev'
+  -v ~/.config/gh:/home/user/.config/gh \
+  claude-dev'
