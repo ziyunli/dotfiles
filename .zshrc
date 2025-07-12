@@ -228,3 +228,11 @@ function activate-venv() {
     source "$HOME/.venv/$selected_env/bin/activate"  # commented out by conda initialize
   fi
 }
+
+# Docker alias for Claude
+alias claudex='docker run -it --rm \
+  -v $(pwd):/workspace \
+  -v ~/.claude:/home/user/.claude \
+  -v ~/.claude.json:/home/user/.claude.json \
+  -v ~/.config/gh:/home/user/.config/gh
+  ziyun-dev'
