@@ -64,8 +64,3 @@ Whenever you build out a new project and specifically start a new Claude.md - yo
 - Run the test to confirm success
 - Refactor code to improve design while keeping tests green
 - Repeat the cycle for each new feature or bugfix
-
-# Specific Technologies
-
-- @~/.claude/docs/python.md
-- @~/.claude/docs/using-uv.md
