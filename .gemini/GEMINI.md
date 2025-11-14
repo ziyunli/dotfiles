@@ -1,1 +1,1 @@
-/Users/ziyunli/.codex/AGENTS.md
+/Users/ziyunli/agents/AGENTS.md
