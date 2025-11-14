@@ -19,5 +19,4 @@ ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
 ln -s ~/agents/commands ~/.codex/prompts
 
 ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
-ln -s ~/agents/commands ~/.gemini/commands
 ```
