@@ -13,6 +13,11 @@ For example
 
 ```sh
 ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
+ln -s ~/agents/commands ~/.claude/commands
+
 ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
+ln -s ~/agents/commands ~/.codex/prompts
+
 ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
+ln -s ~/agents/commands ~/.gemini/commands
 ```
