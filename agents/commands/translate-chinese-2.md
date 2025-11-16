@@ -19,12 +19,12 @@ Instructions:
   3. File creation:
     - Create new file in the same folder as source
     - Keep all frontmatter fields
-    - Add Translations to the tags array
+    - Add `Translations` to the `tags` array
     - Filename format: Chinese title with proper kebab-case or underscores
+    - After the content, insert a horizontal rule --- followed by a footnote *Edited by MODEL (model-id)*, replacing with the actual model name and ID.
 
 Output:
-- Show me the cleaned Markdown (if changes were made)
-- Provide the complete Chinese translation
+- Show me the diff of the cleaned Markdown (if changes were made)
 - Create the new file with proper frontmatter
 
 $ARGUMENTS

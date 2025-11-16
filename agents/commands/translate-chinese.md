@@ -1,10 +1,23 @@
 ---
 description: Translate the source file to Chinese
-argument-hint: ["source_file"]
+argument-hint: ["filepath"]
 ---
 
-First clean up the Markdown formatting for the referenced file below, such as incorrect footnote syntax, unnecessary line breaks, etc. but make sure to keep the original content.
-
-Then translate all its content into Chinese word for word, without omitting anything, and make sure it reads smoothly for Chinese readers. Keep personal names in the original language, and provide both Chinese and English for technical terms or proper nouns (as long as readability is not affected). Do not break the translation into parts just because the content is long. I want you to complete the entire translation in one go. Don’t worry about the output being too long, and make absolutely sure not to miss a single sentence. Create a new file in the same folder to keep the translation. The title in Chinese should be the filename. Keep the frontmatter, but add `Translations` to `tags`.
-
-The referenced file: $ARGUMENTS
+  1. Locate the file referenced as $ARGUMENTS.
+  2. Preprocess:
+      - Retain the entire frontmatter; append Translations to its tags list (create the list if missing).
+      - Normalize Markdown: fix footnotes, remove stray line breaks, ensure proper list/heading spacing, keep original meaning intact.
+  3. Translation:
+      - Translate the full body content to Chinese in one continuous pass; do not omit or rearrange text.
+      - Preserve personal names in their original language.
+      - For each technical term or proper noun, present both Chinese and English (e.g., 超文本传输协议 (HTTP)), unless that harms readability.
+      - Keep frontmatter untouched except for the tags addition.
+      - Set the document title (first visible heading) to the file name rendered in Chinese.
+  4. Output:
+      - Create the translated document in the same directory as $ARGUMENTS. Use a new filename that clearly indicates it is the Chinese version (e.g.,
+        append .zh.md).
+      - Ensure Markdown structure mirrors the cleaned source.
+      - After the content, insert a horizontal rule --- followed by a footnote *Edited by MODEL (model-id)*, replacing with the actual model name and ID.
+  5. Verification:
+      - Confirm no sentences were skipped.
+      - Ensure the translation reads naturally in Chinese while honoring all above constraints.
