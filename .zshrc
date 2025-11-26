@@ -65,7 +65,6 @@ ZSH_THEME="agkozak"
 plugins=(
   # system
   macos # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/macos
-  brew  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
   colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
   git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
   gitfast     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitfast
@@ -73,8 +72,6 @@ plugins=(
   # Import from fasd: zoxide import --from=z ~/.fasd
   zoxide        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/zoxide
   tig	        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
-  # Golang
-  golang  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/golang
 )
 
 # customized zfuncs
