@@ -12,7 +12,7 @@ Each of them use different folders to store system prompts, so we just soft-link
 For example
 
 ```sh
-ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
+ln -s ~/agents/CLAUDE.md ~/.claude/CLAUDE.md
 ln -s ~/agents/commands ~/.claude/commands
 
 ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
