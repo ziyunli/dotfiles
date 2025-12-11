@@ -27,6 +27,7 @@
 	insteadOf = https://gitlab.com/
 [merge]
 	stat = true
+	conflictstyle = diff3
 [github]
 	user = ziyunli
 [pull]
@@ -38,8 +39,9 @@
 	plus-color = "#012800"
 	minus-color = "#340001"
 	syntax-theme = Monokai Extended
-	line-numbers = true
 	navigate = true  # use n and N to move between diff sections
+	light = false
+	line-numbers = true
 	side-by-side = true
 [interactive]
 	diffFilter = delta --color-only
