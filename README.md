@@ -1,5 +1,20 @@
-# Dotfiles
+# Bento
 
-The main dotfiles repository that is supposed to shared with my several machines.
-Note that ZSH configuration is not included in this repository because I have a machine using nix-home. 
-Homebrew configurations used to be included but now only exist in MacOS branches.
+## Instructions
+
+Comment out `.shellrc.d/080_fzf.zsh`
+
+Install latest fzf
+
+```sh
+sudo apt remove fzf -y
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+```
+
+Install other dependencies
+```
+cargo install bat zoxide fd-find eza --locked
+
+npm install -g @openai/codex @google/gemini-cli @anthropic-ai/claude-code
+```
