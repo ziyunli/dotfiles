@@ -1,5 +1,5 @@
 ---
-description: Create a detailed, test-driven development plan for building a project from a specification.
+description: Create a prompt-based development plan for building a project from a specification.
 argument-hint: ["spec_file"]
 ---
 
@@ -9,6 +9,6 @@ From here you should have the foundation to provide a series of prompts for a co
 
 Make sure and separate each prompt section. Use markdown. Each prompt should be tagged as text using code tags. The goal is to output prompts, but context, etc is important as well.
 
-Store the plan in plan.md. Also create a todo.md to keep state.
-
 The spec is in the file called: $ARGUMENTS
+
+Save the outcome as `prompt_plan.md`
