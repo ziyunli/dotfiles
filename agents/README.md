@@ -6,6 +6,7 @@ Currently I am using
 * Claude Code
 * OpenAI Codex
 * Google Gemini
+* Ampcode
 
 Each of them use different folders to store system prompts, so we just soft-link from this folder.
 
@@ -15,17 +16,19 @@ For example
 ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
 ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
 ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
+ln -s ~/agents/AGENTS.md ~/.config/amp/AGENTS.md
 
 ln -s ~/agents/commands ~/.claude/commands
 ln -s ~/agents/commands ~/.codex/prompts
+ln -s ~/agents/commands ~/.config/amp/commands
 ```
 
 Gemeni's commands are TOML based, so we can ask LLM to generate them. For example:
 
 ```text
-Convert the commands within @agetns/commonds to TOML format that Google Geminu uses. 
+Convert the commands within @agetns/commonds to TOML format that Google Geminu uses.
 
-Below is an example. 
+Below is an example.
 
 # In: <project>/.gemini/commands/changelog.toml
 # Invoked via: /changelog 1.2.0 added "Support for default argument parsing."
