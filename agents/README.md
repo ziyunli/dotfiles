@@ -12,7 +12,8 @@ Each of them use different folders to store system prompts, so we just soft-link
 For example
 
 ```sh
-ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
+ln -s ~/agents/AGENTS.md ~/.claude/AGENTS.md
+ln -s ~/agents/CLAUDE.md ~/.claude/CLAUDE.md
 ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
 ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
 
@@ -23,9 +24,9 @@ ln -s ~/agents/commands ~/.codex/prompts
 Gemeni's commands are TOML based, so we can ask LLM to generate them. For example:
 
 ```text
-Convert the commands within @agetns/commonds to TOML format that Google Geminu uses. 
+Convert the commands within @agetns/commonds to TOML format that Google Geminu uses.
 
-Below is an example. 
+Below is an example.
 
 # In: <project>/.gemini/commands/changelog.toml
 # Invoked via: /changelog 1.2.0 added "Support for default argument parsing."
