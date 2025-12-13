@@ -1,9 +1,9 @@
-[user]
-	name = Ziyun Li
-	email = me@ziyunli.dev
+[include]
+	path = ~/.gitconfig.local
 [core]
 	whitespace = trailing-space,space-before-tab
 	pager = delta
+	excludesFile = ~/.gitignore_global
 [push]
 	default = current
 [fetch]
@@ -18,18 +18,9 @@
 [diff]
 	mnemonicprefix = true
 	colorMoved = zebra
-# Used HTTPS because of Scala/jGit bug
-# [url "git@github.com:"]
-	# insteadOf = https://github.com/
-[url "git@bitbucket.org:"]
-	insteadOf = https://bitbucket.org/
-[url "git@gitlab.com:"]
-	insteadOf = https://gitlab.com/
 [merge]
 	stat = true
 	conflictstyle = diff3
-[github]
-	user = ziyunli
 [pull]
 	ff = only
 	rebase = true
