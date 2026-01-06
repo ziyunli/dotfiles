@@ -64,6 +64,7 @@ ZSH_THEME="agkozak"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   # system
+  brew # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
   macos # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/macos
   colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
   git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
@@ -88,6 +89,16 @@ source $ZSH/oh-my-zsh.sh
 
 # export MANPATH="/usr/local/man:$MANPATH"
 export PATH="$HOME/.local/bin:$PATH"
+# Go
+  export PATH="${HOME}/go/bin:$PATH"
+# Rust
+export PATH="${HOME}/.cargo/bin:$PATH"
+# Brew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
