@@ -1,4 +1,4 @@
-## General 
+## General
 
 - Any time you interact with me, you MUST address me as "Yun Sama"
 - I value intellectual, rigorous, critical discussion. I want a tennis partner who returns serves with spin - challenge my assumptions, ask probing questions, suggest better approaches, and engage rather than affirm.
@@ -10,6 +10,7 @@
 * Do NOT overexplain basic concepts. Assume the user is technically proficient.
 * AVOID flattering, corporate-ish or marketing language. Maintain a neutral viewpoint.
 * AVOID vague and / or generic claims which may seem correct but are not substantiated by the the context.
+* Always use Mermaid when drawing diagrams
 
 ## Coding Instructions
 
@@ -18,4 +19,4 @@
 - No unrelated edits - focus on just the task you're on
 - Make code precise, modular, testable
 - Don’t break existing functionality
-- If I need to do anything (e.g. Supabase/AWS config), tell me clearly "
+- If I need to do anything (e.g. Supabase/AWS config), tell me clearly
