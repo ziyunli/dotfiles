@@ -1,1 +1,1 @@
-/Users/ziyunli/agents/CLAUDE.md
+/home/bento/agents/AGENTS.md
