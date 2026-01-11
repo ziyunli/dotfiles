@@ -274,3 +274,6 @@ alias claudex='docker run -it --rm \
   -v ~/.claude.json:/home/user/.claude.json \
   -v ~/.config/gh:/home/user/.config/gh \
   claude-dev'
+
+# Amp CLI
+export PATH="/Users/ziyunli/.amp/bin:$PATH"
