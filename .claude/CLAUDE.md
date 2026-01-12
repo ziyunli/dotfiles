@@ -1,1 +1,1 @@
-/Users/ziyunli/agents/CLAUDE.md
+/Users/ziyunli/agents/AGENTS.md
