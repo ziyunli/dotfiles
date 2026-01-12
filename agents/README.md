@@ -14,12 +14,16 @@ Currently I am using
 ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
 ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
 ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
+
+mkdir -p ~/.config/amp
 ln -s ~/agents/AGENTS.md ~/.config/amp/AGENTS.md
 ```
 
-Each of them use different folders to store system prompts, so we just soft-link from this folder.
+# Commands
 
-For example
+CLI commands are even more different for each agent.
+
+Claude Code and Codex use more standard format, so we just soft-link from this folder.
 
 ```shell
 ln -s ~/agents/commands ~/.claude/commands
