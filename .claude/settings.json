@@ -30,5 +30,17 @@
       "Bash(rm:*)"
     ],
     "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/notify-on-stop.sh"
+          }
+        ]
+      }
+    ]
   }
 }
