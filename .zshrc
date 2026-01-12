@@ -63,16 +63,14 @@ ZSH_THEME="agkozak"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  # system
-  brew # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
-  macos # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/macos
+  brew              # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/brew
+  macos             # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/macos
   colored-man-pages # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/colored-man-pages
-  git   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
-  gitfast     # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitfast
-  gitignore   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitignore
-  # Import from fasd: zoxide import --from=z ~/.fasd
-  zoxide        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/zoxide
-  tig	        # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
+  git               # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git
+  gitfast           # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitfast
+  gitignore         # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/gitignore
+  zoxide            # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/zoxide
+  tig	              # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/tig
 )
 
 # customized zfuncs
