@@ -1,22 +1,27 @@
 # Agents
 
-This folder keep system prompts and commands that are shared by different LLM CLIs.
+This folder keep system prompts and commands that are shared by different LLM CLIs. Each agent has its own configuration folder, so we soft-link from this folder.
 
 Currently I am using
-* Claude Code
-* OpenAI Codex
-* Google Gemini
+* Claude Code: `~/.claude`, see https://code.claude.com/docs/en/settings
+* OpenAI Codex: `~/.codex`, see https://developers.openai.com/codex/guides/agents-md
+* Google Gemini: `~/.gemini`, see https://geminicli.com/docs/cli/gemini-md/
+* AMP: `~/.config/amp`, see https://ampcode.com/manual#AGENTS.md
+
+`AGENTS.md` stores global user preference:
+
+```shell
+ln -s ~/agents/AGENTS.md ~/.claude/CLAUDE.md
+ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
+ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
+ln -s ~/agents/AGENTS.md ~/.config/amp/AGENTS.md
+```
 
 Each of them use different folders to store system prompts, so we just soft-link from this folder.
 
 For example
 
-```sh
-ln -s ~/agents/CLAUDE.md ~/.claude/CLAUDE.md
+```shell
 ln -s ~/agents/commands ~/.claude/commands
-
-ln -s ~/agents/AGENTS.md ~/.codex/AGENTS.md
 ln -s ~/agents/commands ~/.codex/prompts
-
-ln -s ~/agents/AGENTS.md ~/.gemini/GEMINI.md
 ```
