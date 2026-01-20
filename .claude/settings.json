@@ -1,5 +1,4 @@
 {
-  "alwaysThinkingEnabled": true,
   "permissions": {
     "allow": [
       "*",
@@ -42,5 +41,9 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true
 }
