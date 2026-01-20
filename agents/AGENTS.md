@@ -20,6 +20,10 @@
 - Make code precise, modular, testable
 - Don’t break existing functionality
 - If I need to do anything (e.g. Supabase/AWS config), tell me clearly
+- NEVER remove code comments unless you can prove that they are actively false. Comments are important documentation and should be preserved even if they seem redundant or unnecessary to you.
+- All code files should start with a brief 2 line comment explaining what the file does.
+- When writing comments, avoid referring to temporal context about refactors or recent changes. Comments should be evergreen and describe the code as it is, not how it evolved or was recently changed.
+
 
 # Testing
 
