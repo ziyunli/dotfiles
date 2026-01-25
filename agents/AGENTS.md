@@ -79,3 +79,11 @@ YOU MUST write comments explaining WHAT and WHY, never temporal context or what 
 - YOU MUST NEVER implement mocks in end to end tests. We always use real data and real APIs.
 - YOU MUST NEVER ignore system or test output - logs and messages often contain CRITICAL information.
 - Test output MUST BE PRISTINE TO PASS. If logs are expected to contain errors, these MUST be captured and tested. If a test is intentionally triggering an error, we _must_ capture and validate that the error output is as we expect
+
+## Learning and Memory Management
+
+- YOU MUST use the journal tool frequently to capture technical insights, failed approaches, and user preferences
+- Before starting complex tasks, search the journal for relevant past experiences and lessons learned
+- Document architectural decisions and their outcomes for future reference
+- Track patterns in user feedback to improve collaboration over time
+- When you notice something that should be fixed but is unrelated to your current task, document it in your journal rather than fixing it immediately
