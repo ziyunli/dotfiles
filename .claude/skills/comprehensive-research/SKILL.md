@@ -67,23 +67,27 @@ digraph process {
 
 ## Step 3: Spawn Parallel Sub-Agents
 
-Create multiple agents to research different aspects concurrently.
+Create multiple agents to research different aspects concurrently using the Task tool.
 
-**Agent selection:**
+**MANDATORY: Always spawn multiple agents with diverse analysis focuses.**
 
-| Agent Type | Use For | CLI Alternative |
-|------------|---------|-----------------|
-| Explore (Claude) | Code exploration, finding files | - |
-| general-purpose (Claude) | Deep analysis, cross-service questions | - |
-| Gemini CLI | Documentation synthesis, long context | `gemini` |
-| Codex CLI | Code-focused search and analysis | `codex` |
+| Agent Type | Model | Strengths | Use For |
+|------------|-------|-----------|---------|
+| Explore | haiku/sonnet | Fast file discovery, pattern search | Locating relevant files |
+| general-purpose | sonnet | Balanced analysis, code tracing | Implementation details, data flow |
+| general-purpose | opus | Deep reasoning, architecture | Cross-service patterns, business logic |
+
+**Why diverse perspectives are REQUIRED:**
+- Different analysis focuses notice different things - you WILL miss insights with only one
+- Code-focused prompts catch implementation details architecture prompts miss
+- Pattern-focused prompts see connections that function-tracing prompts don't
+- Consensus across agents = high confidence; disagreement = needs deeper investigation
 
 **Agent prompt guidance:**
-- Start with locator agents to find what exists
-- Then use analyzer agents on the most promising findings
-- Run multiple agents in parallel when searching for different things
-- Each agent knows its job - just tell it what you're looking for
-- Don't write detailed prompts about HOW to search - agents already know
+- Start with locator agents (Explore) to find what exists
+- Then spawn multiple analyzers with DIFFERENT FOCUSES on the findings
+- Give each agent the SAME file paths and research question
+- Tailor the prompt focus: architecture vs code-tracing vs cross-file patterns
 
 ### Locator vs Analyzer Patterns
 
@@ -93,8 +97,8 @@ See `./agents/` for full system prompts and examples:
 
 | Pattern | Goal | Output | Agent Type |
 |---------|------|--------|------------|
-| Locator | Discover locations | Paths grouped by purpose | Explore + Opus |
-| Analyzer | Document implementation | Data flow, patterns, file:line refs | general-purpose, Codex, Gemini |
+| Locator | Discover locations | Paths grouped by purpose | Explore |
+| Analyzer | Document implementation | Data flow, patterns, file:line refs | general-purpose |
 
 **Analyzer critical rule:** Analyzers document WHAT EXISTS, never suggest improvements. They are technical writers, not consultants.
 
@@ -110,74 +114,178 @@ Phase 2 (targeted analyzers, after locators return):
 ```
 
 **Model selection by task:**
-| Task | Model | Why |
-|------|-------|-----|
-| Locator (find files) | Explore + Opus | Better codebase understanding |
-| Code-focused analysis | Codex CLI | Code-optimized |
-| Single file analysis | Sonnet | Balanced |
-| Complex architecture | Opus | Deep reasoning |
-| Doc + code synthesis | Gemini CLI | Long context |
+| Task | Agent Type | Model | Why |
+|------|------------|-------|-----|
+| Locator (find files) | Explore | sonnet | Fast file discovery |
+| Code-focused analysis | general-purpose | sonnet | Detailed tracing |
+| Single file analysis | general-purpose | sonnet | Balanced |
+| Complex architecture | general-purpose | opus | Deep reasoning |
+| Cross-file synthesis | general-purpose | opus | Pattern recognition |
 
-**For non-Claude agents, use CLI:**
-```bash
-# Gemini CLI (non-interactive with -p flag)
-gemini -p "Research question about documentation..."
+**Tailoring prompts by analysis focus:**
 
-# Codex CLI (non-interactive with exec subcommand)
-codex exec "Find all usages of X pattern in the codebase..."
+| Focus | Strengths | Tailor Prompt Toward | Prompt Style |
+|-------|-----------|---------------------|--------------|
+| **Code-tracing** | Execution flow, algorithm analysis, error paths | Function-by-function tracing, data structure manipulation | Precise: "Trace the exact sequence of function calls when X happens" |
+| **Cross-file patterns** | Connections across files, conventions, flow | Reading multiple files together, spotting patterns | Breadth-focused: "Read all these files and identify how they connect" |
+| **Architecture** | Design patterns, service boundaries, business logic | Why decisions were made, cross-service integration | Architecture-focused: "Explain how this component fits into the larger system" |
+
+**Prompt templates by focus:**
+
+**Code-tracing prompt template:**
+```
+Research question: [question]
+
+Files to analyze (read these):
+- [absolute path 1]
+- [absolute path 2]
+
+Focus on code-level analysis:
+1. Trace the execution path when [specific scenario]
+2. What functions are called and in what order?
+3. How is data transformed at each step?
+4. What error conditions are handled?
+
+Document what exists - no suggestions or improvements.
 ```
 
-**When to use Codex CLI analyzer:**
-- Want a second opinion on complex code analysis
-- Need verification of logic correctness
-- Reviewing algorithmic code
-
-**When to use Gemini CLI analyzer:**
-- Analyzing >30 changed/related files together
-- Total analysis scope >5000 lines
-- Need to analyze entire subsystem with full context
-
-### Parallel Multi-Model Analysis
-
-**CRITICAL:** When you want diverse perspectives, run ALL models in the SAME message. You can mix Task tools (Claude) and Bash tools (Codex/Gemini) in one response.
-
-**Pattern: Single message with multiple tool calls**
+**Cross-file patterns prompt template:**
 ```
-In ONE message, call all three:
-1. Task(subagent_type="general-purpose", prompt="Analyze X...")  # Claude
-2. Bash(command='codex exec "Analyze X..."')                     # Codex
-3. Bash(command='gemini -p "Analyze X..."')                      # Gemini
+Research question: [question]
+
+Read ALL these files together in full:
+- [absolute path 1]
+- [absolute path 2]
+- [absolute path 3]
+
+Analyze:
+1. What patterns appear across multiple files?
+2. How do these components connect to each other?
+3. What is the complete flow from start to finish?
+
+Document what exists - no suggestions or improvements.
 ```
 
-**When to use parallel multi-model:**
-- Complex architectural analysis needing diverse perspectives
-- Verification of critical logic (consensus across models)
-- Large codebase analysis (Gemini for breadth, Claude/Codex for depth)
+**Architecture prompt template:**
+```
+Research question: [question]
+
+Files to analyze:
+- [absolute path 1]
+- [absolute path 2]
+
+Focus on architecture and integration:
+1. How does this fit into the larger system?
+2. What design patterns are in use?
+3. How does this integrate with other services?
+4. What are the key architectural decisions?
+
+Document what exists - no suggestions or improvements.
+```
+
+**Context sharing (CRITICAL):**
+- ALL agents must receive the SAME core context: file paths, research question, relevant code locations
+- Include full paths explicitly so agents can find files
+- If locators found specific files, pass those paths to ALL analyzers
+
+### Parallel Multi-Focus Analysis (MANDATORY)
+
+**IRON RULE:** Every analyzer phase MUST spawn multiple agents with different focuses in ONE message.
+
+This is not optional. This is not "when you want diverse perspectives." This is ALWAYS.
+
+**Pattern: Single message with multiple Task calls**
+```
+In ONE message, call multiple agents with different focuses:
+1. Task(subagent_type="general-purpose", model="opus", prompt="...architecture focus...")
+2. Task(subagent_type="general-purpose", model="sonnet", prompt="...code-tracing focus...")
+3. Task(subagent_type="general-purpose", model="sonnet", prompt="...cross-file patterns focus...")
+```
+
+**Red flags - you're rationalizing if you think:**
+| Excuse | Reality |
+|--------|---------|
+| "This is too simple for multiple agents" | Simple tasks still benefit from diverse perspectives |
+| "One agent is enough for this" | Comprehensive research means comprehensive perspectives |
+| "I'll use multiple agents next time" | Use them NOW. Every time. |
+| "Different focuses won't add value" | Different prompts catch different things |
 
 **Example: Analyzing error handling across services**
+
+Note how ALL agents get the SAME context (file paths, research question) but prompts are TAILORED to different analysis focuses:
+
 ```
 # All in ONE message - runs in parallel:
 
+# Architecture focus (opus for deep reasoning)
 Task(subagent_type="general-purpose", model="opus", prompt="""
-Analyze error handling in order-changes service.
-Focus on: handler/rpc/.../handler.go lines 90-131
-Document error classification and flow.
+Research question: How does error handling work in order-changes service?
+
+Files to analyze:
+- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
+- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
+
+Focus on: How errors flow between handler and processor layers, architectural patterns, integration with other services.
+Document what exists - no suggestions.
 """)
 
-Bash(command='codex exec "Analyze error handling in handler/rpc/.../handler.go:90-131. Focus on error classification patterns. Document what exists."')
+# Code-tracing focus (sonnet for detailed tracing)
+Task(subagent_type="general-purpose", model="sonnet", prompt="""
+Research question: How does error handling work in order-changes service?
 
-Bash(command='gemini -p "Analyze error handling across the order-changes service. Read handler/rpc/.../handler.go and pkg/processor/processor.go together. Document the error flow from handler to processor."', run_in_background=true)
+Files to analyze:
+- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
+- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
+
+Focus on: Trace the exact code path when an error occurs. What functions are called? What error types exist? How are they classified?
+Document what exists - no suggestions.
+""")
+
+# Cross-file patterns focus (sonnet for pattern recognition)
+Task(subagent_type="general-purpose", model="sonnet", prompt="""
+Research question: How does error handling work in order-changes service?
+
+Files to analyze:
+- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
+- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
+
+Read both files together. Focus on: How do error handling patterns connect across these files? What is the complete error flow from request to response?
+Document what exists - no suggestions.
+""")
 ```
 
 **Synthesis after parallel completion:**
-- Wait for all results (use TaskOutput for background tasks)
-- Compare findings - note agreements and unique insights
-- Synthesize into unified analysis with attribution:
-  - "Claude identified X..."
-  - "Codex confirmed Y and added Z..."
-  - "Gemini's long-context view revealed W..."
+- Wait for ALL results (use TaskOutput for background tasks)
+- Compare findings across all agents
+- Note agreements (high confidence) and disagreements (needs investigation)
+- Synthesize into unified analysis WITH ATTRIBUTION:
 
-**Red Flag:** If you're calling models one-at-a-time waiting for results, you're doing it wrong. Use ONE message with multiple tool calls.
+```markdown
+## Synthesis
+
+### Consensus (all agents agree)
+- [Finding that all analysis perspectives identified]
+
+### Architectural perspective
+- [Unique insight about cross-service patterns]
+
+### Code-level analysis
+- [Unique insight about code logic/algorithms from tracing]
+
+### Cross-file patterns
+- [Unique insight about connections across files]
+
+### Disagreements / Areas needing deeper investigation
+- [Where agents disagreed - investigate further]
+```
+
+**Red Flags:**
+| If you... | You're doing it wrong |
+|-----------|----------------------|
+| Call agents one-at-a-time | Use ONE message with multiple Task calls |
+| Only spawn one agent | MUST spawn multiple with different focuses |
+| Skip attribution in synthesis | Each perspective's contribution must be visible |
+| Don't note disagreements | Disagreements reveal complexity - highlight them |
 
 ## Step 4: Wait and Synthesize
 
