@@ -1,6 +1,6 @@
 ---
 name: locator
-description: Use when finding file locations in Go/Ruby monorepos
+description: Use when finding file locations in monorepos
 tools: Read, Glob, Grep
 ---
 
@@ -92,7 +92,7 @@ service/
 
 ## Ruby Monorepo Patterns (Domain-Driven)
 
-### Instacart Ruby Structure
+### Structure
 ```
 customers-backend/
 ├── domains/              # Domain-driven modules (most code lives here)

@@ -67,27 +67,21 @@ digraph process {
 
 ## Step 3: Spawn Parallel Sub-Agents
 
-Create multiple agents to research different aspects concurrently using the Task tool.
+Create multiple agents to research different aspects concurrently.
 
-**MANDATORY: Always spawn multiple agents with diverse analysis focuses.**
+**Agent selection:**
 
-| Agent Type | Model | Strengths | Use For |
-|------------|-------|-----------|---------|
-| Explore | haiku/sonnet | Fast file discovery, pattern search | Locating relevant files |
-| general-purpose | sonnet | Balanced analysis, code tracing | Implementation details, data flow |
-| general-purpose | opus | Deep reasoning, architecture | Cross-service patterns, business logic |
-
-**Why diverse perspectives are REQUIRED:**
-- Different analysis focuses notice different things - you WILL miss insights with only one
-- Code-focused prompts catch implementation details architecture prompts miss
-- Pattern-focused prompts see connections that function-tracing prompts don't
-- Consensus across agents = high confidence; disagreement = needs deeper investigation
+| Agent Type               | Use For                                | CLI Alternative |
+| ------------------------ | -------------------------------------- | --------------- |
+| Explore (Claude)         | Code exploration, finding files        | -               |
+| general-purpose (Claude) | Deep analysis, cross-service questions | -               |
 
 **Agent prompt guidance:**
-- Start with locator agents (Explore) to find what exists
-- Then spawn multiple analyzers with DIFFERENT FOCUSES on the findings
-- Give each agent the SAME file paths and research question
-- Tailor the prompt focus: architecture vs code-tracing vs cross-file patterns
+- Start with locator agents to find what exists
+- Then use analyzer agents on the most promising findings
+- Run multiple agents in parallel when searching for different things
+- Each agent knows its job - just tell it what you're looking for
+- Don't write detailed prompts about HOW to search - agents already know
 
 ### Locator vs Analyzer Patterns
 
@@ -95,9 +89,9 @@ See `./agents/` for full system prompts and examples:
 - **`./agents/locator.md`** - Find where things are (paths, entry points)
 - **`./agents/analyzer.md`** - Document how code works (NO suggestions/improvements)
 
-| Pattern | Goal | Output | Agent Type |
-|---------|------|--------|------------|
-| Locator | Discover locations | Paths grouped by purpose | Explore |
+| Pattern  | Goal                    | Output                              | Agent Type      |
+| -------- | ----------------------- | ----------------------------------- | --------------- |
+| Locator  | Discover locations      | Paths grouped by purpose            | Explore + Opus  |
 | Analyzer | Document implementation | Data flow, patterns, file:line refs | general-purpose |
 
 **Analyzer critical rule:** Analyzers document WHAT EXISTS, never suggest improvements. They are technical writers, not consultants.
@@ -114,178 +108,11 @@ Phase 2 (targeted analyzers, after locators return):
 ```
 
 **Model selection by task:**
-| Task | Agent Type | Model | Why |
-|------|------------|-------|-----|
-| Locator (find files) | Explore | sonnet | Fast file discovery |
-| Code-focused analysis | general-purpose | sonnet | Detailed tracing |
-| Single file analysis | general-purpose | sonnet | Balanced |
-| Complex architecture | general-purpose | opus | Deep reasoning |
-| Cross-file synthesis | general-purpose | opus | Pattern recognition |
-
-**Tailoring prompts by analysis focus:**
-
-| Focus | Strengths | Tailor Prompt Toward | Prompt Style |
-|-------|-----------|---------------------|--------------|
-| **Code-tracing** | Execution flow, algorithm analysis, error paths | Function-by-function tracing, data structure manipulation | Precise: "Trace the exact sequence of function calls when X happens" |
-| **Cross-file patterns** | Connections across files, conventions, flow | Reading multiple files together, spotting patterns | Breadth-focused: "Read all these files and identify how they connect" |
-| **Architecture** | Design patterns, service boundaries, business logic | Why decisions were made, cross-service integration | Architecture-focused: "Explain how this component fits into the larger system" |
-
-**Prompt templates by focus:**
-
-**Code-tracing prompt template:**
-```
-Research question: [question]
-
-Files to analyze (read these):
-- [absolute path 1]
-- [absolute path 2]
-
-Focus on code-level analysis:
-1. Trace the execution path when [specific scenario]
-2. What functions are called and in what order?
-3. How is data transformed at each step?
-4. What error conditions are handled?
-
-Document what exists - no suggestions or improvements.
-```
-
-**Cross-file patterns prompt template:**
-```
-Research question: [question]
-
-Read ALL these files together in full:
-- [absolute path 1]
-- [absolute path 2]
-- [absolute path 3]
-
-Analyze:
-1. What patterns appear across multiple files?
-2. How do these components connect to each other?
-3. What is the complete flow from start to finish?
-
-Document what exists - no suggestions or improvements.
-```
-
-**Architecture prompt template:**
-```
-Research question: [question]
-
-Files to analyze:
-- [absolute path 1]
-- [absolute path 2]
-
-Focus on architecture and integration:
-1. How does this fit into the larger system?
-2. What design patterns are in use?
-3. How does this integrate with other services?
-4. What are the key architectural decisions?
-
-Document what exists - no suggestions or improvements.
-```
-
-**Context sharing (CRITICAL):**
-- ALL agents must receive the SAME core context: file paths, research question, relevant code locations
-- Include full paths explicitly so agents can find files
-- If locators found specific files, pass those paths to ALL analyzers
-
-### Parallel Multi-Focus Analysis (MANDATORY)
-
-**IRON RULE:** Every analyzer phase MUST spawn multiple agents with different focuses in ONE message.
-
-This is not optional. This is not "when you want diverse perspectives." This is ALWAYS.
-
-**Pattern: Single message with multiple Task calls**
-```
-In ONE message, call multiple agents with different focuses:
-1. Task(subagent_type="general-purpose", model="opus", prompt="...architecture focus...")
-2. Task(subagent_type="general-purpose", model="sonnet", prompt="...code-tracing focus...")
-3. Task(subagent_type="general-purpose", model="sonnet", prompt="...cross-file patterns focus...")
-```
-
-**Red flags - you're rationalizing if you think:**
-| Excuse | Reality |
-|--------|---------|
-| "This is too simple for multiple agents" | Simple tasks still benefit from diverse perspectives |
-| "One agent is enough for this" | Comprehensive research means comprehensive perspectives |
-| "I'll use multiple agents next time" | Use them NOW. Every time. |
-| "Different focuses won't add value" | Different prompts catch different things |
-
-**Example: Analyzing error handling across services**
-
-Note how ALL agents get the SAME context (file paths, research question) but prompts are TAILORED to different analysis focuses:
-
-```
-# All in ONE message - runs in parallel:
-
-# Architecture focus (opus for deep reasoning)
-Task(subagent_type="general-purpose", model="opus", prompt="""
-Research question: How does error handling work in order-changes service?
-
-Files to analyze:
-- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
-- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
-
-Focus on: How errors flow between handler and processor layers, architectural patterns, integration with other services.
-Document what exists - no suggestions.
-""")
-
-# Code-tracing focus (sonnet for detailed tracing)
-Task(subagent_type="general-purpose", model="sonnet", prompt="""
-Research question: How does error handling work in order-changes service?
-
-Files to analyze:
-- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
-- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
-
-Focus on: Trace the exact code path when an error occurs. What functions are called? What error types exist? How are they classified?
-Document what exists - no suggestions.
-""")
-
-# Cross-file patterns focus (sonnet for pattern recognition)
-Task(subagent_type="general-purpose", model="sonnet", prompt="""
-Research question: How does error handling work in order-changes service?
-
-Files to analyze:
-- ~/carrot/customers/commerce/order-changes/handler/rpc/.../handler.go:90-131
-- ~/carrot/customers/commerce/order-changes/pkg/processor/processor.go
-
-Read both files together. Focus on: How do error handling patterns connect across these files? What is the complete error flow from request to response?
-Document what exists - no suggestions.
-""")
-```
-
-**Synthesis after parallel completion:**
-- Wait for ALL results (use TaskOutput for background tasks)
-- Compare findings across all agents
-- Note agreements (high confidence) and disagreements (needs investigation)
-- Synthesize into unified analysis WITH ATTRIBUTION:
-
-```markdown
-## Synthesis
-
-### Consensus (all agents agree)
-- [Finding that all analysis perspectives identified]
-
-### Architectural perspective
-- [Unique insight about cross-service patterns]
-
-### Code-level analysis
-- [Unique insight about code logic/algorithms from tracing]
-
-### Cross-file patterns
-- [Unique insight about connections across files]
-
-### Disagreements / Areas needing deeper investigation
-- [Where agents disagreed - investigate further]
-```
-
-**Red Flags:**
-| If you... | You're doing it wrong |
-|-----------|----------------------|
-| Call agents one-at-a-time | Use ONE message with multiple Task calls |
-| Only spawn one agent | MUST spawn multiple with different focuses |
-| Skip attribution in synthesis | Each perspective's contribution must be visible |
-| Don't note disagreements | Disagreements reveal complexity - highlight them |
+| Task                 | Model          | Why                           |
+| -------------------- | -------------- | ----------------------------- |
+| Locator (find files) | Explore + Opus | Better codebase understanding |
+| Single file analysis | Opus           | Balanced                      |
+| Complex architecture | Opus           | Deep reasoning                |
 
 ## Step 4: Wait and Synthesize
 
@@ -327,22 +154,14 @@ basename $(git rev-parse --show-toplevel)
 ```markdown
 ---
 date: [Current date and time with timezone in ISO format]
-researcher: [Researcher name]
 git_commit: [Current commit hash]
 branch: [Current branch name]
 repository: [Repository name]
 topic: "[User's Question/Topic]"
 last_updated: [Current date in YYYY-MM-DD format]
-last_updated_by: [Researcher name]
 ---
 
 # Research: [User's Question/Topic]
-
-**Date**: [Current date and time with timezone]
-**Researcher**: [Researcher name]
-**Git Commit**: [Current commit hash]
-**Branch**: [Current branch name]
-**Repository**: [Repository name]
 
 ## Research Question
 
@@ -426,22 +245,22 @@ If the user has follow-up questions:
 
 **ALWAYS follow the numbered steps exactly:**
 
-| Rule | Consequence of Violation |
-|------|--------------------------|
-| Read mentioned files FIRST (step 1) | Missing context, wrong decomposition |
-| Wait for ALL agents (step 4) | Incomplete synthesis |
-| Gather metadata BEFORE writing (step 5→6) | Placeholder values in document |
-| NEVER write with placeholders | Broken references, unusable document |
+| Rule                                      | Consequence of Violation             |
+| ----------------------------------------- | ------------------------------------ |
+| Read mentioned files FIRST (step 1)       | Missing context, wrong decomposition |
+| Wait for ALL agents (step 4)              | Incomplete synthesis                 |
+| Gather metadata BEFORE writing (step 5→6) | Placeholder values in document       |
+| NEVER write with placeholders             | Broken references, unusable document |
 
 ## Red Flags
 
-| Thought | Reality |
-|---------|---------|
-| "I'll spawn agents before reading the files" | NO. Read files first for context. |
-| "I'll synthesize as agents return" | NO. Wait for ALL agents. |
-| "I'll fill in metadata later" | NO. Gather metadata first. |
-| "I'll create a new doc for follow-ups" | NO. Append to existing document. |
-| "I don't need GitHub permalinks" | YES you do. They're permanent references. |
+| Thought                                      | Reality                                   |
+| -------------------------------------------- | ----------------------------------------- |
+| "I'll spawn agents before reading the files" | NO. Read files first for context.         |
+| "I'll synthesize as agents return"           | NO. Wait for ALL agents.                  |
+| "I'll fill in metadata later"                | NO. Gather metadata first.                |
+| "I'll create a new doc for follow-ups"       | NO. Append to existing document.          |
+| "I don't need GitHub permalinks"             | YES you do. They're permanent references. |
 
 ## Directory Structure
 
