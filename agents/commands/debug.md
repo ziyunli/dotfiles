@@ -1,0 +1,1 @@
+/home/bento/claude-config/claude/commands/debug.md
