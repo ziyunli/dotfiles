@@ -89,12 +89,14 @@ Create multiple agents to research different aspects concurrently.
 
 See `./agents/` for full system prompts and examples:
 - **`./agents/locator.md`** - Find where things are (paths, entry points)
-- **`./agents/analyzer.md`** - Deep understanding of specific code
+- **`./agents/analyzer.md`** - Document how code works (NO suggestions/improvements)
 
 | Pattern | Goal | Output | Agent Type |
 |---------|------|--------|------------|
 | Locator | Discover locations | Paths grouped by purpose | Explore + Opus |
-| Analyzer | Deep understanding | Detailed analysis, connections | general-purpose, Codex, Gemini |
+| Analyzer | Document implementation | Data flow, patterns, file:line refs | general-purpose, Codex, Gemini |
+
+**Analyzer critical rule:** Analyzers document WHAT EXISTS, never suggest improvements. They are technical writers, not consultants.
 
 **Two-phase pattern:**
 ```
@@ -118,12 +120,22 @@ Phase 2 (targeted analyzers, after locators return):
 
 **For non-Claude agents, use CLI:**
 ```bash
-# Gemini CLI
-gemini "Research question about documentation..."
+# Gemini CLI (non-interactive with -p flag)
+gemini -p "Research question about documentation..."
 
-# Codex CLI
-codex "Find all usages of X pattern in the codebase..."
+# Codex CLI (non-interactive with exec subcommand)
+codex exec "Find all usages of X pattern in the codebase..."
 ```
+
+**When to use Codex CLI analyzer:**
+- Want a second opinion on complex code analysis
+- Need verification of logic correctness
+- Reviewing algorithmic code
+
+**When to use Gemini CLI analyzer:**
+- Analyzing >30 changed/related files together
+- Total analysis scope >5000 lines
+- Need to analyze entire subsystem with full context
 
 ## Step 4: Wait and Synthesize
 
