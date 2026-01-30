@@ -117,6 +117,20 @@ Structure your analysis like this:
 | Cross-service architecture | Claude Opus   | Deep reasoning         |
 | Code-focused logic tracing | Codex CLI     | Code-optimized         |
 | Large context (>30 files)  | Gemini CLI    | 1M token context       |
+| **Critical analysis**      | **All three** | **Diverse perspectives** |
+
+### Running Analyzers in Parallel
+
+For critical analysis, run Claude + Codex + Gemini in ONE message:
+
+```
+# All in same message - executes in parallel:
+Task(subagent_type="general-purpose", model="opus", prompt="Analyze X...")
+Bash(command='codex exec "Analyze X..."')
+Bash(command='gemini -p "Analyze X..."', run_in_background=true)
+```
+
+See main SKILL.md "Parallel Multi-Model Analysis" section for synthesis pattern.
 
 ## Claude (Task Tool)
 

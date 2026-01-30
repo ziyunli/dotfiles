@@ -137,6 +137,48 @@ codex exec "Find all usages of X pattern in the codebase..."
 - Total analysis scope >5000 lines
 - Need to analyze entire subsystem with full context
 
+### Parallel Multi-Model Analysis
+
+**CRITICAL:** When you want diverse perspectives, run ALL models in the SAME message. You can mix Task tools (Claude) and Bash tools (Codex/Gemini) in one response.
+
+**Pattern: Single message with multiple tool calls**
+```
+In ONE message, call all three:
+1. Task(subagent_type="general-purpose", prompt="Analyze X...")  # Claude
+2. Bash(command='codex exec "Analyze X..."')                     # Codex
+3. Bash(command='gemini -p "Analyze X..."')                      # Gemini
+```
+
+**When to use parallel multi-model:**
+- Complex architectural analysis needing diverse perspectives
+- Verification of critical logic (consensus across models)
+- Large codebase analysis (Gemini for breadth, Claude/Codex for depth)
+
+**Example: Analyzing error handling across services**
+```
+# All in ONE message - runs in parallel:
+
+Task(subagent_type="general-purpose", model="opus", prompt="""
+Analyze error handling in order-changes service.
+Focus on: handler/rpc/.../handler.go lines 90-131
+Document error classification and flow.
+""")
+
+Bash(command='codex exec "Analyze error handling in handler/rpc/.../handler.go:90-131. Focus on error classification patterns. Document what exists."')
+
+Bash(command='gemini -p "Analyze error handling across the order-changes service. Read handler/rpc/.../handler.go and pkg/processor/processor.go together. Document the error flow from handler to processor."', run_in_background=true)
+```
+
+**Synthesis after parallel completion:**
+- Wait for all results (use TaskOutput for background tasks)
+- Compare findings - note agreements and unique insights
+- Synthesize into unified analysis with attribution:
+  - "Claude identified X..."
+  - "Codex confirmed Y and added Z..."
+  - "Gemini's long-context view revealed W..."
+
+**Red Flag:** If you're calling models one-at-a-time waiting for results, you're doing it wrong. Use ONE message with multiple tool calls.
+
 ## Step 4: Wait and Synthesize
 
 **IMPORTANT:** Wait for ALL sub-agent tasks to complete before proceeding.
