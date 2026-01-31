@@ -1,0 +1,50 @@
+# Include local config (user info, machine-specific settings)
+# This file should exist at ~/.gitconfig.local
+[include]
+	path = ~/.gitconfig.local
+
+[core]
+	whitespace = trailing-space,space-before-tab
+	pager = delta
+
+[push]
+	default = current
+
+[fetch]
+	prune = true
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[diff]
+	mnemonicprefix = true
+	colorMoved = zebra
+
+[merge]
+	stat = true
+	conflictstyle = diff3
+
+[pull]
+	ff = only
+	rebase = true
+
+[branch]
+	autosetupmerge = true
+
+[delta]
+	plus-color = "#012800"
+	minus-color = "#340001"
+	syntax-theme = Monokai Extended
+	navigate = true
+	light = false
+	line-numbers = true
+	side-by-side = true
+
+[interactive]
+	diffFilter = delta --color-only
+
+[init]
+	defaultBranch = main

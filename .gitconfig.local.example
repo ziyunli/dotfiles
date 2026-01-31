@@ -1,0 +1,26 @@
+# Copy this to ~/.gitconfig.local and customize
+# This file is gitignored and not tracked
+
+[user]
+	name = Your Name
+	email = your@email.com
+
+# GitHub username (for hub/gh CLI)
+[github]
+	user = yourusername
+
+# macOS credential helper
+# [credential]
+# 	helper = osxkeychain
+
+# Linux credential helper (libsecret)
+# [credential]
+# 	helper = /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
+
+# Global gitignore (optional)
+# [core]
+# 	excludesFile = ~/.gitignore_global
+
+# URL rewrites (optional)
+# [url "git@github.com:"]
+# 	insteadOf = https://github.com/
