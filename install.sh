@@ -67,6 +67,7 @@ link_file() {
     log "Linked: $dst -> $src"
 }
 
+# link_directory links all regular files and symbolic links found under a source directory into the user's $HOME, preserving each entry's relative path.
 link_directory() {
     local src_dir="$1" prefix="$2"
 
