@@ -132,9 +132,8 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
-dotfiles() {
-  GIT_DIR=$HOME/.dotfiles GIT_WORK_TREE=$HOME "$@"
-}
+# Dotfiles management (regular repo with symlinks)
+alias dotfiles='git -C ~/.dotfiles'
 
 source <(fzf --zsh)
 # https://remysharp.com/2018/08/23/cli-improved
