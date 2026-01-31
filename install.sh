@@ -6,6 +6,8 @@
 #   - shared/*        -> $HOME/*     (configuration common to all machines)
 #   - devices/<dev>/* -> $HOME/*     (machine-specific configuration)
 #
+# Both regular files and symlinks in the source directories are processed.
+#
 # Existing files are backed up to ~/.dotfiles-backup-<timestamp>/
 # Existing symlinks pointing elsewhere are replaced.
 # Symlinks already pointing to the correct target are skipped.
@@ -65,6 +67,7 @@ link_file() {
     log "Linked: $dst -> $src"
 }
 
+# link_directory links all regular files and symbolic links found under a source directory into the user's $HOME, preserving each entry's relative path.
 link_directory() {
     local src_dir="$1" prefix="$2"
 
@@ -75,7 +78,7 @@ link_directory() {
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
         link_file "$src" "$HOME/$rel"
-    done < <(find "$src_dir" -type f -print0)
+    done < <(find "$src_dir" \( -type f -o -type l \) -print0)
 }
 
 # Main
