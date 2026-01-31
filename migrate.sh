@@ -1,8 +1,37 @@
 #!/usr/bin/env bash
+#
+# migrate.sh - Migrate from bare repo pattern to regular repo with symlinks
+#
+# This script handles the one-time migration from the old dotfiles setup
+# (bare git repo with $HOME as work-tree) to the new structure (regular
+# git repo with symlinks).
+#
+# What it does:
+#   1. Clones the new repo structure to ~/.dotfiles-new
+#   2. Runs install.sh to create symlinks (backs up existing files)
+#   3. Moves old bare repo to ~/.dotfiles.bare-backup-<date>
+#   4. Moves new repo to ~/.dotfiles
+#
+# After migration:
+#   - Remove the dotfiles() function from your shell rc
+#   - Create ~/.gitconfig.local with your personal settings
+#   - Verify symlinks work, then delete the backup
+#
+# Usage:
+#   ./migrate.sh <device-name>
+#
+# Arguments:
+#   device-name   Required. Name of device folder in devices/
+#
+# Environment:
+#   OLD_BARE_REPO   Path to existing bare repo (default: ~/.dotfiles)
+#   NEW_REPO_URL    Git URL for new repo (default: git@github.com:ziyunli/dotfiles.git)
+#
+# Examples:
+#   ./migrate.sh Ziyuns-Mac-mini
+#   OLD_BARE_REPO=~/.cfg ./migrate.sh bento
+#
 set -euo pipefail
-
-# Migration script: bare repo -> regular repo with symlinks
-# Run this on each existing system to migrate from the old structure
 
 DEVICE="${1:-}"
 OLD_BARE_REPO="${OLD_BARE_REPO:-$HOME/.dotfiles}"

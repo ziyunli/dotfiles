@@ -1,4 +1,29 @@
 #!/usr/bin/env bash
+#
+# install.sh - Create symlinks from dotfiles repo to $HOME
+#
+# This script links configuration files from the repo to your home directory:
+#   - shared/*        -> $HOME/*     (configuration common to all machines)
+#   - devices/<dev>/* -> $HOME/*     (machine-specific configuration)
+#
+# Existing files are backed up to ~/.dotfiles-backup-<timestamp>/
+# Existing symlinks pointing elsewhere are replaced.
+# Symlinks already pointing to the correct target are skipped.
+#
+# Usage:
+#   ./install.sh [device-name]
+#
+# Arguments:
+#   device-name   Name of device folder in devices/ (default: hostname -s)
+#
+# Environment:
+#   DRY_RUN       Set to any value to preview changes without making them
+#
+# Examples:
+#   ./install.sh                    # Use hostname as device name
+#   ./install.sh Ziyuns-Mac-mini    # Specify device explicitly
+#   DRY_RUN=1 ./install.sh          # Preview what would be linked
+#
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

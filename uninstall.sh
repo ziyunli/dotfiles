@@ -1,4 +1,27 @@
 #!/usr/bin/env bash
+#
+# uninstall.sh - Remove symlinks created by install.sh
+#
+# This script removes symlinks in $HOME that point to this dotfiles repo.
+# Only symlinks pointing to this repo are removed; other files are untouched.
+#
+# After uninstalling, you may want to restore backed-up files from
+# ~/.dotfiles-backup-*/ if they exist.
+#
+# Usage:
+#   ./uninstall.sh [device-name]
+#
+# Arguments:
+#   device-name   Name of device folder in devices/ (default: hostname -s)
+#
+# Environment:
+#   DRY_RUN       Set to any value to preview changes without making them
+#
+# Examples:
+#   ./uninstall.sh                    # Use hostname as device name
+#   ./uninstall.sh Ziyuns-Mac-mini    # Specify device explicitly
+#   DRY_RUN=1 ./uninstall.sh          # Preview what would be removed
+#
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -21,32 +21,109 @@ dotfiles/
 └── migrate.sh        # Migrate from bare repo
 ```
 
-## Installation
+## Recipes
 
-### New System
+### Install dotfiles on a new system
 
 ```bash
 git clone git@github.com:ziyunli/dotfiles.git ~/.dotfiles
-~/.dotfiles/install.sh
+cd ~/.dotfiles
+./install.sh              # Uses $(hostname -s) as device name
+# or
+./install.sh <device>     # Specify device explicitly
 ```
 
-If your hostname doesn't match a device folder:
+### Preview what install/uninstall would do
+
 ```bash
-~/.dotfiles/install.sh <device-name>
+DRY_RUN=1 ./install.sh
+DRY_RUN=1 ./uninstall.sh
 ```
 
-### Migrating from Bare Repo
+### Add a new shared config file
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ziyunli/dotfiles/main/migrate.sh | bash -s -- <device-name>
+cd ~/.dotfiles
+# Add the file to shared/
+cp ~/.some-new-config shared/.some-new-config
+# Or create it directly
+vim shared/.some-new-config
+
+# Link it to $HOME
+./install.sh
+
+# Commit
+git add shared/.some-new-config
+git commit -m "add some-new-config"
 ```
 
-Or manually:
+### Add a device-specific config file
+
 ```bash
+cd ~/.dotfiles
+mkdir -p devices/$(hostname -s)
+cp ~/.device-specific-config devices/$(hostname -s)/.device-specific-config
+
+./install.sh
+
+git add devices/
+git commit -m "add device-specific config for $(hostname -s)"
+```
+
+### Add a new device
+
+```bash
+cd ~/.dotfiles
+mkdir -p devices/<new-hostname>
+# Copy any device-specific files
+cp ~/.zshrc devices/<new-hostname>/.zshrc
+
+git add devices/<new-hostname>
+git commit -m "add device config for <new-hostname>"
+```
+
+### Remove all symlinks (uninstall)
+
+```bash
+cd ~/.dotfiles
+./uninstall.sh
+
+# Restore backed-up files if needed
+ls ~/.dotfiles-backup-*/
+cp ~/.dotfiles-backup-*/.some-file ~/
+```
+
+### Re-link after pulling changes
+
+```bash
+cd ~/.dotfiles
+git pull
+./install.sh    # Safe to re-run; skips already-correct symlinks
+```
+
+### Check which files are linked
+
+```bash
+# List all symlinks in $HOME pointing to dotfiles
+find ~ -maxdepth 3 -type l -exec sh -c 'readlink "$1" | grep -q "\.dotfiles" && echo "$1 -> $(readlink "$1")"' _ {} \; 2>/dev/null
+```
+
+### Migrate from bare repo pattern
+
+If you're using the old bare repo setup (`git --git-dir=$HOME/.dotfiles --work-tree=$HOME`):
+
+```bash
+# Option 1: Run migrate script directly
+./migrate.sh <device-name>
+
+# Option 2: Manual migration
 git clone git@github.com:ziyunli/dotfiles.git ~/.dotfiles-new
 ~/.dotfiles-new/install.sh <device-name>
 mv ~/.dotfiles ~/.dotfiles.bare-backup
 mv ~/.dotfiles-new ~/.dotfiles
+
+# Clean up: remove dotfiles() function from .zshrc/.bashrc
+# Then delete backup once verified: rm -rf ~/.dotfiles.bare-backup
 ```
 
 ## Post-Install
@@ -67,18 +144,24 @@ Create `~/.gitconfig.local` with your personal settings:
 
 See `.gitconfig.local.example` in the repo root for more options.
 
-## Usage
+## How It Works
 
-Edit files in `shared/` for changes that should apply everywhere.
-Edit files in `devices/<hostname>/` for machine-specific changes.
+- **install.sh** creates symlinks from `$HOME` to files in the repo
+- Files in `shared/` are linked for all devices
+- Files in `devices/<hostname>/` are linked only for that device
+- Device-specific files override shared files (linked second)
+- Existing files are backed up to `~/.dotfiles-backup-<timestamp>/`
+- Edit files in the repo; changes take effect immediately (symlinks)
 
-Changes take effect immediately (files are symlinked).
+## Scripts Reference
 
-## Adding a New Device
+| Script | Purpose |
+|--------|---------|
+| `install.sh [device]` | Create symlinks to $HOME |
+| `uninstall.sh [device]` | Remove symlinks |
+| `migrate.sh <device>` | Migrate from bare repo pattern |
 
-1. Create `devices/<hostname>/` directory
-2. Add device-specific dotfiles
-3. Run `./install.sh <hostname>`
+All scripts support `DRY_RUN=1` to preview changes.
 
 ## MCP
 
