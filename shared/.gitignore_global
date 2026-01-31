@@ -1,0 +1,14 @@
+# Local config files (not tracked)
+.gitconfig.local
+settings.local.json
+
+# Private journal (MCP tool)
+.private-journal/
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~

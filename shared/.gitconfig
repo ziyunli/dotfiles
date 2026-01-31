@@ -4,6 +4,7 @@
 	path = ~/.gitconfig.local
 
 [core]
+	excludesfile = ~/.gitignore_global
 	whitespace = trailing-space,space-before-tab
 	pager = delta
 
