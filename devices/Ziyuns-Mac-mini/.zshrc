@@ -132,9 +132,6 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
-# Dotfiles management (regular repo with symlinks)
-alias dotfiles='git -C ~/.dotfiles'
-
 source <(fzf --zsh)
 # https://remysharp.com/2018/08/23/cli-improved
 alias preview="fzf --preview 'bat --color \"always\" {}'"
