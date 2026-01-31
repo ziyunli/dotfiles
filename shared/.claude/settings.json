@@ -3,6 +3,7 @@
     "allow": [
       "*",
       "Bash",
+      "Bash(claude mcp list)",
       "Read",
       "Write",
       "Edit",
@@ -24,14 +25,10 @@
       "mcp__glean_default__search",
       "mcp__glean_default__chat",
       "mcp__glean_default__read_document",
-      "Bash(claude mcp list)"
+      "mcp__private-journal__process_thoughts"
     ],
     "deny": [],
-    "ask": [
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(rm:*)"
-    ],
+    "ask": ["Bash(git commit:*)", "Bash(git push:*)", "Bash(rm:*)"],
     "defaultMode": "acceptEdits"
   },
   "enabledPlugins": {
