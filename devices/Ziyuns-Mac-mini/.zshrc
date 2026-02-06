@@ -271,3 +271,8 @@ alias claudex='docker run -it --rm \
 
 # Amp CLI
 export PATH="/Users/ziyunli/.amp/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/ziyunli/.lmstudio/bin"
+# End of LM Studio CLI section
+
