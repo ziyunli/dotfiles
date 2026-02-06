@@ -11,6 +11,7 @@
 # Existing files are backed up to ~/.dotfiles-backup-<timestamp>/
 # Existing symlinks pointing elsewhere are replaced.
 # Symlinks already pointing to the correct target are skipped.
+# A devices/<dev>/.dotfiles-skip file can list paths to exclude from shared/.
 #
 # Usage:
 #   ./install.sh [device-name]
@@ -35,6 +36,17 @@ DRY_RUN="${DRY_RUN:-}"
 
 log() { echo "[dotfiles] $*"; }
 warn() { echo "[dotfiles] WARNING: $*" >&2; }
+
+# Load device skip list (paths that shared/ should not overwrite)
+declare -A SKIP_FILES
+load_skip_list() {
+    local skip_file="$DOTFILES_DIR/devices/$DEVICE/.dotfiles-skip"
+    [[ -f "$skip_file" ]] || return 0
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" == \#* ]] && continue
+        SKIP_FILES["$line"]=1
+    done < "$skip_file"
+}
 
 link_file() {
     local src="$1" dst="$2"
@@ -67,9 +79,11 @@ link_file() {
     log "Linked: $dst -> $src"
 }
 
-# link_directory links all regular files and symbolic links found under a source directory into the user's $HOME, preserving each entry's relative path.
+# link_directory links all regular files and symbolic links found under a source
+# directory into the user's $HOME, preserving each entry's relative path.
+# When check_skip is "true", paths listed in .dotfiles-skip are excluded.
 link_directory() {
-    local src_dir="$1" prefix="$2"
+    local src_dir="$1" check_skip="${2:-false}"
 
     if [[ ! -d "$src_dir" ]]; then
         return
@@ -77,6 +91,11 @@ link_directory() {
 
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
+        [[ "$(basename "$rel")" == ".dotfiles-skip" ]] && continue
+        if [[ "$check_skip" == "true" && -n "${SKIP_FILES[$rel]+x}" ]]; then
+            log "Skipped: $rel (listed in .dotfiles-skip)"
+            continue
+        fi
         link_file "$src" "$HOME/$rel"
     done < <(find "$src_dir" \( -type f -o -type l \) -print0)
 }
@@ -84,11 +103,12 @@ link_directory() {
 # Main
 log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
+load_skip_list
 
 # Link shared files
 if [[ -d "$DOTFILES_DIR/shared" ]]; then
     log "Linking shared configuration..."
-    link_directory "$DOTFILES_DIR/shared" ""
+    link_directory "$DOTFILES_DIR/shared" true
 else
     warn "No shared directory found"
 fi
@@ -96,7 +116,7 @@ fi
 # Link device-specific files
 if [[ -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     log "Linking device-specific configuration for '$DEVICE'..."
-    link_directory "$DOTFILES_DIR/devices/$DEVICE" ""
+    link_directory "$DOTFILES_DIR/devices/$DEVICE"
 else
     warn "No device configuration found for '$DEVICE'"
     echo ""
