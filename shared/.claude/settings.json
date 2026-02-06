@@ -28,9 +28,14 @@
       "mcp__private-journal__process_thoughts"
     ],
     "deny": [],
-    "ask": ["Bash(git commit:*)", "Bash(git push:*)", "Bash(rm:*)"],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(rm:*)"
+    ],
     "defaultMode": "acceptEdits"
   },
+  "model": "us.anthropic.claude-opus-4-6-v1",
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
@@ -39,6 +44,5 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true,
-  "model": "opus"
+  "alwaysThinkingEnabled": true
 }
