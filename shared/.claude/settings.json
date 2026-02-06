@@ -40,6 +40,5 @@
     "claude-md-management@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "autoUpdatesChannel": "stable",
   "model": "opus"
 }
