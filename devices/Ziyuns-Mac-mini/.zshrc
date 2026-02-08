@@ -94,6 +94,13 @@ export PATH="${HOME}/.cargo/bin:$PATH"
 # Brew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# Amp CLI
+export PATH="/Users/ziyunli/.amp/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/ziyunli/.lmstudio/bin"
+# End of LM Studio CLI section
+
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
@@ -208,8 +215,6 @@ function branches () {
     xargs git checkout
 }
 
-
-
 function delete-branches() {
   git branch |
     grep --invert-match '\*' |
@@ -257,22 +262,21 @@ function activate-venv() {
   selected_env=$(ls ~/.venv/ | fzf)
 
   if [ -n "$selected_env" ]; then
-    source "$HOME/.venv/$selected_env/bin/activate"  # commented out by conda initialize
+    source "$HOME/.venv/$selected_env/bin/activate"
   fi
 }
 
-# Docker alias for Claude
-alias claudex='docker run -it --rm \
-  -v $(pwd):/workspace \
-  -v ~/.claude:/home/user/.claude \
-  -v ~/.claude.json:/home/user/.claude.json \
-  -v ~/.config/gh:/home/user/.config/gh \
-  claude-dev'
-
-# Amp CLI
-export PATH="/Users/ziyunli/.amp/bin:$PATH"
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/ziyunli/.lmstudio/bin"
-# End of LM Studio CLI section
-
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
