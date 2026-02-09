@@ -38,14 +38,17 @@ log() { echo "[dotfiles] $*"; }
 warn() { echo "[dotfiles] WARNING: $*" >&2; }
 
 # Load device skip list (paths that shared/ should not overwrite)
-declare -A SKIP_FILES
+SKIP_FILES=""
 load_skip_list() {
     local skip_file="$DOTFILES_DIR/devices/$DEVICE/.dotfiles-skip"
     [[ -f "$skip_file" ]] || return 0
     while IFS= read -r line; do
         [[ -z "$line" || "$line" == \#* ]] && continue
-        SKIP_FILES["$line"]=1
+        SKIP_FILES="$SKIP_FILES$line"$'\n'
     done < "$skip_file"
+}
+is_skipped() {
+    [[ -n "$SKIP_FILES" ]] && echo "$SKIP_FILES" | grep -qxF "$1"
 }
 
 link_file() {
@@ -92,7 +95,7 @@ link_directory() {
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
         [[ "$(basename "$rel")" == ".dotfiles-skip" ]] && continue
-        if [[ "$check_skip" == "true" && -n "${SKIP_FILES[$rel]+x}" ]]; then
+        if [[ "$check_skip" == "true" ]] && is_skipped "$rel"; then
             log "Skipped: $rel (listed in .dotfiles-skip)"
             continue
         fi
