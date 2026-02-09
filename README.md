@@ -126,9 +126,18 @@ mv ~/.dotfiles-new ~/.dotfiles
 # Then delete backup once verified: rm -rf ~/.dotfiles.bare-backup
 ```
 
-## Post-Install
+## Untracked Files
 
-Create `~/.gitconfig.local` with your personal settings:
+These files are gitignored and must be created/maintained by the user.
+
+### `~/.gitconfig.local` (required)
+
+Personal git settings included by `shared/.gitconfig`. Create from the template:
+
+```bash
+cp ~/.dotfiles/.gitconfig.local.example ~/.gitconfig.local
+# Then edit with your details
+```
 
 ```gitconfig
 [user]
@@ -142,7 +151,19 @@ Create `~/.gitconfig.local` with your personal settings:
     helper = osxkeychain  # or appropriate helper for your OS
 ```
 
-See `.gitconfig.local.example` in the repo root for more options.
+`install.sh` will remind you if this file is missing.
+
+### `devices/<hostname>/.dotfiles-skip` (optional)
+
+Lists paths from `shared/` that should NOT be symlinked for this device. One path per line, relative to `$HOME`. Lines starting with `#` are comments.
+
+```bash
+# Example: devices/bento/.dotfiles-skip
+# The company environment manages these directly.
+.claude/settings.json
+```
+
+Use this when a device manages certain configs externally (e.g., corporate-managed settings) or when a shared config conflicts with device-specific needs.
 
 ## How It Works
 
