@@ -94,7 +94,7 @@ link_directory() {
 
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
-        [[ "$(basename "$rel")" == ".dotfiles-skip" ]] && continue
+        [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".gitkeep" ]] && continue
         if [[ "$check_skip" == "true" ]] && is_skipped "$rel"; then
             log "Skipped: $rel (listed in .dotfiles-skip)"
             continue
