@@ -6,7 +6,7 @@ input=$(cat)
 user=$(whoami)
 host=$(hostname -s)
 dir=$(echo "$input" | jq -r '.workspace.current_dir // ""')
-model=$(echo "$input" | jq -r '.model.display_name')
+model=$(echo "$input" | jq -r '.model.display_name // ""')
 
 # Calculate token usage from current_usage (reflects compaction)
 context_size=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
