@@ -33,11 +33,21 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 DRY_RUN="${DRY_RUN:-}"
 
+print_available_devices() {
+    local devices
+    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null)
+    if [[ -n "$devices" ]]; then
+        echo "$devices" | sed 's/^/  /' >&2
+    else
+        echo "  (none)" >&2
+    fi
+}
+
 if [[ $# -eq 0 ]]; then
     echo "Error: device name is required." >&2
     echo "" >&2
     echo "Available devices:" >&2
-    ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null | sed 's/^/  /' >&2 || echo "  (none)" >&2
+    print_available_devices
     echo "" >&2
     echo "Usage: $0 <device-name>" >&2
     exit 1
@@ -49,7 +59,7 @@ if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     echo "Error: no device configuration found for '$DEVICE'" >&2
     echo "" >&2
     echo "Available devices:" >&2
-    ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null | sed 's/^/  /' >&2 || echo "  (none)" >&2
+    print_available_devices
     echo "" >&2
     echo "Usage: $0 <device-name>" >&2
     exit 1

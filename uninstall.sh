@@ -31,7 +31,12 @@ if [[ $# -eq 0 ]]; then
     echo "Error: device name is required." >&2
     echo "" >&2
     echo "Available devices:" >&2
-    ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null | sed 's/^/  /' >&2 || echo "  (none)" >&2
+    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null)
+    if [[ -n "$devices" ]]; then
+        echo "$devices" | sed 's/^/  /' >&2
+    else
+        echo "  (none)" >&2
+    fi
     echo "" >&2
     echo "Usage: $0 <device-name>" >&2
     exit 1
