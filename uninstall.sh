@@ -29,7 +29,7 @@ DRY_RUN="${DRY_RUN:-}"
 
 print_available_devices() {
     local devices
-    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null)
+    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null) || true
     if [[ -n "$devices" ]]; then
         echo "$devices" | sed 's/^/  /' >&2
     else
