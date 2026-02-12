@@ -14,25 +14,56 @@
 # A devices/<dev>/.dotfiles-skip file can list paths to exclude from shared/.
 #
 # Usage:
-#   ./install.sh [device-name]
+#   ./install.sh <device-name>
 #
 # Arguments:
-#   device-name   Name of device folder in devices/ (default: hostname -s)
+#   device-name   Name of device folder in devices/ (required)
 #
 # Environment:
 #   DRY_RUN       Set to any value to preview changes without making them
 #
 # Examples:
-#   ./install.sh                    # Use hostname as device name
-#   ./install.sh Ziyuns-Mac-mini    # Specify device explicitly
-#   DRY_RUN=1 ./install.sh          # Preview what would be linked
+#   ./install.sh bento              # Install for bento device
+#   ./install.sh Ziyuns-Mac-mini    # Install for Mac mini
+#   DRY_RUN=1 ./install.sh bento    # Preview what would be linked
 #
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEVICE="${1:-$(hostname -s)}"
 BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 DRY_RUN="${DRY_RUN:-}"
+
+print_available_devices() {
+    local devices
+    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null) || true
+    if [[ -n "$devices" ]]; then
+        echo "$devices" | sed 's/^/  /' >&2
+    else
+        echo "  (none)" >&2
+    fi
+}
+
+if [[ $# -eq 0 ]]; then
+    echo "Error: device name is required." >&2
+    echo "" >&2
+    echo "Available devices:" >&2
+    print_available_devices
+    echo "" >&2
+    echo "Usage: $0 <device-name>" >&2
+    exit 1
+fi
+
+DEVICE="$1"
+
+if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
+    echo "Error: no device configuration found for '$DEVICE'" >&2
+    echo "" >&2
+    echo "Available devices:" >&2
+    print_available_devices
+    echo "" >&2
+    echo "Usage: $0 <device-name>" >&2
+    exit 1
+fi
 
 log() { echo "[dotfiles] $*"; }
 warn() { echo "[dotfiles] WARNING: $*" >&2; }
@@ -117,18 +148,8 @@ else
 fi
 
 # Link device-specific files
-if [[ -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
-    log "Linking device-specific configuration for '$DEVICE'..."
-    link_directory "$DOTFILES_DIR/devices/$DEVICE"
-else
-    warn "No device configuration found for '$DEVICE'"
-    echo ""
-    echo "Available devices:"
-    ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null || echo "  (none)"
-    echo ""
-    echo "Usage: $0 [device-name]"
-    echo "   or: Set hostname to match a device folder"
-fi
+log "Linking device-specific configuration for '$DEVICE'..."
+link_directory "$DOTFILES_DIR/devices/$DEVICE"
 
 # Remind about local config
 if [[ ! -f "$HOME/.gitconfig.local" ]]; then

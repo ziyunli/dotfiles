@@ -9,24 +9,55 @@
 # ~/.dotfiles-backup-*/ if they exist.
 #
 # Usage:
-#   ./uninstall.sh [device-name]
+#   ./uninstall.sh <device-name>
 #
 # Arguments:
-#   device-name   Name of device folder in devices/ (default: hostname -s)
+#   device-name   Name of device folder in devices/ (required)
 #
 # Environment:
 #   DRY_RUN       Set to any value to preview changes without making them
 #
 # Examples:
-#   ./uninstall.sh                    # Use hostname as device name
-#   ./uninstall.sh Ziyuns-Mac-mini    # Specify device explicitly
-#   DRY_RUN=1 ./uninstall.sh          # Preview what would be removed
+#   ./uninstall.sh bento              # Uninstall for bento device
+#   ./uninstall.sh Ziyuns-Mac-mini    # Uninstall for Mac mini
+#   DRY_RUN=1 ./uninstall.sh bento    # Preview what would be removed
 #
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEVICE="${1:-$(hostname -s)}"
 DRY_RUN="${DRY_RUN:-}"
+
+print_available_devices() {
+    local devices
+    devices=$(ls -1 "$DOTFILES_DIR/devices/" 2>/dev/null) || true
+    if [[ -n "$devices" ]]; then
+        echo "$devices" | sed 's/^/  /' >&2
+    else
+        echo "  (none)" >&2
+    fi
+}
+
+if [[ $# -eq 0 ]]; then
+    echo "Error: device name is required." >&2
+    echo "" >&2
+    echo "Available devices:" >&2
+    print_available_devices
+    echo "" >&2
+    echo "Usage: $0 <device-name>" >&2
+    exit 1
+fi
+
+DEVICE="$1"
+
+if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
+    echo "Error: no device configuration found for '$DEVICE'" >&2
+    echo "" >&2
+    echo "Available devices:" >&2
+    print_available_devices
+    echo "" >&2
+    echo "Usage: $0 <device-name>" >&2
+    exit 1
+fi
 
 log() { echo "[dotfiles] $*"; }
 
@@ -70,10 +101,8 @@ if [[ -d "$DOTFILES_DIR/shared" ]]; then
 fi
 
 # Unlink device-specific files
-if [[ -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
-    log "Removing device-specific symlinks for '$DEVICE'..."
-    unlink_directory "$DOTFILES_DIR/devices/$DEVICE"
-fi
+log "Removing device-specific symlinks for '$DEVICE'..."
+unlink_directory "$DOTFILES_DIR/devices/$DEVICE"
 
 log "Done!"
 log ""
