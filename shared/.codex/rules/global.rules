@@ -1,0 +1,20 @@
+# Global execution policy for Codex CLI.
+# Require approval for destructive or externally-visible operations.
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "prompt",
+    justification = "require approval before committing",
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "require approval before pushing",
+)
+
+prefix_rule(
+    pattern = ["rm"],
+    decision = "prompt",
+    justification = "require approval before deleting files",
+)
