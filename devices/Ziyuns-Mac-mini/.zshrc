@@ -1,13 +1,13 @@
 # Mac mini zsh configuration
 # Sources shared config and adds machine-specific settings
 
+# Homebrew (must be before sourcing shared config for completions/plugin)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # macOS-specific plugin (must be set before sourcing shared config)
 DEVICE_PLUGINS=(macos)
 
 source ~/.zshrc.common
-
-# Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Amp CLI
 export PATH="$HOME/.amp/bin:$PATH"
@@ -49,7 +49,7 @@ add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
 # zsh-syntax-highlighting (must be near end)
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Conda
 __conda_setup="$('/opt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"

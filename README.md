@@ -40,13 +40,19 @@ This creates `~/.fzf.zsh` which is sourced by `shared/.zshrc.common`.
 
 - `ncdu` - disk usage analyzer (aliased to `du` if available)
 - `htop` - process viewer (aliased to `top` if available)
+- `prettyping` - prettier ping with colors (aliased to `ping` if available; **note:** overrides system `ping`)
 - `bat` - syntax-highlighted file viewer (used by fzf previews)
 - `fd` - fast file finder (used by fzf)
-- `eza` - modern `ls` replacement
+- `eza` - modern `ls` replacement (aliased to `ls` if available)
+- `nvim` - Neovim text editor (set as `$EDITOR`)
+- `gh` - GitHub CLI (required for `pr-checkout` function)
+- `jq` - JSON processor (required for `pr-checkout` function)
+- `zoxide` - smarter cd command (oh-my-zsh plugin)
+- `tig` - text-mode interface for git (oh-my-zsh plugin)
 
 Install via Homebrew:
 ```bash
-brew install ncdu htop bat fd eza
+brew install ncdu htop prettyping bat fd eza neovim gh jq zoxide tig
 ```
 
 ## Recipes
