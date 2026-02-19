@@ -36,6 +36,15 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 
 This creates `~/.fzf.zsh` which is sourced by `shared/.zshrc.common`.
 
+### Agkozak ZSH Prompt
+
+Oh-my-zsh theme used by `shared/.zshrc.common`. Install via git:
+
+```bash
+git clone --depth 1 https://github.com/agkozak/agkozak-zsh-theme ~/.oh-my-zsh/custom/themes/agkozak
+ln -s ~/.oh-my-zsh/custom/themes/agkozak/agkozak-zsh-prompt.plugin.zsh ~/.oh-my-zsh/custom/themes/agkozak.zsh-theme
+```
+
 ### Other Tools
 
 - `ncdu` - disk usage analyzer (aliased to `du` if available)
