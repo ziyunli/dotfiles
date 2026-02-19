@@ -53,11 +53,9 @@ Only pause to ask for confirmation when:
 - YOU MUST MATCH the style and formatting of surrounding code, even if it differs from standard style guides. Consistency within a file trumps external standards.
 - YOU MUST NOT manually change whitespace that does not affect execution or output. Otherwise, use a formatting tool.
 - Fix broken things immediately when you find them. Don't ask permission to fix bugs.
-
-## Naming and Comments
-
-YOU MUST name code by what it does in the domain, not how it's implemented or its history.
-YOU MUST write comments explaining WHAT and WHY, never temporal context or what changed.
+- YOU MUST name code by what it does in the domain, not how it's implemented or its history.
+- YOU MUST write comments explaining WHAT and WHY, never temporal context or what changed.
+- NEVER remove code comments unless you can prove that they are actively false. Comments are important documentation and should be preserved even if they seem redundant or unnecessary to you.
 
 ## Version Control
 
