@@ -8,29 +8,13 @@ ZSH_THEME="agkozak"
 
 # Plugins
 plugins=(
-  # system
   brew
   colored-man-pages
   git
   gitfast
   gitignore
-  # tools
-  aws
-  docker
-  docker-compose
   zoxide
-  httpie
-  terraform
   tig
-  tmux
-  # Javascript
-  node
-  yarn
-  # Ruby
-  bundler
-  ruby
-  # Golang
-  golang
 )
 
 # Custom zfuncs
@@ -47,7 +31,6 @@ source $ZSH/oh-my-zsh.sh
 export GIT_CEILING_DIRECTORIES=~
 export TERM="xterm-256color"
 export EDITOR='nvim'
-export VISUAL='code'
 
 # Aliases
 alias vim='nvim'
@@ -55,7 +38,7 @@ alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
 # FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source <(fzf --zsh)
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
 
@@ -80,13 +63,9 @@ alias eza="eza --header --color-scale --time-style=long-iso --group-directories-
 alias ls=eza
 
 # PATH
-export PATH="/usr/local/opt/ncurses/bin:$PATH"
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
-export PATH=$PATH:$HOME/go/bin:/usr/local/opt/go/libexec/bin
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/.docker/bin:$PATH
-export PATH=$HOME/zig:$PATH
-export PATH=$HOME/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # Git utilities
 alias git_delete_squashed='git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse $branch\^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
