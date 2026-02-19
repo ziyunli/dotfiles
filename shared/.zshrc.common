@@ -1,0 +1,155 @@
+# Generic zsh configuration - sourced by device-specific .zshrc files
+
+# Path to oh-my-zsh installation
+export ZSH="$HOME/.oh-my-zsh"
+
+# Theme
+ZSH_THEME="agkozak"
+
+# Plugins
+plugins=(
+  # system
+  macos
+  brew
+  colored-man-pages
+  git
+  gitfast
+  gitignore
+  # tools
+  aws
+  docker
+  docker-compose
+  zoxide
+  httpie
+  terraform
+  tig
+  tmux
+  # Javascript
+  node
+  yarn
+  # Ruby
+  bundler
+  ruby
+  # Golang
+  golang
+)
+
+# Custom zfuncs
+fpath+=~/.zfunc
+
+# Homebrew completions
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
+
+source $ZSH/oh-my-zsh.sh
+
+# Environment
+export GIT_CEILING_DIRECTORIES=~
+export TERM="xterm-256color"
+export EDITOR='nvim'
+export VISUAL='code'
+
+# Aliases
+alias vim='nvim'
+alias zshconfig="vim ~/.zshrc"
+alias brewski='bubu; brew doctor'
+
+# FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+alias preview="fzf --preview 'bat --color \"always\" {}'"
+export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
+
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# CLI improvements
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+alias ping='prettyping --nolegend'
+alias top="sudo htop"
+
+# eza/ls
+alias eza="eza --header --color-scale --time-style=long-iso --group-directories-first"
+alias ls=eza
+
+# PATH
+export PATH="/usr/local/opt/ncurses/bin:$PATH"
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+export PATH=$PATH:$HOME/go/bin:/usr/local/opt/go/libexec/bin
+export PATH=$PATH:$GOPATH/bin
+export PATH=$HOME/.local/bin:$PATH
+export PATH=$HOME/.docker/bin:$PATH
+export PATH=$HOME/zig:$PATH
+export PATH=$HOME/bin:$PATH
+
+# asdf
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+
+# zsh-syntax-highlighting
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Git utilities
+alias git_delete_squashed='git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse $branch\^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
+
+# FZF functions
+function branches () {
+  git branch --sort=-committerdate |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --preview="git log {} | bat --style=plain --color=always --line-range :500" |
+    xargs git checkout
+}
+
+function activate-venv() {
+  local selected_env
+  selected_env=$(ls ~/.venv/ | fzf)
+
+  if [ -n "$selected_env" ]; then
+    source "$HOME/.venv/$selected_env/bin/activate"
+  fi
+}
+
+function delete-branches() {
+  git branch |
+    grep --invert-match '\*' |
+    cut -c 3- |
+    fzf --multi --preview="git log {} | bat --style=plain --color=always --line-range :500" |
+    xargs git branch --delete --force
+}
+
+function pr-checkout() {
+  local jq_template pr_number
+
+  jq_template='"'\
+'#\(.number) - \(.title)'\
+'\t'\
+'Author: \(.user.login)\n'\
+'Created: \(.created_at)\n'\
+'Updated: \(.updated_at)\n\n'\
+'\(.body)'\
+'"'
+
+  pr_number=$(
+    gh api 'repos/:owner/:repo/pulls' |
+    jq ".[] | $jq_template" |
+    sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+    fzf \
+      --with-nth=1 \
+      --delimiter='\t' \
+      --preview='echo -e {2} | bat --style=plain --color=always --line-range :500 -l markdown' \
+      --preview-window=top:wrap |
+    sed 's/^#\([0-9]\+\).*/\1/'
+  )
+
+  if [ -n "$pr_number" ]; then
+    gh pr checkout "$pr_number"
+  fi
+}
