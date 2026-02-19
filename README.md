@@ -21,6 +21,40 @@ dotfiles/
 └── migrate.sh        # Migrate from bare repo
 ```
 
+## Dependencies
+
+The shared configuration expects certain tools to be installed. These are optional—the config guards against missing tools—but for full functionality:
+
+### FZF (Fuzzy Finder)
+
+Install via git (preferred method for consistent shell integration):
+
+```bash
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+```
+
+This creates `~/.fzf.zsh` which is sourced by `shared/.zshrc.common`.
+
+### Other Tools
+
+- `ncdu` - disk usage analyzer (aliased to `du` if available)
+- `htop` - process viewer (aliased to `top` if available)
+- `prettyping` - prettier ping with colors (aliased to `ping` if available; **note:** overrides system `ping`)
+- `bat` - syntax-highlighted file viewer (used by fzf previews)
+- `fd` - fast file finder (used by fzf)
+- `eza` - modern `ls` replacement (aliased to `ls` if available)
+- `nvim` - Neovim text editor (set as `$EDITOR`)
+- `gh` - GitHub CLI (required for `pr-checkout` function)
+- `jq` - JSON processor (required for `pr-checkout` function)
+- `zoxide` - smarter cd command (oh-my-zsh plugin)
+- `tig` - text-mode interface for git (oh-my-zsh plugin)
+
+Install via Homebrew:
+```bash
+brew install ncdu htop prettyping bat fd eza neovim gh jq zoxide tig
+```
+
 ## Recipes
 
 ### Install dotfiles on a new system
