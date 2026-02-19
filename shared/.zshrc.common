@@ -42,10 +42,8 @@ alias vim='nvim'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
-# FZF
-if command -v fzf &>/dev/null; then
-  source <(fzf --zsh)
-fi
+# FZF (git-based installation via ~/.fzf)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 export FZF_DEFAULT_OPTS="--bind='ctrl-o:execute(code {})+abort'"
 
