@@ -9,7 +9,6 @@ ZSH_THEME="agkozak"
 # Plugins
 plugins=(
   # system
-  macos
   brew
   colored-man-pages
   git
@@ -84,17 +83,10 @@ alias ls=eza
 export PATH="/usr/local/opt/ncurses/bin:$PATH"
 export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 export PATH=$PATH:$HOME/go/bin:/usr/local/opt/go/libexec/bin
-export PATH=$PATH:$GOPATH/bin
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.docker/bin:$PATH
 export PATH=$HOME/zig:$PATH
 export PATH=$HOME/bin:$PATH
-
-# asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-# zsh-syntax-highlighting
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Git utilities
 alias git_delete_squashed='git checkout -q master && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base master $branch) && [[ $(git cherry master $(git commit-tree $(git rev-parse $branch\^{tree}) -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
