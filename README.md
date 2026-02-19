@@ -152,9 +152,9 @@ If you're using the old bare repo setup (`git --git-dir=$HOME/.dotfiles --work-t
 
 # Option 2: Manual migration
 git clone git@github.com:ziyunli/dotfiles.git ~/.dotfiles-new
-~/.dotfiles-new/install.sh <device-name>
 mv ~/.dotfiles ~/.dotfiles.bare-backup
 mv ~/.dotfiles-new ~/.dotfiles
+~/.dotfiles/install.sh <device-name>
 
 # Clean up: remove dotfiles() function from .zshrc/.bashrc
 # Then delete backup once verified: rm -rf ~/.dotfiles.bare-backup
