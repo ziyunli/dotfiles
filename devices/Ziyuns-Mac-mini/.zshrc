@@ -12,18 +12,20 @@ source ~/.zshrc.common
 # Amp CLI
 export PATH="$HOME/.amp/bin:$PATH"
 
-# LM Studio CLI
+# Added by LM Studio CLI (lms)
 export PATH="$PATH:$HOME/.lmstudio/bin"
+# End of LM Studio CLI section
 
-# OrbStack
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
-# Auto-switch node version on directory change
+# Calling nvm use automatically in a directory with a .nvmrc file - place this after nvm initialization!
 autoload -U add-zsh-hook
 
 load-nvmrc() {
@@ -48,10 +50,11 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# zsh-syntax-highlighting (must be near end)
+# https://github.com/zsh-users/zsh-syntax-highlighting
 [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# Conda
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/opt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
@@ -63,3 +66,4 @@ else
     fi
 fi
 unset __conda_setup
+# <<< conda initialize <<<

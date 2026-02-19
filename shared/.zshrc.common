@@ -59,6 +59,7 @@ _fzf_compgen_dir() {
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
+# https://remysharp.com/2018/08/23/cli-improved
 # CLI improvements (conditionally defined based on tool availability)
 if command -v ncdu &>/dev/null; then
   alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
@@ -81,7 +82,9 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 
+######################################################################################
 # FZF functions
+######################################################################################
 function branches () {
   local branch
   branch=$(git branch --sort=-committerdate |
@@ -94,6 +97,11 @@ function branches () {
   fi
 }
 
+######################################################################################
+# Python
+######################################################################################
+
+# from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
 function activate-venv() {
   local selected_env
   selected_env=$(command ls ~/.venv/ 2>/dev/null | fzf)
