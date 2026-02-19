@@ -1,5 +1,6 @@
 # Copy this to ~/.gitconfig.local and customize
 # This file is gitignored and not tracked
+# vim: set filetype=gitconfig:
 
 [user]
 	name = Your Name
