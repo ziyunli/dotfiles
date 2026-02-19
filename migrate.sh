@@ -81,10 +81,6 @@ fi
 log "Cloning new repository structure..."
 git clone "$NEW_REPO_URL" "$NEW_REPO_DIR"
 
-# Run install
-log "Installing dotfiles..."
-"$NEW_REPO_DIR/install.sh" "$DEVICE"
-
 # Handle old bare repo
 if [[ -d "$OLD_BARE_REPO" ]]; then
     BACKUP_NAME="${OLD_BARE_REPO}.bare-backup-$(date +%Y%m%d)"
@@ -92,9 +88,14 @@ if [[ -d "$OLD_BARE_REPO" ]]; then
     mv "$OLD_BARE_REPO" "$BACKUP_NAME"
 fi
 
-# Move new repo to final location
+# Move new repo to final location before installing, so symlinks
+# point to the permanent path rather than the temporary clone path.
 log "Moving new repo to $HOME/.dotfiles"
 mv "$NEW_REPO_DIR" "$HOME/.dotfiles"
+
+# Run install
+log "Installing dotfiles..."
+"$HOME/.dotfiles/install.sh" "$DEVICE"
 
 log ""
 log "=== Migration complete ==="
