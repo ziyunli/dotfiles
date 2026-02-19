@@ -1,10 +1,10 @@
 # Mac mini zsh configuration
 # Sources shared config and adds machine-specific settings
 
-source ~/.zshrc.common
+# macOS-specific plugin (must be set before sourcing shared config)
+DEVICE_PLUGINS=(macos)
 
-# macOS-specific plugin
-plugins+=(macos)
+source ~/.zshrc.common
 
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
