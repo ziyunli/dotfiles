@@ -19,6 +19,7 @@ Use `prefix r` (with this config, `prefix` is `C-a`) to reload the file. Some op
 - Right status shows date/time: `%d %b %R`.
 - Status updates every 60 seconds and centers the window list.
 - Activity monitoring is enabled (`monitor-activity` + `visual-activity`).
+- Popups use a high-contrast palette: white text on black with a yellow border.
 
 ## Behavior defaults
 
@@ -48,4 +49,5 @@ Use `prefix r` (with this config, `prefix` is `C-a`) to reload the file. Some op
 - Uses `fd` to list files and `fzf` for selection.
 - `ctrl-g` toggles `fd --no-ignore` with a `no-ignore>` prompt.
 - `ctrl-h` restores the default `fd` search with a `>` prompt.
+- Preview window is shown on the right; `bat` is used when available with a `cat` fallback.
 - The selected path is typed into the active pane (no automatic Enter).
