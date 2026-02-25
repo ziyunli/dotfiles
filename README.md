@@ -9,6 +9,7 @@ dotfiles/
 ├── shared/           # Configuration shared across all machines
 │   ├── .gitconfig    # Base git config (includes ~/.gitconfig.local)
 │   ├── .tmux.conf
+│   ├── TMUX_GUIDE.md # Tmux configuration guide
 │   ├── .myclirc
 │   └── ...
 ├── devices/          # Machine-specific configuration
