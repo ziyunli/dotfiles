@@ -69,4 +69,4 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 # opencode
-export PATH=/Users/ziyunli/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
