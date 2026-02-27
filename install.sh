@@ -12,6 +12,7 @@
 # Existing symlinks pointing elsewhere are replaced.
 # Symlinks already pointing to the correct target are skipped.
 # A devices/<dev>/.dotfiles-skip file can list paths to exclude from shared/.
+# A devices/<dev>/.dotfiles-merge file can list paths to deep-merge instead of symlink.
 #
 # Usage:
 #   ./install.sh <device-name>
@@ -82,6 +83,20 @@ is_skipped() {
     [[ -n "$SKIP_FILES" ]] && echo "$SKIP_FILES" | grep -qxF "$1"
 }
 
+# Load device merge list (paths that should be deep-merged instead of symlinked)
+MERGE_FILES=""
+load_merge_list() {
+    local merge_file="$DOTFILES_DIR/devices/$DEVICE/.dotfiles-merge"
+    [[ -f "$merge_file" ]] || return 0
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" == \#* ]] && continue
+        MERGE_FILES="$MERGE_FILES$line"$'\n'
+    done < "$merge_file"
+}
+is_merged() {
+    [[ -n "$MERGE_FILES" ]] && echo "$MERGE_FILES" | grep -qxF "$1"
+}
+
 link_file() {
     local src="$1" dst="$2"
     local dst_dir
@@ -113,6 +128,37 @@ link_file() {
     log "Linked: $dst -> $src"
 }
 
+merge_file() {
+    local src="$1" dst="$2"
+    local dst_dir
+    dst_dir="$(dirname "$dst")"
+
+    if [[ -n "$DRY_RUN" ]]; then
+        if [[ -f "$dst" ]] && [[ ! -L "$dst" ]]; then
+            echo "Would merge: $src + $dst -> $dst"
+        else
+            echo "Would copy: $src -> $dst (no existing file to merge)"
+        fi
+        return
+    fi
+
+    mkdir -p "$dst_dir"
+
+    # Remove symlink if it exists (e.g., leftover from previous install)
+    if [[ -L "$dst" ]]; then
+        rm "$dst"
+    fi
+
+    if [[ -f "$dst" ]]; then
+        "$DOTFILES_DIR/merge-json.sh" "$src" "$dst" > "$dst.merged.tmp"
+        mv "$dst.merged.tmp" "$dst"
+        log "Merged: $src + $dst -> $dst"
+    else
+        cp "$src" "$dst"
+        log "Copied: $src -> $dst (no existing file to merge)"
+    fi
+}
+
 # link_directory links all regular files and symbolic links found under a source
 # directory into the user's $HOME, preserving each entry's relative path.
 # When check_skip is "true", paths listed in .dotfiles-skip are excluded.
@@ -125,9 +171,13 @@ link_directory() {
 
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
-        [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".gitkeep" ]] && continue
+        [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".dotfiles-merge" || "$(basename "$rel")" == ".gitkeep" ]] && continue
         if [[ "$check_skip" == "true" ]] && is_skipped "$rel"; then
             log "Skipped: $rel (listed in .dotfiles-skip)"
+            continue
+        fi
+        if [[ "$check_skip" == "true" ]] && is_merged "$rel"; then
+            log "Deferred: $rel (will be merged)"
             continue
         fi
         link_file "$src" "$HOME/$rel"
@@ -138,6 +188,7 @@ link_directory() {
 log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
 load_skip_list
+load_merge_list
 
 # Link shared files
 if [[ -d "$DOTFILES_DIR/shared" ]]; then
@@ -150,6 +201,20 @@ fi
 # Link device-specific files
 log "Linking device-specific configuration for '$DEVICE'..."
 link_directory "$DOTFILES_DIR/devices/$DEVICE"
+
+# Merge files listed in .dotfiles-merge
+if [[ -n "$MERGE_FILES" ]]; then
+    log "Merging configuration files..."
+    while IFS= read -r rel; do
+        [[ -z "$rel" ]] && continue
+        merge_src="$DOTFILES_DIR/shared/$rel"
+        if [[ -f "$merge_src" ]]; then
+            merge_file "$merge_src" "$HOME/$rel"
+        else
+            warn "Merge source not found: $merge_src"
+        fi
+    done <<< "$MERGE_FILES"
+fi
 
 # Remind about local config
 if [[ ! -f "$HOME/.gitconfig.local" ]]; then
