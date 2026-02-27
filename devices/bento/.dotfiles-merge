@@ -1,0 +1,3 @@
+# Paths (relative to $HOME) to deep-merge instead of symlink.
+# Existing local values take precedence; conflicts are reported.
+.claude/settings.json

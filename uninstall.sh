@@ -105,6 +105,19 @@ log "Removing device-specific symlinks for '$DEVICE'..."
 unlink_directory "$DOTFILES_DIR/devices/$DEVICE"
 
 log "Done!"
+
+# Warn about merged files (not symlinks, can't auto-remove)
+merge_file="$DOTFILES_DIR/devices/$DEVICE/.dotfiles-merge"
+if [[ -f "$merge_file" ]]; then
+    log ""
+    log "NOTE: The following files were merged (not symlinked) and cannot be auto-removed:"
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" == \#* ]] && continue
+        echo "  ~/$line"
+    done < "$merge_file"
+    log "You may want to manually remove or restore them."
+fi
+
 log ""
 log "NOTE: Backup files (if any) were left in ~/.dotfiles-backup-*"
 log "      You may want to restore them manually."
