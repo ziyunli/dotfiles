@@ -1,3 +1,1 @@
 # Paths (relative to $HOME) to skip when linking shared files.
-# The company environment manages these directly.
-.claude/settings.json
