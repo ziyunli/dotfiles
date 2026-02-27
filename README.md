@@ -209,6 +209,18 @@ Lists paths from `shared/` that should NOT be symlinked for this device. One pat
 
 Use this when a device manages certain configs externally (e.g., corporate-managed settings) or when a shared config conflicts with device-specific needs.
 
+### `devices/<hostname>/.dotfiles-merge` (optional)
+
+Lists paths from `shared/` that should be **deep-merged** instead of symlinked. One path per line, relative to `$HOME`. Lines starting with `#` are comments.
+
+```bash
+# Example: devices/bento/.dotfiles-merge
+# Personal settings are merged with existing local (company) config.
+.claude/settings.json
+```
+
+Use this when a device has its own version of a config file (e.g., company-injected settings) that should be combined with your personal settings. Merge semantics: objects are recursively merged, arrays are unioned, and existing local scalar values take precedence. Conflicts are reported to stderr.
+
 ## How It Works
 
 - **install.sh** creates symlinks from `$HOME` to files in the repo
