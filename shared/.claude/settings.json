@@ -166,6 +166,14 @@
     "accelerated-learning@rabbit-hole": true,
     "gopls-lsp@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "rabbit-hole": {
+      "source": {
+        "source": "github",
+        "repo": "BunnyRocks/rabbit-hole"
+      }
+    }
+  },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high"
 }
