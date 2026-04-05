@@ -34,7 +34,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -159,12 +159,27 @@
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "accelerated-learning@rabbit-hole": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "burrow-keeper@rabbit-hole": true,
+    "obsidian@obsidian-skills": true
+  },
+  "extraKnownMarketplaces": {
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kepano/obsidian-skills"
+      }
+    },
+    "rabbit-hole": {
+      "source": {
+        "source": "github",
+        "repo": "BunnyRocks/rabbit-hole"
+      }
+    }
   },
   "extraKnownMarketplaces": {
     "rabbit-hole": {
