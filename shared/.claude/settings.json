@@ -168,24 +168,16 @@
     "obsidian@obsidian-skills": true
   },
   "extraKnownMarketplaces": {
+    "rabbit-hole": {
+      "source": {
+        "source": "github",
+        "repo": "BunnyRocks/rabbit-hole"
+      }
+    },
     "obsidian-skills": {
       "source": {
         "source": "github",
         "repo": "kepano/obsidian-skills"
-      }
-    },
-    "rabbit-hole": {
-      "source": {
-        "source": "github",
-        "repo": "BunnyRocks/rabbit-hole"
-      }
-    }
-  },
-  "extraKnownMarketplaces": {
-    "rabbit-hole": {
-      "source": {
-        "source": "github",
-        "repo": "BunnyRocks/rabbit-hole"
       }
     }
   },
