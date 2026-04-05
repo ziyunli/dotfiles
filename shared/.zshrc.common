@@ -236,3 +236,6 @@ function activate-venv() {
     source "$HOME/.venv/$selected_env/bin/activate"
   fi
 }
+
+# By default, Ollama unloads models after 5 minutes of inactivity.
+export OLLAMA_KEEP_ALIVE="-1"
