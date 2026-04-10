@@ -70,3 +70,10 @@ unset __conda_setup
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# bun completions
+[ -s "/Users/ziyunli/.bun/_bun" ] && source "/Users/ziyunli/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
