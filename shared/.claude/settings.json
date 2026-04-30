@@ -185,5 +185,6 @@
       }
     }
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "editorMode": "vim"
 }
