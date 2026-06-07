@@ -183,5 +183,8 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "editorMode": "vim"
+  "skipWorkflowUsageWarning": true,
+  "editorMode": "vim",
+  "agentPushNotifEnabled": true,
+  "model": "opus"
 }
