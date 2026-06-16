@@ -9,18 +9,19 @@
 # ~/.dotfiles-backup-*/ if they exist.
 #
 # Usage:
-#   ./uninstall.sh <device-name>
+#   ./uninstall.sh [device-name]
 #
 # Arguments:
-#   device-name   Name of device folder in devices/ (required)
+#   device-name   Name of device folder in devices/ (default: hostname -s)
 #
 # Environment:
 #   DRY_RUN       Set to any value to preview changes without making them
 #
 # Examples:
+#   ./uninstall.sh                    # Uninstall for current hostname
 #   ./uninstall.sh bento              # Uninstall for bento device
 #   ./uninstall.sh Ziyuns-Mac-mini    # Uninstall for Mac mini
-#   DRY_RUN=1 ./uninstall.sh bento    # Preview what would be removed
+#   DRY_RUN=1 ./uninstall.sh          # Preview what would be removed
 #
 set -euo pipefail
 
@@ -37,17 +38,17 @@ print_available_devices() {
     fi
 }
 
-if [[ $# -eq 0 ]]; then
-    echo "Error: device name is required." >&2
+if [[ $# -gt 1 ]]; then
+    echo "Error: expected at most one device name." >&2
     echo "" >&2
     echo "Available devices:" >&2
     print_available_devices
     echo "" >&2
-    echo "Usage: $0 <device-name>" >&2
+    echo "Usage: $0 [device-name]" >&2
     exit 1
 fi
 
-DEVICE="$1"
+DEVICE="${1:-$(hostname -s)}"
 
 if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     echo "Error: no device configuration found for '$DEVICE'" >&2
@@ -55,7 +56,7 @@ if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     echo "Available devices:" >&2
     print_available_devices
     echo "" >&2
-    echo "Usage: $0 <device-name>" >&2
+    echo "Usage: $0 [device-name]" >&2
     exit 1
 fi
 

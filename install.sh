@@ -15,18 +15,19 @@
 # A devices/<dev>/.dotfiles-merge file can list paths to deep-merge instead of symlink.
 #
 # Usage:
-#   ./install.sh <device-name>
+#   ./install.sh [device-name]
 #
 # Arguments:
-#   device-name   Name of device folder in devices/ (required)
+#   device-name   Name of device folder in devices/ (default: hostname -s)
 #
 # Environment:
 #   DRY_RUN       Set to any value to preview changes without making them
 #
 # Examples:
+#   ./install.sh                    # Install for current hostname
 #   ./install.sh bento              # Install for bento device
 #   ./install.sh Ziyuns-Mac-mini    # Install for Mac mini
-#   DRY_RUN=1 ./install.sh bento    # Preview what would be linked
+#   DRY_RUN=1 ./install.sh          # Preview what would be linked
 #
 set -euo pipefail
 
@@ -44,17 +45,17 @@ print_available_devices() {
     fi
 }
 
-if [[ $# -eq 0 ]]; then
-    echo "Error: device name is required." >&2
+if [[ $# -gt 1 ]]; then
+    echo "Error: expected at most one device name." >&2
     echo "" >&2
     echo "Available devices:" >&2
     print_available_devices
     echo "" >&2
-    echo "Usage: $0 <device-name>" >&2
+    echo "Usage: $0 [device-name]" >&2
     exit 1
 fi
 
-DEVICE="$1"
+DEVICE="${1:-$(hostname -s)}"
 
 if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     echo "Error: no device configuration found for '$DEVICE'" >&2
@@ -62,7 +63,7 @@ if [[ ! -d "$DOTFILES_DIR/devices/$DEVICE" ]]; then
     echo "Available devices:" >&2
     print_available_devices
     echo "" >&2
-    echo "Usage: $0 <device-name>" >&2
+    echo "Usage: $0 [device-name]" >&2
     exit 1
 fi
 

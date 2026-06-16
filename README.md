@@ -77,6 +77,57 @@ cd ~/.dotfiles
 ./install.sh <device>     # Specify device explicitly
 ```
 
+### Bootstrap a new Mac
+
+Install Homebrew first:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Add Homebrew to login shells so `brew` is available after opening a new terminal:
+
+```bash
+echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+
+Install and authenticate GitHub CLI, then add an SSH key for SSH-based GitHub clones:
+
+```bash
+brew install gh
+gh auth login
+ssh-keygen -t ed25519 -C "your_email@example.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+gh ssh-key add ~/.ssh/id_ed25519.pub --title "personal laptop"
+```
+
+Install Oh My Zsh:
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+Install the shell dependencies used by `shared/.zshrc.common`:
+
+```bash
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
+git clone --depth 1 https://github.com/agkozak/agkozak-zsh-theme ~/.oh-my-zsh/custom/themes/agkozak
+ln -s ~/.oh-my-zsh/custom/themes/agkozak/agkozak-zsh-prompt.plugin.zsh ~/.oh-my-zsh/custom/themes/agkozak.zsh-theme
+```
+
+Then install the dotfiles for the current hostname:
+
+```bash
+git clone git@github.com:ziyunli/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./install.sh
+```
+
 ### Preview what install/uninstall would do
 
 ```bash
