@@ -1,3 +1,0 @@
-# Compatibility placeholder for Ghostty releases that still read ~/.config/ghostty/config.
-# Do not include config.ghostty here: Ghostty may load both filenames by default,
-# and pointing one default file at another can trigger cycle detection.

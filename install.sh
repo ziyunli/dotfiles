@@ -11,6 +11,7 @@
 # Existing files are backed up to ~/.dotfiles-backup-<timestamp>/
 # Existing symlinks pointing elsewhere are replaced.
 # Symlinks already pointing to the correct target are skipped.
+# Obsolete repo-owned symlinks are removed when configs move or are retired.
 # A devices/<dev>/.dotfiles-skip file can list paths to exclude from shared/.
 # A devices/<dev>/.dotfiles-merge file can list paths to deep-merge instead of symlink.
 #
@@ -70,6 +71,11 @@ fi
 log() { echo "[dotfiles] $*"; }
 warn() { echo "[dotfiles] WARNING: $*" >&2; }
 
+OBSOLETE_SHARED_LINKS=(
+    ".config/ghostty/config"
+    "Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+)
+
 # Load device skip list (paths that shared/ should not overwrite)
 SKIP_FILES=""
 load_skip_list() {
@@ -127,6 +133,35 @@ link_file() {
 
     ln -s "$src" "$dst"
     log "Linked: $dst -> $src"
+}
+
+remove_obsolete_shared_link() {
+    local rel="$1" dst="$HOME/$rel"
+
+    if [[ -L "$dst" ]]; then
+        local target
+        target="$(readlink "$dst")"
+        if [[ "$target" == "$DOTFILES_DIR/"* ]]; then
+            if [[ -n "$DRY_RUN" ]]; then
+                echo "Would remove obsolete symlink: $dst"
+            else
+                rm "$dst"
+                log "Removed obsolete symlink: $dst"
+            fi
+        else
+            warn "Obsolete path is a symlink outside this repo: $dst -> $target"
+        fi
+    elif [[ -e "$dst" ]]; then
+        warn "Obsolete path exists and may shadow managed config: $dst"
+    fi
+}
+
+remove_obsolete_shared_links() {
+    local rel
+
+    for rel in "${OBSOLETE_SHARED_LINKS[@]}"; do
+        remove_obsolete_shared_link "$rel"
+    done
 }
 
 merge_file() {
@@ -190,6 +225,7 @@ log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
 load_skip_list
 load_merge_list
+remove_obsolete_shared_links
 
 # Link shared files
 if [[ -d "$DOTFILES_DIR/shared" ]]; then

@@ -22,6 +22,12 @@ assert_file_not_contains() {
     ! grep -Fq -- "$unexpected" "$file" || fail "$file unexpectedly contains: $unexpected"
 }
 
+assert_path_not_exists() {
+    local path="$1"
+
+    [[ ! -e "$path" && ! -L "$path" ]] || fail "$path should not exist"
+}
+
 with_fake_hostname() {
     local temp_home temp_bin output
 
@@ -43,6 +49,28 @@ with_fake_hostname() {
         fail "install.sh did not include the current MBP .zprofile starter"
     [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc"* ]] ||
         fail "install.sh did not include the current MBP .zshrc starter"
+    [[ "$output" != *"Would link: $temp_home/.config/ghostty/config ->"* ]] ||
+        fail "install.sh should not link the legacy Ghostty config filename"
+    [[ "$output" != *"Would link: $temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty ->"* ]] ||
+        fail "install.sh should not link the macOS Ghostty config when XDG is canonical"
+
+    mkdir -p "$temp_home/.config/ghostty" "$temp_home/Library/Application Support/com.mitchellh.ghostty"
+    ln -s "$ROOT_DIR/shared/.config/ghostty/config" "$temp_home/.config/ghostty/config"
+    ln -s "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" "$temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+
+    output="$(
+        PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" 2>&1
+    )"
+    [[ "$output" == *"Would remove obsolete symlink: $temp_home/.config/ghostty/config"* ]] ||
+        fail "install.sh dry run did not clean up the legacy Ghostty config symlink"
+    [[ "$output" == *"Would remove obsolete symlink: $temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"* ]] ||
+        fail "install.sh dry run did not clean up the macOS Ghostty config symlink"
+
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    assert_path_not_exists "$temp_home/.config/ghostty/config"
+    assert_path_not_exists "$temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+    [[ -L "$temp_home/.config/ghostty/config.ghostty" ]] ||
+        fail "install.sh did not link the XDG Ghostty config"
 
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/uninstall.sh" 2>&1
@@ -81,12 +109,10 @@ assert_file_contains "$ROOT_DIR/shared/.zshrc.common" '-z "${SSH_CONNECTION:-}"'
 
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys on'
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'GHOSTTY_RESOURCES_DIR'
-assert_file_not_contains "$ROOT_DIR/shared/.config/ghostty/config" 'config-file ='
 assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path'
 assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'macos-option-as-alt = left'
-assert_file_contains "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" 'shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path'
-assert_file_contains "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" 'macos-option-as-alt = left'
-assert_file_not_contains "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" 'config-file ='
+assert_path_not_exists "$ROOT_DIR/shared/.config/ghostty/config"
+assert_path_not_exists "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
 
 assert_file_contains "$ROOT_DIR/README.md" '### Bootstrap a new Mac'
 assert_file_contains "$ROOT_DIR/README.md" '### Zsh startup files'

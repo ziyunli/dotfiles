@@ -9,13 +9,17 @@ Ghostty 1.3 reads `config.ghostty`. On macOS, Ghostty checks:
 1. `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`
 2. `~/.config/ghostty/config.ghostty`
 
-The repo manages both paths:
+The repo manages the XDG path only:
 
-- `shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty` contains the macOS default settings.
 - `shared/.config/ghostty/config.ghostty` contains the XDG default settings.
-- `shared/.config/ghostty/config` is a compatibility placeholder for Ghostty releases that read the older XDG filename.
 
-Do not use `config-file` to point one default Ghostty config file at another. Ghostty can load multiple default files during startup, and that indirection can trigger cycle detection.
+`install.sh` removes repo-owned symlinks at the macOS default path and the older
+`~/.config/ghostty/config` filename. Ghostty checks the macOS default path before
+XDG, so leaving an old symlink there would shadow the canonical config.
+
+Do not use `config-file` to point one default Ghostty config file at another.
+Ghostty can load multiple default files during startup, and that indirection can
+trigger cycle detection.
 
 ## Shell integration
 
