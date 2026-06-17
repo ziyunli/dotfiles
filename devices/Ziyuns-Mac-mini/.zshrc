@@ -1,9 +1,6 @@
 # Mac mini zsh configuration
 # Sources shared config and adds machine-specific settings
 
-# Homebrew (must be before sourcing shared config for completions/plugin)
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
 # macOS-specific plugin (must be set before sourcing shared config)
 DEVICE_PLUGINS=(macos)
 
@@ -67,9 +64,6 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"
 
 # bun completions
 [ -s "/Users/ziyunli/.bun/_bun" ] && source "/Users/ziyunli/.bun/_bun"

@@ -29,36 +29,47 @@ with_fake_hostname() {
     temp_bin="$(mktemp -d)"
     trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
 
-    printf '#!/usr/bin/env bash\nprintf "Ziyuns-MBP\\n"\n' > "$temp_bin/hostname"
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MacBook-Pro\\n"\n' > "$temp_bin/hostname"
     chmod +x "$temp_bin/hostname"
 
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" 2>&1
     )"
-    [[ "$output" == *"[dotfiles] Installing dotfiles for device: Ziyuns-MBP"* ]] ||
+    [[ "$output" == *"[dotfiles] Installing dotfiles for device: Ziyuns-M5-MacBook-Pro"* ]] ||
         fail "install.sh did not default to hostname"
-    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-MBP/.zshrc"* ]] ||
-        fail "install.sh did not include the MBP .zshrc starter"
+    [[ "$output" == *"Would link: $temp_home/.zprofile.macos -> $ROOT_DIR/shared/.zprofile.macos"* ]] ||
+        fail "install.sh did not include the shared macOS .zprofile"
+    [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile"* ]] ||
+        fail "install.sh did not include the current MBP .zprofile starter"
+    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc"* ]] ||
+        fail "install.sh did not include the current MBP .zshrc starter"
 
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/uninstall.sh" 2>&1
     )"
-    [[ "$output" == *"[dotfiles] Uninstalling dotfiles for device: Ziyuns-MBP"* ]] ||
+    [[ "$output" == *"[dotfiles] Uninstalling dotfiles for device: Ziyuns-M5-MacBook-Pro"* ]] ||
         fail "uninstall.sh did not default to hostname"
 }
 
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'typeset -U path'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.local/bin"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.opencode/bin"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/bin"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/go/bin"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.cargo/bin"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.opencode/bin"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/bin"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/go/bin"'
+assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.cargo/bin"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile" 'source ~/.zprofile.macos'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc" 'DEVICE_PLUGINS=(macos)'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc" 'source ~/.zshrc.common'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'source ~/.zprofile.macos'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" '# MBP zsh configuration'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'source ~/.zshrc.common'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zprofile" 'source ~/.zprofile.macos'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'export PATH='
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" '.opencode/bin'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.local/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
@@ -66,6 +77,7 @@ assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.c
 
 assert_file_contains "$ROOT_DIR/README.md" '### Bootstrap a new Mac'
 assert_file_contains "$ROOT_DIR/README.md" '### Zsh startup files'
+assert_file_contains "$ROOT_DIR/README.md" '`~/.zprofile.macos` contains macOS login-shell environment shared by personal Apple devices'
 assert_file_contains "$ROOT_DIR/README.md" '`~/.zprofile` is for login-shell environment'
 assert_file_contains "$ROOT_DIR/README.md" '`~/.zshrc` is for interactive shell behavior'
 assert_file_contains "$ROOT_DIR/README.md" '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'

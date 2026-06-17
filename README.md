@@ -69,11 +69,12 @@ brew install ncdu htop prettyping bat fd eza neovim gh jq zoxide tig
 
 Use zsh startup files by responsibility:
 
+- `~/.zprofile.macos` contains macOS login-shell environment shared by personal Apple devices.
 - `~/.zprofile` is for login-shell environment inherited by child processes: Homebrew `shellenv`, durable PATH entries, and language or tool paths.
 - `~/.zshrc` is for interactive shell behavior: Oh My Zsh, prompt, plugins, completions, aliases, and shell functions.
 - Non-login interactive shells such as `zsh -ic '...'` do not read `~/.zprofile`; they inherit PATH from their parent process.
 
-Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.
+Personal Apple device `.zprofile` files should source `~/.zprofile.macos`. Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.
 
 ## Recipes
 
@@ -102,6 +103,8 @@ echo >> ~/.zprofile
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
+
+After the dotfiles are installed, personal Apple device `.zprofile` files source the repo-managed `~/.zprofile.macos` for this setup.
 
 Install and authenticate GitHub CLI, then add an SSH key for SSH-based GitHub clones:
 
