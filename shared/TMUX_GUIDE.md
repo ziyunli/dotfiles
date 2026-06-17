@@ -9,6 +9,7 @@ Use `prefix r` (with this config, `prefix` is `C-a`) to reload the file. Some op
 ## Terminal and clipboard
 
 - Default terminal is set to `tmux-256color` when available, otherwise `screen-256color`.
+- Extended keys use CSI-u format so modified keys such as Shift-Enter work in terminal apps that expect it.
 - OSC52 clipboard integration is enabled via `set -s set-clipboard on`.
 - `allow-passthrough` is enabled when supported (requires tmux 3.3+; no-op otherwise).
 

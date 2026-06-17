@@ -108,6 +108,7 @@ assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A 
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" '-z "${SSH_CONNECTION:-}"'
 
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys on'
+assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys-format csi-u'
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'GHOSTTY_RESOURCES_DIR'
 assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path'
 assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'macos-option-as-alt = left'
