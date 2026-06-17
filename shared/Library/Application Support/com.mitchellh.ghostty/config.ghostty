@@ -1,0 +1,3 @@
+# macOS Ghostty reads this path before XDG config.
+# Keep the shared settings in ~/.config/ghostty/config.ghostty.
+config-file = "../../../.config/ghostty/config.ghostty"

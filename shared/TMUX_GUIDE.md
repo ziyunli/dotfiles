@@ -23,10 +23,27 @@ Use `prefix r` (with this config, `prefix` is `C-a`) to reload the file. Some op
 
 ## Behavior defaults
 
+- Ghostty-launched interactive shells auto-attach to tmux session `main`.
 - Mouse support enabled.
 - Prefix key is `C-a`; `C-b` is unbound.
 - `escape-time` set to `1` for snappier prefix handling.
 - Window and pane indices start at `1`.
+
+## Ghostty auto-attach
+
+`shared/.zshrc.common` starts `tmux new-session -A -s main` when all of these are true:
+
+- The shell is interactive.
+- The shell is running under Ghostty (`GHOSTTY_RESOURCES_DIR` is set).
+- The shell is not already inside tmux (`TMUX` is empty).
+- The shell is not an SSH login (`SSH_CONNECTION` is empty).
+- `tmux` is available on `PATH`.
+
+This keeps normal non-Ghostty shells unchanged, avoids recursive tmux panes, and avoids starting local tmux inside remote SSH sessions.
+
+Ghostty shell integration is also sourced from `shared/.zshrc.common` when Ghostty exposes its resources directory. Ghostty only auto-injects integration into direct child shells; tmux-created shells need the manual source so prompt marks, title updates, and Ghostty's SSH helpers still work.
+
+The tmux `update-environment` list includes Ghostty variables such as `GHOSTTY_RESOURCES_DIR`, `GHOSTTY_SHELL_FEATURES`, and `GHOSTTY_BIN_DIR`. That lets panes created from an existing tmux server see Ghostty integration metadata after a new Ghostty client attaches.
 
 ## Keybindings
 

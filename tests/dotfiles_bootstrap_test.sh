@@ -12,14 +12,14 @@ assert_file_contains() {
     local file="$1"
     local expected="$2"
 
-    grep -Fq "$expected" "$file" || fail "$file is missing: $expected"
+    grep -Fq -- "$expected" "$file" || fail "$file is missing: $expected"
 }
 
 assert_file_not_contains() {
     local file="$1"
     local unexpected="$2"
 
-    ! grep -Fq "$unexpected" "$file" || fail "$file unexpectedly contains: $unexpected"
+    ! grep -Fq -- "$unexpected" "$file" || fail "$file unexpectedly contains: $unexpected"
 }
 
 with_fake_hostname() {
@@ -74,6 +74,17 @@ assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.l
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.cargo/bin:$PATH"'
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export TERM="xterm-256color"'
+assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"'
+assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A -s main'
+assert_file_contains "$ROOT_DIR/shared/.zshrc.common" '-z "${SSH_CONNECTION:-}"'
+
+assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys on'
+assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'GHOSTTY_RESOURCES_DIR'
+assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config" 'config-file = "config.ghostty"'
+assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path'
+assert_file_contains "$ROOT_DIR/shared/.config/ghostty/config.ghostty" 'macos-option-as-alt = left'
+assert_file_contains "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" 'config-file = "../../../.config/ghostty/config.ghostty"'
 
 assert_file_contains "$ROOT_DIR/README.md" '### Bootstrap a new Mac'
 assert_file_contains "$ROOT_DIR/README.md" '### Zsh startup files'
@@ -87,6 +98,8 @@ assert_file_contains "$ROOT_DIR/README.md" 'gh ssh-key add ~/.ssh/id_ed25519.pub
 assert_file_contains "$ROOT_DIR/README.md" 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf'
 assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.com/agkozak/agkozak-zsh-theme ~/.oh-my-zsh/custom/themes/agkozak'
+assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'Ghostty-launched interactive shells auto-attach to tmux session `main`.'
+assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
 
 with_fake_hostname
 

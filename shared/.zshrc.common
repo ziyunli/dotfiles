@@ -90,6 +90,18 @@ fi
 
 source $ZSH/oh-my-zsh.sh
 
+# Ghostty auto-injects this only into direct child shells. Source it here so
+# tmux-created shells keep prompt marks, title updates, and SSH helpers.
+if [[ -n "${GHOSTTY_RESOURCES_DIR:-}" && -r "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration" ]]; then
+  source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
+fi
+
+# Ghostty opens a normal shell; promote that shell into a persistent tmux client.
+# Nested tmux panes and SSH sessions must keep their existing shell process.
+if [[ -o interactive && -n "${GHOSTTY_RESOURCES_DIR:-}" && -z "${TMUX:-}" && -z "${SSH_CONNECTION:-}" ]] && command -v tmux >/dev/null 2>&1; then
+  exec tmux new-session -A -s main
+fi
+
 # User configuration
 
 # Durable PATH setup belongs in login-shell environment files such as ~/.zprofile.
@@ -104,7 +116,7 @@ source $ZSH/oh-my-zsh.sh
 #   export EDITOR='mvim'
 # fi
 export GIT_CEILING_DIRECTORIES=~
-export TERM="xterm-256color"
+# TERM is negotiated by the terminal emulator, tmux, and SSH.
 export EDITOR='nvim'
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
