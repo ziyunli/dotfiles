@@ -45,6 +45,8 @@ with_fake_hostname() {
         fail "install.sh did not default to hostname"
     [[ "$output" == *"Would link: $temp_home/.zprofile.macos -> $ROOT_DIR/shared/.zprofile.macos"* ]] ||
         fail "install.sh did not include the shared macOS .zprofile"
+    [[ "$output" == *"Would link: $temp_home/.pi/agent/AGENTS.md -> $ROOT_DIR/shared/.pi/agent/AGENTS.md"* ]] ||
+        fail "install.sh did not include the shared Pi agent instructions"
     [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile"* ]] ||
         fail "install.sh did not include the current MBP .zprofile starter"
     [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc"* ]] ||
