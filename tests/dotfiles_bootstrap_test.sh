@@ -15,6 +15,13 @@ assert_file_contains() {
     grep -Fq "$expected" "$file" || fail "$file is missing: $expected"
 }
 
+assert_file_not_contains() {
+    local file="$1"
+    local unexpected="$2"
+
+    ! grep -Fq "$unexpected" "$file" || fail "$file unexpectedly contains: $unexpected"
+}
+
 with_fake_hostname() {
     local temp_home temp_bin output
 
@@ -41,11 +48,26 @@ with_fake_hostname() {
 }
 
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'typeset -U path'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.local/bin"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.opencode/bin"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/bin"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/go/bin"'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" '"$HOME/.cargo/bin"'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" '# MBP zsh configuration'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'source ~/.zshrc.common'
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'export PATH='
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.local/bin:$PATH"'
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bin:$PATH"'
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.cargo/bin:$PATH"'
 
 assert_file_contains "$ROOT_DIR/README.md" '### Bootstrap a new Mac'
+assert_file_contains "$ROOT_DIR/README.md" '### Zsh startup files'
+assert_file_contains "$ROOT_DIR/README.md" '`~/.zprofile` is for login-shell environment'
+assert_file_contains "$ROOT_DIR/README.md" '`~/.zshrc` is for interactive shell behavior'
 assert_file_contains "$ROOT_DIR/README.md" '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
 assert_file_contains "$ROOT_DIR/README.md" 'brew install gh'
 assert_file_contains "$ROOT_DIR/README.md" 'ssh-keygen -t ed25519 -C "your_email@example.com"'

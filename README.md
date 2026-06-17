@@ -65,6 +65,16 @@ Install via Homebrew:
 brew install ncdu htop prettyping bat fd eza neovim gh jq zoxide tig
 ```
 
+### Zsh startup files
+
+Use zsh startup files by responsibility:
+
+- `~/.zprofile` is for login-shell environment inherited by child processes: Homebrew `shellenv`, durable PATH entries, and language or tool paths.
+- `~/.zshrc` is for interactive shell behavior: Oh My Zsh, prompt, plugins, completions, aliases, and shell functions.
+- Non-login interactive shells such as `zsh -ic '...'` do not read `~/.zprofile`; they inherit PATH from their parent process.
+
+Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.
+
 ## Recipes
 
 ### Install dotfiles on a new system
