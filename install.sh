@@ -72,6 +72,7 @@ log() { echo "[dotfiles] $*"; }
 warn() { echo "[dotfiles] WARNING: $*" >&2; }
 
 OBSOLETE_SHARED_LINKS=(
+    "AGENTS.md"
     ".config/ghostty/config"
     "Library/Application Support/com.mitchellh.ghostty/config.ghostty"
 )
@@ -102,6 +103,15 @@ load_merge_list() {
 }
 is_merged() {
     [[ -n "$MERGE_FILES" ]] && echo "$MERGE_FILES" | grep -qxF "$1"
+}
+
+is_obsolete_shared_link() {
+    local rel="$1" obsolete
+
+    for obsolete in "${OBSOLETE_SHARED_LINKS[@]}"; do
+        [[ "$rel" == "$obsolete" ]] && return 0
+    done
+    return 1
 }
 
 link_file() {
@@ -208,6 +218,10 @@ link_directory() {
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
         [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".dotfiles-merge" || "$(basename "$rel")" == ".gitkeep" ]] && continue
+        if [[ "$check_skip" == "true" ]] && is_obsolete_shared_link "$rel"; then
+            log "Skipped obsolete shared link: $rel"
+            continue
+        fi
         if [[ "$check_skip" == "true" ]] && is_skipped "$rel"; then
             log "Skipped: $rel (listed in .dotfiles-skip)"
             continue

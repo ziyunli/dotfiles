@@ -47,6 +47,8 @@ with_fake_hostname() {
         fail "install.sh did not include the shared macOS .zprofile"
     [[ "$output" == *"Would link: $temp_home/.pi/agent/AGENTS.md -> $ROOT_DIR/shared/.pi/agent/AGENTS.md"* ]] ||
         fail "install.sh did not include the shared Pi agent instructions"
+    [[ "$output" != *"Would link: $temp_home/AGENTS.md ->"* ]] ||
+        fail "install.sh should not link the root AGENTS.md"
     [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile"* ]] ||
         fail "install.sh did not include the current MBP .zprofile starter"
     [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc"* ]] ||
@@ -59,16 +61,20 @@ with_fake_hostname() {
     mkdir -p "$temp_home/.config/ghostty" "$temp_home/Library/Application Support/com.mitchellh.ghostty"
     ln -s "$ROOT_DIR/shared/.config/ghostty/config" "$temp_home/.config/ghostty/config"
     ln -s "$ROOT_DIR/shared/Library/Application Support/com.mitchellh.ghostty/config.ghostty" "$temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+    ln -s "$ROOT_DIR/shared/AGENTS.md" "$temp_home/AGENTS.md"
 
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" 2>&1
     )"
+    [[ "$output" == *"Would remove obsolete symlink: $temp_home/AGENTS.md"* ]] ||
+        fail "install.sh dry run did not clean up the root AGENTS.md symlink"
     [[ "$output" == *"Would remove obsolete symlink: $temp_home/.config/ghostty/config"* ]] ||
         fail "install.sh dry run did not clean up the legacy Ghostty config symlink"
     [[ "$output" == *"Would remove obsolete symlink: $temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"* ]] ||
         fail "install.sh dry run did not clean up the macOS Ghostty config symlink"
 
     PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    assert_path_not_exists "$temp_home/AGENTS.md"
     assert_path_not_exists "$temp_home/.config/ghostty/config"
     assert_path_not_exists "$temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
     [[ -L "$temp_home/.config/ghostty/config.ghostty" ]] ||
