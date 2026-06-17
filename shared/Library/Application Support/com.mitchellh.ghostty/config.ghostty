@@ -1,3 +1,24 @@
-# macOS Ghostty reads this path before XDG config.
-# Keep the shared settings in ~/.config/ghostty/config.ghostty.
-config-file = "../../../.config/ghostty/config.ghostty"
+# Shared Ghostty defaults for tmux-heavy SSH work.
+#
+# This macOS default config duplicates the XDG config intentionally. Ghostty may
+# load multiple default files; using config-file between them can create cycles.
+
+# Keep shell integration enabled so prompt marks, titles, and SSH wrappers work
+# when the zsh integration is loaded.
+shell-integration = detect
+
+# Enable SSH helpers:
+# - ssh-env sends truecolor/program metadata and uses xterm-256color fallback.
+# - ssh-terminfo installs and caches xterm-ghostty terminfo on remote hosts.
+# sudo stays disabled so shared shell config does not wrap sudo.
+shell-integration-features = cursor,no-sudo,title,ssh-env,ssh-terminfo,path
+
+# Treat left Option as terminal Alt/Meta for readline, zsh, vim, and tmux.
+# Right Option remains available for macOS character input.
+macos-option-as-alt = left
+
+# Clipboard policy for local and remote terminal workflows.
+# Programs may write via OSC52; reads still ask before exposing clipboard data.
+clipboard-read = ask
+clipboard-write = allow
+copy-on-select = true
