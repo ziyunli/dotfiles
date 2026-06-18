@@ -10,3 +10,8 @@
 if [[ -d "$HOME/.fzf/bin" && ":$PATH:" != *":$HOME/.fzf/bin:"* ]]; then
   export PATH="$HOME/.fzf/bin:$PATH"
 fi
+
+# >>> gohan setup, do not edit this section <<<
+# !! Contents within this block are managed by gohan !!
+[ -f "/Users/stephenli/.config/gohan/gohan.sh" ] && source "/Users/stephenli/.config/gohan/gohan.sh"
+# <<< gohan setup end <<<
