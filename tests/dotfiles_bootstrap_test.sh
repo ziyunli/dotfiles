@@ -79,6 +79,33 @@ with_fake_hostname() {
         fail "uninstall.sh did not default to hostname"
 }
 
+with_explicit_work_devices() {
+    local temp_home output
+
+    temp_home="$(mktemp -d)"
+    trap 'rm -rf "$temp_home"' RETURN
+
+    output="$(
+        HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" insta-laptop 2>&1
+    )"
+    [[ "$output" == *"[dotfiles] Installing dotfiles for device: insta-laptop"* ]] ||
+        fail "install.sh did not accept explicit insta-laptop device"
+    [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/insta-laptop/.zprofile"* ]] ||
+        fail "insta-laptop install did not include work laptop .zprofile"
+    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/insta-laptop/.zshrc"* ]] ||
+        fail "insta-laptop install did not include work laptop .zshrc"
+
+    output="$(
+        HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" bento 2>&1
+    )"
+    [[ "$output" == *"[dotfiles] Installing dotfiles for device: bento"* ]] ||
+        fail "install.sh did not accept explicit bento device"
+    [[ "$output" == *"Would link: $temp_home/.shellrc.d/005_oh-my-zshrc.zsh -> $ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh"* ]] ||
+        fail "bento install did not include oh-my-zsh shellrc hook"
+    [[ "$output" == *"Would link: $temp_home/.shellrc.d/080_fzf.zsh -> $ROOT_DIR/devices/bento/.shellrc.d/080_fzf.zsh"* ]] ||
+        fail "bento install did not include fzf shellrc hook"
+}
+
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
@@ -94,6 +121,12 @@ assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" '# MBP zsh configurat
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'source ~/.zshrc.common'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zprofile" 'source ~/.zprofile.macos'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zprofile" 'source ~/.zprofile.macos'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zprofile" 'source ~/.orbstack/shell/init.zsh 2>/dev/null || :'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'DEVICE_PLUGINS=(macos)'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'source ~/.zshrc.common'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'source "$HOME/.config/gohan/gohan.sh"'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'source "$HOME/.instacart_shell_profile"'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'export PATH='
@@ -129,7 +162,9 @@ assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.c
 assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.com/agkozak/agkozak-zsh-theme ~/.oh-my-zsh/custom/themes/agkozak'
 assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'Ghostty-launched interactive shells auto-attach to tmux session `main`.'
 assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
+assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 'source ~/.zshrc.common'
 
 with_fake_hostname
+with_explicit_work_devices
 
 echo "ok - dotfiles bootstrap checks passed"
