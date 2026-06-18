@@ -11,5 +11,5 @@ source ~/.zshrc.common
 
 # >>> gohan setup, do not edit this section <<<
 # !! Contents within this block are managed by gohan !!
-[ -f "$HOME/.config/gohan/gohan.sh" ] && source "$HOME/.config/gohan/gohan.sh"
+[ -f "/Users/stephenli/.config/gohan/gohan.sh" ] && source "/Users/stephenli/.config/gohan/gohan.sh"
 # <<< gohan setup end <<<
