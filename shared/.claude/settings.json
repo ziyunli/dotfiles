@@ -6,7 +6,6 @@
   },
   "permissions": {
     "allow": [
-      "*",
       "Bash",
       "Bash(claude mcp list)",
       "Read",
@@ -36,6 +35,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "opus",
   "hooks": {},
   "statusLine": {
     "type": "command",
@@ -67,7 +67,7 @@
   },
   "alwaysThinkingEnabled": true,
   "skipWorkflowUsageWarning": true,
+  "theme": "dark",
   "editorMode": "vim",
-  "agentPushNotifEnabled": true,
-  "model": "opus"
+  "agentPushNotifEnabled": true
 }
