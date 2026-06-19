@@ -8,8 +8,3 @@ source ~/.zshrc.common
 
 # Instacart setup owns this profile; keep its generated contents local.
 [ -f "$HOME/.instacart_shell_profile" ] && source "$HOME/.instacart_shell_profile"
-
-# >>> gohan setup, do not edit this section <<<
-# !! Contents within this block are managed by gohan !!
-[ -f "/Users/stephenli/.config/gohan/gohan.sh" ] && source "/Users/stephenli/.config/gohan/gohan.sh"
-# <<< gohan setup end <<<

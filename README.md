@@ -72,6 +72,7 @@ Use zsh startup files by responsibility:
 - `~/.zprofile.macos` contains macOS login-shell environment shared by personal Apple devices.
 - `~/.zprofile` is for login-shell environment inherited by child processes: Homebrew `shellenv`, durable PATH entries, and language or tool paths.
 - `~/.zshrc` is for interactive shell behavior: Oh My Zsh, prompt, plugins, completions, aliases, and shell functions.
+- `~/.zshenv` is read by every zsh, including non-interactive `zsh -c '...'`. It is a machine-local, untracked file (seeded by `install.sh`) that sources the repo-managed `~/.zshenv.shared`. Keeping it local lets machine tooling append its own setup without churning this repo; `~/.zshenv.shared` holds env every shell needs (e.g. fzf on PATH for the tmux file-picker popup).
 - Non-login interactive shells such as `zsh -ic '...'` do not read `~/.zprofile`; they inherit PATH from their parent process.
 
 Personal Apple device `.zprofile` files should source `~/.zprofile.macos`. Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.

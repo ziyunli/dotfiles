@@ -234,6 +234,65 @@ link_directory() {
     done < <(find "$src_dir" \( -type f -o -type l \) -print0)
 }
 
+# ~/.zshenv must be a real, machine-local file rather than a symlink into this
+# repo. Tools like gohan auto-inject shell setup into ~/.zshenv on every run; if
+# it were a repo symlink, that churn (and machine-specific absolute paths) would
+# be written straight back into tracked files and leak to every other device.
+# Instead the local ~/.zshenv just sources the shared env, and tool-managed
+# blocks accumulate locally where they belong.
+SHARED_ENV_SOURCE_LINE='source "$HOME/.zshenv.shared"'
+
+seed_local_zshenv() {
+    local dst="$HOME/.zshenv"
+
+    # Retire the obsolete repo-owned symlink left by the previous layout.
+    if [[ -L "$dst" ]]; then
+        local target
+        target="$(readlink "$dst")"
+        if [[ "$target" == "$DOTFILES_DIR/"* ]]; then
+            if [[ -n "$DRY_RUN" ]]; then
+                echo "Would replace obsolete ~/.zshenv symlink with a local seed sourcing ~/.zshenv.shared"
+                return
+            fi
+            rm "$dst"
+        else
+            warn "~/.zshenv is a symlink outside this repo; leaving it untouched: $dst -> $target"
+            return
+        fi
+    fi
+
+    if [[ -n "$DRY_RUN" ]]; then
+        if [[ -e "$dst" ]]; then
+            if grep -Fq "$SHARED_ENV_SOURCE_LINE" "$dst" 2>/dev/null; then
+                echo "Would leave ~/.zshenv as-is (already sources ~/.zshenv.shared)"
+            else
+                echo "Would add shared-env source line to existing ~/.zshenv"
+            fi
+        else
+            echo "Would seed local ~/.zshenv sourcing ~/.zshenv.shared"
+        fi
+        return
+    fi
+
+    if [[ ! -e "$dst" ]]; then
+        printf '%s\n' \
+            '# Machine-local zsh environment (not tracked by dotfiles).' \
+            '# Sources the repo-shared env; tools like gohan append their own' \
+            '# blocks below without churning the dotfiles repo.' \
+            "$SHARED_ENV_SOURCE_LINE" > "$dst"
+        log "Seeded local ~/.zshenv (sources ~/.zshenv.shared)"
+    elif ! grep -Fq "$SHARED_ENV_SOURCE_LINE" "$dst"; then
+        # Preserve existing local content (e.g. a gohan block); prepend the source.
+        local tmp="$dst.dotfiles.tmp"
+        {
+            printf '%s\n' "$SHARED_ENV_SOURCE_LINE"
+            cat "$dst"
+        } > "$tmp"
+        mv "$tmp" "$dst"
+        log "Added shared-env source line to existing local ~/.zshenv"
+    fi
+}
+
 # Main
 log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
@@ -248,6 +307,9 @@ if [[ -d "$DOTFILES_DIR/shared" ]]; then
 else
     warn "No shared directory found"
 fi
+
+# Ensure ~/.zshenv is a machine-local file sourcing the shared env (see above).
+seed_local_zshenv
 
 # Link device-specific files
 log "Linking device-specific configuration for '$DEVICE'..."
