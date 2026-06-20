@@ -44,20 +44,12 @@
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "accelerated-learning@rabbit-hole": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "burrow-keeper@rabbit-hole": true,
-    "obsidian@obsidian-skills": true
+    "obsidian@obsidian-skills": true,
+    "remember@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
-    "rabbit-hole": {
-      "source": {
-        "source": "github",
-        "repo": "BunnyRocks/rabbit-hole"
-      }
-    },
     "obsidian-skills": {
       "source": {
         "source": "github",
@@ -66,6 +58,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "vim",
