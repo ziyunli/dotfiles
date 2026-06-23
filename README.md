@@ -77,6 +77,16 @@ Use zsh startup files by responsibility:
 
 Personal Apple device `.zprofile` files should source `~/.zprofile.macos`. Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.
 
+### GBrain token for Codex MCP
+
+`~/.zprofile.macos` exports `GBRAIN_REMOTE_TOKEN` from macOS Keychain when a `gbrain-remote-token` item exists. Store or rotate the token with:
+
+```bash
+security add-generic-password -a "$USER" -s gbrain-remote-token -w "gbrain_xxx" -U
+```
+
+Restart Codex from a new login shell after updating the Keychain item. Keep the token out of repo files, shell history, and process logs.
+
 ## Recipes
 
 ### Install dotfiles on a new system

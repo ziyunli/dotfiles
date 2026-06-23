@@ -16,3 +16,12 @@ path=(
   $path
 )
 export PATH
+
+# GBrain uses a bearer token; keep the secret in Keychain and expose it to Codex.
+if command -v security >/dev/null 2>&1; then
+  if gbrain_remote_token="$(security find-generic-password -a "$USER" -s gbrain-remote-token -w 2>/dev/null)" &&
+    [[ -n "$gbrain_remote_token" ]]; then
+    export GBRAIN_REMOTE_TOKEN="$gbrain_remote_token"
+  fi
+  unset gbrain_remote_token
+fi
