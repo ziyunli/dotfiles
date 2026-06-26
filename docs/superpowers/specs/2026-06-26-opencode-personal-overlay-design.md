@@ -30,10 +30,13 @@ secret enters git.
   gateway URL — a reason not to track `opencode.json` wholesale.
 - **opencode config precedence** (per opencode docs): global
   `~/.config/opencode/opencode.json` → `OPENCODE_CONFIG` file → project
-  `opencode.json`, deep-merged with later layers overriding earlier. `OPENCODE_CONFIG`
-  is documented as "loaded in the precedence order between global and project
-  configurations, allowing for specific overrides" — i.e. it layers on top of the
-  tool-owned global file rather than replacing it.
+  `opencode.json`, deep-merged with later layers overriding earlier. **Empirically
+  confirmed** on opencode `1.17.11` via `opencode debug config`: with an
+  `OPENCODE_CONFIG` overlay, all six company providers survive (merge, not replace),
+  the overlay's `model` overrides the global, and an identical `superpowers` plugin
+  spec resolves **once** (opencode dedupes across layers — no double-load). The
+  install-time `merge-json.sh` also reads through a symlinked fragment correctly
+  (the `bento` case).
 - **`model` and `plugin` are user-added.** Neither appears in any
   `.instacart-managed-*.json` manifest (the managed plugin is only
   `empty-tool-result.ts`). `opencode-config` therefore appears to *merge* rather than
@@ -212,15 +215,13 @@ manages flows through untouched.
 
 ## Open items (resolve during planning)
 
-- Confirm, against the installed opencode version, that `OPENCODE_CONFIG` **merges**
-  onto (not replaces) the global config, and that opencode **dedupes identical
-  `plugin` specs across layers** — `superpowers` will be present in both the global
-  file and the overlay on the current machine. If opencode double-loads, decide
-  whether to drop the key from the tool-owned global (accepting `opencode-config` may
-  re-add it) or accept the harmless redundancy.
-- Confirm `merge-json.sh` reads a symlinked base/overlay (Component C) as expected.
 - Decide the exact bash for the three-layer compose (temp-file handling, ordering of
   the device-linking deferral) when writing the plan.
+- `opencode-config`'s sync/prune behavior remains unverified (its repo is not cloned
+  locally); the design sidesteps it by keeping the overlay outside `~/.config/opencode/`.
+
+*Resolved during design (see Verified facts): `OPENCODE_CONFIG` merge/override/dedupe
+on opencode 1.17.11, and `merge-json.sh` reading through a symlinked fragment.*
 
 ## Verification (post-implementation)
 
