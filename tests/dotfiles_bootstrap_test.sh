@@ -106,6 +106,10 @@ with_explicit_work_devices() {
         fail "insta-laptop install did not include work laptop .zprofile"
     [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/insta-laptop/.zshrc"* ]] ||
         fail "insta-laptop install did not include work laptop .zshrc"
+    [[ "$output" == *"Would link: $temp_home/.claude/CLAUDE.md -> $ROOT_DIR/devices/insta-laptop/.claude/CLAUDE.md"* ]] ||
+        fail "insta-laptop install did not override CLAUDE.md with the work overlay"
+    [[ "$output" == *"Would link: $temp_home/.claude/instacart-work-context.md -> $ROOT_DIR/devices/insta-laptop/.claude/instacart-work-context.md"* ]] ||
+        fail "insta-laptop install did not link the curated work-context overlay"
 
     output="$(
         HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" bento 2>&1
@@ -116,6 +120,10 @@ with_explicit_work_devices() {
         fail "bento install did not include oh-my-zsh shellrc hook"
     [[ "$output" == *"Would link: $temp_home/.shellrc.d/080_fzf.zsh -> $ROOT_DIR/devices/bento/.shellrc.d/080_fzf.zsh"* ]] ||
         fail "bento install did not include fzf shellrc hook"
+    [[ "$output" == *"Would link: $temp_home/.claude/CLAUDE.md -> $ROOT_DIR/devices/bento/.claude/CLAUDE.md"* ]] ||
+        fail "bento install did not override CLAUDE.md with the work overlay"
+    [[ "$output" == *"Would link: $temp_home/.claude/instacart-work-context.md -> $ROOT_DIR/devices/bento/.claude/instacart-work-context.md"* ]] ||
+        fail "bento install did not link the curated work-context overlay"
 }
 
 with_local_zshenv() {
@@ -233,6 +241,16 @@ assert_path_not_exists "$ROOT_DIR/shared/.pi/agent/AGENTS.md"
     fail "shared/.pi/agent/APPEND_SYSTEM.md should be a symlink to the personal prompt"
 [[ "$(readlink "$ROOT_DIR/shared/.pi/agent/APPEND_SYSTEM.md")" == "../../AGENTS.md" ]] ||
     fail "shared/.pi/agent/APPEND_SYSTEM.md should point to ../../AGENTS.md"
+
+# Work-device Claude overlay: personal first (@AGENTS.md), curated company facts second.
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.claude/CLAUDE.md" '@AGENTS.md'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.claude/CLAUDE.md" '@instacart-work-context.md'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.claude/instacart-work-context.md" 'aigateway.instacart.tools'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.claude/instacart-work-context.md" 'isc-web'
+assert_file_contains "$ROOT_DIR/devices/bento/.claude/CLAUDE.md" '@AGENTS.md'
+assert_file_contains "$ROOT_DIR/devices/bento/.claude/CLAUDE.md" '@instacart-work-context.md'
+# bento's overlay is a symlink to insta-laptop's canonical copy; grep follows it.
+assert_file_contains "$ROOT_DIR/devices/bento/.claude/instacart-work-context.md" 'aigateway.instacart.tools'
 
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
