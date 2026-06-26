@@ -293,6 +293,52 @@ seed_local_zshenv() {
     fi
 }
 
+# ~/.pi/agent/AGENTS.md must be a real, machine-local file rather than a symlink
+# into this repo. @instacart/pi-config's syncAgents() does a full overwrite of
+# this exact path on every run; if it were a repo symlink, that write would
+# follow the chain into shared/AGENTS.md and clobber the personal prompt for all
+# tools. Personal content reaches Pi instead via ~/.pi/agent/APPEND_SYSTEM.md
+# (linked from shared/), which pi-config never touches.
+seed_local_pi_agents() {
+    local dst="$HOME/.pi/agent/AGENTS.md"
+
+    # Retire a repo-owned symlink (current or dangling) from the old layout.
+    if [[ -L "$dst" ]]; then
+        local target
+        target="$(readlink "$dst")"
+        if [[ "$target" == "$DOTFILES_DIR/"* ]]; then
+            if [[ -n "$DRY_RUN" ]]; then
+                echo "Would replace obsolete ~/.pi/agent/AGENTS.md symlink with a local file"
+                return
+            fi
+            rm "$dst"
+        else
+            warn "~/.pi/agent/AGENTS.md is a symlink outside this repo; leaving it untouched: $dst -> $target"
+            return
+        fi
+    fi
+
+    if [[ -n "$DRY_RUN" ]]; then
+        if [[ -e "$dst" ]]; then
+            echo "Would leave ~/.pi/agent/AGENTS.md as-is (real local file)"
+        else
+            echo "Would seed local ~/.pi/agent/AGENTS.md (machine-local; pi-config overwrites it here)"
+        fi
+        return
+    fi
+
+    # Only create a seed when nothing is there. A real file (e.g. pi-config's
+    # boilerplate) is left untouched — it is local and safe to overwrite.
+    if [[ ! -e "$dst" ]]; then
+        mkdir -p "$(dirname "$dst")"
+        printf '%s\n' \
+            '# Machine-local Pi agent instructions (not tracked by dotfiles).' \
+            '# pi-config overwrites this file on work devices; personal instructions' \
+            '# are supplied separately via ~/.pi/agent/APPEND_SYSTEM.md.' > "$dst"
+        log "Seeded local ~/.pi/agent/AGENTS.md"
+    fi
+}
+
 # Main
 log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
@@ -310,6 +356,10 @@ fi
 
 # Ensure ~/.zshenv is a machine-local file sourcing the shared env (see above).
 seed_local_zshenv
+
+# Ensure ~/.pi/agent/AGENTS.md is a machine-local file (see above) so pi-config
+# can never write through it into the repo.
+seed_local_pi_agents
 
 # Link device-specific files
 log "Linking device-specific configuration for '$DEVICE'..."
