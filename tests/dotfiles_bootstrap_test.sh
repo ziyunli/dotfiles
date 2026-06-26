@@ -45,8 +45,12 @@ with_fake_hostname() {
         fail "install.sh did not default to hostname"
     [[ "$output" == *"Would link: $temp_home/.zprofile.macos -> $ROOT_DIR/shared/.zprofile.macos"* ]] ||
         fail "install.sh did not include the shared macOS .zprofile"
-    [[ "$output" == *"Would link: $temp_home/.pi/agent/AGENTS.md -> $ROOT_DIR/shared/.pi/agent/AGENTS.md"* ]] ||
-        fail "install.sh did not include the shared Pi agent instructions"
+    [[ "$output" != *"Would link: $temp_home/.pi/agent/AGENTS.md ->"* ]] ||
+        fail "install.sh should not link ~/.pi/agent/AGENTS.md into the repo (pi-config write-through risk)"
+    [[ "$output" == *"Would link: $temp_home/.pi/agent/APPEND_SYSTEM.md -> $ROOT_DIR/shared/.pi/agent/APPEND_SYSTEM.md"* ]] ||
+        fail "install.sh did not link the Pi APPEND_SYSTEM.md personal channel"
+    [[ "$output" == *"Would seed local ~/.pi/agent/AGENTS.md"* ]] ||
+        fail "install.sh did not plan to seed a local ~/.pi/agent/AGENTS.md"
     [[ "$output" != *"Would link: $temp_home/AGENTS.md ->"* ]] ||
         fail "install.sh should not link the root AGENTS.md"
     [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile"* ]] ||
@@ -153,6 +157,42 @@ with_local_zshenv() {
         fail "replaced ~/.zshenv does not source the shared env"
 }
 
+with_local_pi_agents() {
+    local temp_home temp_bin
+
+    temp_home="$(mktemp -d)"
+    temp_bin="$(mktemp -d)"
+    trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
+
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MacBook-Pro\\n"\n' > "$temp_bin/hostname"
+    chmod +x "$temp_bin/hostname"
+
+    # Fresh install: ~/.pi/agent/AGENTS.md is a real local file (never a repo
+    # symlink), and personal content reaches Pi via ~/.pi/agent/APPEND_SYSTEM.md.
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -f "$temp_home/.pi/agent/AGENTS.md" && ! -L "$temp_home/.pi/agent/AGENTS.md" ]] ||
+        fail "install.sh did not seed a real local ~/.pi/agent/AGENTS.md"
+    [[ -L "$temp_home/.pi/agent/APPEND_SYSTEM.md" ]] ||
+        fail "install.sh did not link ~/.pi/agent/APPEND_SYSTEM.md"
+    grep -Fq "You are an experienced, pragmatic software engineer" "$temp_home/.pi/agent/APPEND_SYSTEM.md" ||
+        fail "Pi APPEND_SYSTEM.md does not resolve to the personal prompt"
+
+    # Idempotent: a pi-config-style overwrite of the local AGENTS.md is preserved.
+    printf '# Instacart Engineering\n' > "$temp_home/.pi/agent/AGENTS.md"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -f "$temp_home/.pi/agent/AGENTS.md" && ! -L "$temp_home/.pi/agent/AGENTS.md" ]] ||
+        fail "install.sh turned ~/.pi/agent/AGENTS.md into a symlink"
+    grep -Fq "# Instacart Engineering" "$temp_home/.pi/agent/AGENTS.md" ||
+        fail "install.sh clobbered the local pi-config-written ~/.pi/agent/AGENTS.md"
+
+    # An obsolete repo-owned symlink at ~/.pi/agent/AGENTS.md is replaced with a local file.
+    rm "$temp_home/.pi/agent/AGENTS.md"
+    ln -s "$ROOT_DIR/shared/AGENTS.md" "$temp_home/.pi/agent/AGENTS.md"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -f "$temp_home/.pi/agent/AGENTS.md" && ! -L "$temp_home/.pi/agent/AGENTS.md" ]] ||
+        fail "install.sh did not replace the obsolete ~/.pi/agent/AGENTS.md symlink with a local file"
+}
+
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
@@ -181,6 +221,19 @@ assert_file_not_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'gohan'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/090_gohan.zsh" 'source "$HOME/.config/gohan/gohan.sh"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshenv.shared" 'gohan'
 assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" '$HOME/.fzf/bin'
+# The personal prompt must be the canonical shared/AGENTS.md content, never the
+# company boilerplate (a re-clobber landing in the repo would trip this).
+assert_file_contains "$ROOT_DIR/shared/AGENTS.md" 'You are an experienced, pragmatic software engineer'
+assert_file_not_contains "$ROOT_DIR/shared/AGENTS.md" '# Instacart Engineering'
+
+# No tracked file may be a pi-config write target. shared/.pi/agent/AGENTS.md is
+# retired; personal reaches Pi through APPEND_SYSTEM.md instead.
+assert_path_not_exists "$ROOT_DIR/shared/.pi/agent/AGENTS.md"
+[[ -L "$ROOT_DIR/shared/.pi/agent/APPEND_SYSTEM.md" ]] ||
+    fail "shared/.pi/agent/APPEND_SYSTEM.md should be a symlink to the personal prompt"
+[[ "$(readlink "$ROOT_DIR/shared/.pi/agent/APPEND_SYSTEM.md")" == "../../AGENTS.md" ]] ||
+    fail "shared/.pi/agent/APPEND_SYSTEM.md should point to ../../AGENTS.md"
+
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" 'brew shellenv'
@@ -222,5 +275,6 @@ assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 's
 with_fake_hostname
 with_explicit_work_devices
 with_local_zshenv
+with_local_pi_agents
 
 echo "ok - dotfiles bootstrap checks passed"
