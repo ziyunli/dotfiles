@@ -84,6 +84,11 @@ with_fake_hostname() {
     [[ -L "$temp_home/.config/ghostty/config.ghostty" ]] ||
         fail "install.sh did not link the XDG Ghostty config"
 
+    [[ -L "$temp_home/.config/opencode.personal.json" ]] ||
+        fail "install.sh did not symlink the shared opencode overlay on a personal device"
+    assert_file_contains "$temp_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
+    assert_file_not_contains "$temp_home/.config/opencode.personal.json" '"model"'
+
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/uninstall.sh" 2>&1
     )"
@@ -251,6 +256,11 @@ assert_file_contains "$ROOT_DIR/devices/bento/.claude/CLAUDE.md" '@AGENTS.md'
 assert_file_contains "$ROOT_DIR/devices/bento/.claude/CLAUDE.md" '@instacart-work-context.md'
 # bento's overlay is a symlink to insta-laptop's canonical copy; grep follows it.
 assert_file_contains "$ROOT_DIR/devices/bento/.claude/instacart-work-context.md" 'aigateway.instacart.tools'
+
+# Personal opencode overlay: superpowers plugin everywhere via the shared base;
+# the work model default is layered in only on work devices (Tasks 2-3).
+assert_file_contains "$ROOT_DIR/shared/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
+assert_file_not_contains "$ROOT_DIR/shared/.config/opencode.personal.json" '"model"'
 
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
