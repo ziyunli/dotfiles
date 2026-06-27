@@ -309,6 +309,11 @@ assert_file_contains "$ROOT_DIR/devices/insta-laptop/.dotfiles-merge" '.config/o
     fail "devices/bento/.config/opencode.personal.json should point to ../../insta-laptop/.config/opencode.personal.json"
 assert_file_contains "$ROOT_DIR/devices/bento/.dotfiles-merge" '.config/opencode.personal.json'
 
+# opencode reads OPENCODE_CONFIG and deep-merges it over its global config, so
+# the personal overlay reaches opencode without touching the tool-managed dir.
+assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" 'if [[ -f "$HOME/.config/opencode.personal.json" ]]; then'
+assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" 'export OPENCODE_CONFIG="$HOME/.config/opencode.personal.json"'
+
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" 'brew shellenv'

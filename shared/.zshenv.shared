@@ -12,3 +12,13 @@
 if [[ -d "$HOME/.fzf/bin" && ":$PATH:" != *":$HOME/.fzf/bin:"* ]]; then
   export PATH="$HOME/.fzf/bin:$PATH"
 fi
+
+# opencode deep-merges the file named by OPENCODE_CONFIG over its global config.
+# install.sh composes the personal overlay (superpowers everywhere, plus the work
+# model on work devices) into ~/.config/opencode.personal.json -- a sibling of the
+# company-tool-managed ~/.config/opencode/ dir, which never sees it. The file
+# guard only skips machines where the overlay was never installed (there
+# .zshenv.shared is not sourced anyway).
+if [[ -f "$HOME/.config/opencode.personal.json" ]]; then
+  export OPENCODE_CONFIG="$HOME/.config/opencode.personal.json"
+fi
