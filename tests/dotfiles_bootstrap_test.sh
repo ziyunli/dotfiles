@@ -116,6 +116,14 @@ with_explicit_work_devices() {
     [[ "$output" == *"Would link: $temp_home/.claude/instacart-work-context.md -> $ROOT_DIR/devices/insta-laptop/.claude/instacart-work-context.md"* ]] ||
         fail "insta-laptop install did not link the curated work-context overlay"
 
+    # The opencode overlay is a .dotfiles-merge path on work devices, so it must
+    # be composed in the merge phase -- never symlinked from the shared OR the
+    # device pass (the latter is what the unconditional is_merged deferral fixes).
+    [[ "$output" != *"Would link: $temp_home/.config/opencode.personal.json ->"* ]] ||
+        fail "insta-laptop opencode overlay must be merged, not symlinked"
+    [[ "$output" == *"Would merge: $ROOT_DIR/shared/.config/opencode.personal.json + $ROOT_DIR/devices/insta-laptop/.config/opencode.personal.json + $temp_home/.config/opencode.personal.json -> $temp_home/.config/opencode.personal.json"* ]] ||
+        fail "insta-laptop install did not compose the opencode overlay from shared + device + local"
+
     output="$(
         HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" bento 2>&1
     )"
@@ -206,6 +214,24 @@ with_local_pi_agents() {
         fail "install.sh did not replace the obsolete ~/.pi/agent/AGENTS.md symlink with a local file"
 }
 
+with_work_opencode_overlay() {
+    local work_root insta_home
+
+    work_root="$(mktemp -d)"
+    trap 'rm -rf "$work_root"' RETURN
+
+    # Work device (insta-laptop): the overlay is COMPOSED into a real file --
+    # superpowers (from the shared base) + the work model (from the device layer).
+    # Explicit device arg means no hostname fake is needed.
+    insta_home="$work_root/insta"
+    mkdir -p "$insta_home"
+    HOME="$insta_home" "$ROOT_DIR/install.sh" insta-laptop >/dev/null
+    [[ -f "$insta_home/.config/opencode.personal.json" && ! -L "$insta_home/.config/opencode.personal.json" ]] ||
+        fail "insta-laptop install did not compose a real opencode overlay file"
+    assert_file_contains "$insta_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
+    assert_file_contains "$insta_home/.config/opencode.personal.json" 'openai/gpt-5.4'
+}
+
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
@@ -261,6 +287,8 @@ assert_file_contains "$ROOT_DIR/devices/bento/.claude/instacart-work-context.md"
 # the work model default is layered in only on work devices (Tasks 2-3).
 assert_file_contains "$ROOT_DIR/shared/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
 assert_file_not_contains "$ROOT_DIR/shared/.config/opencode.personal.json" '"model"'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.config/opencode.personal.json" 'openai/gpt-5.4'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.dotfiles-merge" '.config/opencode.personal.json'
 
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
@@ -304,5 +332,6 @@ with_fake_hostname
 with_explicit_work_devices
 with_local_zshenv
 with_local_pi_agents
+with_work_opencode_overlay
 
 echo "ok - dotfiles bootstrap checks passed"

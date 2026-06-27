@@ -205,9 +205,47 @@ merge_file() {
     fi
 }
 
+# merge_path composes a single .dotfiles-merge entry from up to three layers --
+# shared/<rel> (base), devices/<DEVICE>/<rel> (optional device overlay), and the
+# existing local file at $HOME/<rel> (optional) -- with later layers winning
+# (local > device > shared). With no device overlay this is exactly the original
+# shared -> local merge, so paths merged only against shared (e.g.
+# .claude/settings.json) are unaffected.
+merge_path() {
+    local rel="$1"
+    local shared_src="$DOTFILES_DIR/shared/$rel"
+    local device_src="$DOTFILES_DIR/devices/$DEVICE/$rel"
+
+    if [[ ! -f "$shared_src" ]]; then
+        warn "Merge source not found: $shared_src"
+        return
+    fi
+
+    # No device overlay: identical to the original shared -> local merge.
+    if [[ ! -f "$device_src" ]]; then
+        merge_file "$shared_src" "$HOME/$rel"
+        return
+    fi
+
+    if [[ -n "$DRY_RUN" ]]; then
+        echo "Would merge: $shared_src + $device_src + $HOME/$rel -> $HOME/$rel"
+        return
+    fi
+
+    # Compose shared + device into a temp base, then merge the existing local
+    # file on top via merge_file (which also clears any stale symlink at $dst).
+    local base_tmp="$HOME/$rel.base.tmp"
+    mkdir -p "$(dirname "$base_tmp")"
+    "$DOTFILES_DIR/merge-json.sh" "$shared_src" "$device_src" > "$base_tmp"
+    merge_file "$base_tmp" "$HOME/$rel"
+    rm -f "$base_tmp"
+}
+
 # link_directory links all regular files and symbolic links found under a source
 # directory into the user's $HOME, preserving each entry's relative path.
 # When check_skip is "true", paths listed in .dotfiles-skip are excluded.
+# Paths listed in .dotfiles-merge are always deferred to the merge phase (from
+# both the shared and the device pass), so a symlink never lands on a merge target.
 link_directory() {
     local src_dir="$1" check_skip="${2:-false}"
 
@@ -226,7 +264,7 @@ link_directory() {
             log "Skipped: $rel (listed in .dotfiles-skip)"
             continue
         fi
-        if [[ "$check_skip" == "true" ]] && is_merged "$rel"; then
+        if is_merged "$rel"; then
             log "Deferred: $rel (will be merged)"
             continue
         fi
@@ -365,17 +403,12 @@ seed_local_pi_agents
 log "Linking device-specific configuration for '$DEVICE'..."
 link_directory "$DOTFILES_DIR/devices/$DEVICE"
 
-# Merge files listed in .dotfiles-merge
+# Merge files listed in .dotfiles-merge (shared -> device -> local; later wins)
 if [[ -n "$MERGE_FILES" ]]; then
     log "Merging configuration files..."
     while IFS= read -r rel; do
         [[ -z "$rel" ]] && continue
-        merge_src="$DOTFILES_DIR/shared/$rel"
-        if [[ -f "$merge_src" ]]; then
-            merge_file "$merge_src" "$HOME/$rel"
-        else
-            warn "Merge source not found: $merge_src"
-        fi
+        merge_path "$rel"
     done <<< "$MERGE_FILES"
 fi
 
