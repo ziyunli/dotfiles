@@ -137,6 +137,10 @@ with_explicit_work_devices() {
         fail "bento install did not override CLAUDE.md with the work overlay"
     [[ "$output" == *"Would link: $temp_home/.claude/instacart-work-context.md -> $ROOT_DIR/devices/bento/.claude/instacart-work-context.md"* ]] ||
         fail "bento install did not link the curated work-context overlay"
+    [[ "$output" != *"Would link: $temp_home/.config/opencode.personal.json ->"* ]] ||
+        fail "bento opencode overlay must be merged, not symlinked"
+    [[ "$output" == *"Would merge: $ROOT_DIR/shared/.config/opencode.personal.json + $ROOT_DIR/devices/bento/.config/opencode.personal.json + $temp_home/.config/opencode.personal.json -> $temp_home/.config/opencode.personal.json"* ]] ||
+        fail "bento install did not compose the opencode overlay from shared + device + local"
 }
 
 with_local_zshenv() {
@@ -215,7 +219,7 @@ with_local_pi_agents() {
 }
 
 with_work_opencode_overlay() {
-    local work_root insta_home
+    local work_root insta_home bento_home
 
     work_root="$(mktemp -d)"
     trap 'rm -rf "$work_root"' RETURN
@@ -230,6 +234,16 @@ with_work_opencode_overlay() {
         fail "insta-laptop install did not compose a real opencode overlay file"
     assert_file_contains "$insta_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
     assert_file_contains "$insta_home/.config/opencode.personal.json" 'openai/gpt-5.4'
+
+    # bento shares insta-laptop's work fragment via a repo symlink; the compose
+    # must read through it and still yield both keys.
+    bento_home="$work_root/bento"
+    mkdir -p "$bento_home"
+    HOME="$bento_home" "$ROOT_DIR/install.sh" bento >/dev/null
+    [[ -f "$bento_home/.config/opencode.personal.json" && ! -L "$bento_home/.config/opencode.personal.json" ]] ||
+        fail "bento install did not compose a real opencode overlay file"
+    assert_file_contains "$bento_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
+    assert_file_contains "$bento_home/.config/opencode.personal.json" 'openai/gpt-5.4'
 }
 
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
@@ -289,6 +303,11 @@ assert_file_contains "$ROOT_DIR/shared/.config/opencode.personal.json" 'superpow
 assert_file_not_contains "$ROOT_DIR/shared/.config/opencode.personal.json" '"model"'
 assert_file_contains "$ROOT_DIR/devices/insta-laptop/.config/opencode.personal.json" 'openai/gpt-5.4'
 assert_file_contains "$ROOT_DIR/devices/insta-laptop/.dotfiles-merge" '.config/opencode.personal.json'
+[[ -L "$ROOT_DIR/devices/bento/.config/opencode.personal.json" ]] ||
+    fail "devices/bento/.config/opencode.personal.json should be a symlink to insta-laptop's fragment"
+[[ "$(readlink "$ROOT_DIR/devices/bento/.config/opencode.personal.json")" == "../../insta-laptop/.config/opencode.personal.json" ]] ||
+    fail "devices/bento/.config/opencode.personal.json should point to ../../insta-laptop/.config/opencode.personal.json"
+assert_file_contains "$ROOT_DIR/devices/bento/.dotfiles-merge" '.config/opencode.personal.json'
 
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
