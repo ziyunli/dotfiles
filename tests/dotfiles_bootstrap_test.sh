@@ -246,6 +246,29 @@ with_work_opencode_overlay() {
     assert_file_contains "$bento_home/.config/opencode.personal.json" 'openai/gpt-5.4'
 }
 
+with_settings_backward_compat() {
+    local temp_home
+
+    temp_home="$(mktemp -d)"
+    trap 'rm -rf "$temp_home"' RETURN
+
+    # Pre-seed a local Claude settings file with a personal key.
+    mkdir -p "$temp_home/.claude"
+    printf '{"local_only_key": "keep-me"}\n' > "$temp_home/.claude/settings.json"
+
+    # A work-device install merges shared settings over the local file. There is
+    # no devices/insta-laptop/.claude/settings.json fragment, so the new device
+    # layer is a no-op: local values still survive AND shared keys are merged in
+    # (proving a real deep-merge, not a clobber or a symlink). Explicit device
+    # arg means no hostname fake is needed.
+    HOME="$temp_home" "$ROOT_DIR/install.sh" insta-laptop >/dev/null
+    [[ -f "$temp_home/.claude/settings.json" && ! -L "$temp_home/.claude/settings.json" ]] ||
+        fail "settings.json merge did not produce a real local file"
+    assert_file_contains "$temp_home/.claude/settings.json" 'local_only_key'
+    assert_file_contains "$temp_home/.claude/settings.json" 'keep-me'
+    assert_file_contains "$temp_home/.claude/settings.json" 'ANTHROPIC_MODEL'
+}
+
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
@@ -366,5 +389,6 @@ with_explicit_work_devices
 with_local_zshenv
 with_local_pi_agents
 with_work_opencode_overlay
+with_settings_backward_compat
 
 echo "ok - dotfiles bootstrap checks passed"
