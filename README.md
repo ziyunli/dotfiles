@@ -12,11 +12,11 @@ dotfiles/
 │   ├── TMUX_GUIDE.md # Tmux configuration guide
 │   ├── .myclirc
 │   └── ...
-├── devices/          # Machine-specific configuration
-│   ├── Ziyuns-Mac-mini/
+├── devices/          # Machine-specific configuration (one dir per `hostname -s`)
+│   ├── insta-laptop/
 │   ├── bento/
-│   ├── m1/
-│   └── popos/
+│   ├── Ziyuns-Mac-mini/
+│   └── ...
 ├── install.sh        # Create symlinks
 ├── uninstall.sh      # Remove symlinks
 └── migrate.sh        # Migrate from bare repo
@@ -235,9 +235,9 @@ mv ~/.dotfiles-new ~/.dotfiles
 # Then delete backup once verified: rm -rf ~/.dotfiles.bare-backup
 ```
 
-## Untracked Files
+## User-Maintained Files
 
-These files are gitignored and must be created/maintained by the user.
+These files are created and maintained by the user. `~/.gitconfig.local` is personal and gitignored (never committed); the per-device `.dotfiles-skip` and `.dotfiles-merge` control files are committed under `devices/<hostname>/`.
 
 ### `~/.gitconfig.local` (required)
 
@@ -276,15 +276,24 @@ Use this when a device manages certain configs externally (e.g., corporate-manag
 
 ### `devices/<hostname>/.dotfiles-merge` (optional)
 
-Lists paths from `shared/` that should be **deep-merged** instead of symlinked. One path per line, relative to `$HOME`. Lines starting with `#` are comments.
+Lists paths that should be **deep-merged** instead of symlinked. One path per line, relative to `$HOME`. Lines starting with `#` are comments.
 
 ```bash
-# Example: devices/bento/.dotfiles-merge
-# Personal settings are merged with existing local (company) config.
+# Example: devices/insta-laptop/.dotfiles-merge
 .claude/settings.json
+.config/opencode.personal.json
 ```
 
-Use this when a device has its own version of a config file (e.g., company-injected settings) that should be combined with your personal settings. Merge semantics: objects are recursively merged, arrays are unioned, and existing local scalar values take precedence. Conflicts are reported to stderr.
+For each listed path, `install.sh` composes up to three layers, with later layers winning:
+
+```
+shared/<path>  ->  devices/<hostname>/<path>  ->  existing ~/<path>
+  (base)             (optional device layer)         (optional local)
+```
+
+The result is written as a real file, never a symlink, so an externally-managed local file (e.g. company-injected settings) keeps its own values while your shared and device-specific settings merge in. When no `devices/<hostname>/<path>` fragment exists, this reduces to the original `shared -> local` merge. Merge semantics (`merge-json.sh`): objects merge recursively, arrays union, and scalar conflicts resolve to the later layer; conflicts are reported to stderr.
+
+For example, `.config/opencode.personal.json` is composed from the shared `superpowers` plugin plus a work-device `model` override, then loaded by opencode via `OPENCODE_CONFIG` (exported from `.zshenv.shared`). `.claude/settings.json` has only a shared source, so its device layer is a no-op.
 
 ## How It Works
 
