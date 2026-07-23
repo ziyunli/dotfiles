@@ -93,9 +93,9 @@ require_runtime() {
 setup_runtime() {
     local remote jobs
     require_command git 'install the Xcode command-line tools'
-    require_command cmake 'run: brew install cmake'
 
     if [[ ! -e "$RUNTIME_DIR" ]]; then
+        require_command cmake 'run: brew install cmake'
         mkdir -p "$(dirname "$RUNTIME_DIR")"
         git clone --branch laguna --single-branch "$RUNTIME_URL" "$RUNTIME_DIR"
     else
@@ -105,6 +105,7 @@ setup_runtime() {
             die "$RUNTIME_DIR origin is $remote; expected $RUNTIME_URL"
         [[ -z "$(git -C "$RUNTIME_DIR" status --porcelain)" ]] ||
             die "$RUNTIME_DIR has uncommitted changes; clean or move them before setup"
+        require_command cmake 'run: brew install cmake'
         git -C "$RUNTIME_DIR" fetch origin laguna
     fi
 

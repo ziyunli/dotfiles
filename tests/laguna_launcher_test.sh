@@ -17,13 +17,13 @@ assert_contains() {
 [[ -x "$LAUNCHER" ]] || fail "$LAUNCHER is not executable"
 bash -n "$LAUNCHER" || fail "$LAUNCHER has invalid Bash syntax"
 
-output="$($LAUNCHER help)"
+output="$("$LAUNCHER" help)"
 assert_contains "$output" 'Usage: laguna <command>'
 assert_contains "$output" 'download q4|dflash'
 assert_contains "$output" 'serve [--dflash]'
 
 set +e
-output="$($LAUNCHER unknown 2>&1)"
+output="$("$LAUNCHER" unknown 2>&1)"
 exit_status=$?
 set -e
 [[ "$exit_status" == "2" ]] || fail "unknown command exited $exit_status instead of 2"
@@ -47,10 +47,60 @@ assert_contains "$output" 'dflash: missing (optional)'
 assert_contains "$output" 'server: stopped'
 
 set +e
-output="$($LAUNCHER download invalid 2>&1)"
+output="$("$LAUNCHER" download invalid 2>&1)"
 exit_status=$?
 set -e
 [[ "$exit_status" == "2" ]] || fail "invalid download exited $exit_status instead of 2"
 assert_contains "$output" 'download target must be q4 or dflash'
+
+set +e
+output="$(
+    HOME="$empty_home" \
+    LAGUNA_RUNTIME_DIR="$empty_home/prompt-runtime" \
+    LAGUNA_STATE_DIR="$empty_home/state" \
+    "$LAUNCHER" prompt 2>&1
+)"
+exit_status=$?
+set -e
+[[ "$exit_status" == "2" ]] || fail "missing prompt exited $exit_status instead of 2"
+assert_contains "$output" 'prompt requires text'
+
+set +e
+output="$("$LAUNCHER" serve invalid 2>&1)"
+exit_status=$?
+set -e
+[[ "$exit_status" == "2" ]] || fail "invalid serve argument exited $exit_status instead of 2"
+assert_contains "$output" 'serve accepts only --dflash'
+
+wrong_origin_runtime="$empty_home/wrong-origin-runtime"
+git init -q "$wrong_origin_runtime"
+git -C "$wrong_origin_runtime" remote add origin https://example.invalid/wrong.git
+set +e
+output="$(
+    HOME="$empty_home" \
+    LAGUNA_RUNTIME_DIR="$wrong_origin_runtime" \
+    LAGUNA_STATE_DIR="$empty_home/state" \
+    "$LAUNCHER" setup 2>&1
+)"
+exit_status=$?
+set -e
+[[ "$exit_status" == "2" ]] || fail "wrong-origin setup exited $exit_status instead of 2"
+assert_contains "$output" 'origin is https://example.invalid/wrong.git; expected https://github.com/poolsideai/llama.cpp.git'
+
+dirty_runtime="$empty_home/dirty-runtime"
+git init -q "$dirty_runtime"
+git -C "$dirty_runtime" remote add origin https://github.com/poolsideai/llama.cpp.git
+touch "$dirty_runtime/untracked"
+set +e
+output="$(
+    HOME="$empty_home" \
+    LAGUNA_RUNTIME_DIR="$dirty_runtime" \
+    LAGUNA_STATE_DIR="$empty_home/state" \
+    "$LAUNCHER" setup 2>&1
+)"
+exit_status=$?
+set -e
+[[ "$exit_status" == "2" ]] || fail "dirty setup exited $exit_status instead of 2"
+assert_contains "$output" 'has uncommitted changes; clean or move them before setup'
 
 printf '%s\n' 'ok - Laguna launcher checks passed'
