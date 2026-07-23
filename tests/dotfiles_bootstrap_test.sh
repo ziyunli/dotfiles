@@ -35,13 +35,18 @@ with_fake_hostname() {
     temp_bin="$(mktemp -d)"
     trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
 
-    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MacBook-Pro\\n"\n' > "$temp_bin/hostname"
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MBP\\n"\n' > "$temp_bin/hostname"
     chmod +x "$temp_bin/hostname"
 
+    set +e
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" 2>&1
     )"
-    [[ "$output" == *"[dotfiles] Installing dotfiles for device: Ziyuns-M5-MacBook-Pro"* ]] ||
+    status=$?
+    set -e
+    [[ "$status" -eq 0 ]] ||
+        fail "install.sh reports that no Ziyuns-M5-MBP device configuration exists: $output"
+    [[ "$output" == *"[dotfiles] Installing dotfiles for device: Ziyuns-M5-MBP"* ]] ||
         fail "install.sh did not default to hostname"
     [[ "$output" == *"Would link: $temp_home/.zprofile.macos -> $ROOT_DIR/shared/.zprofile.macos"* ]] ||
         fail "install.sh did not include the shared macOS .zprofile"
@@ -53,9 +58,9 @@ with_fake_hostname() {
         fail "install.sh did not plan to seed a local ~/.pi/agent/AGENTS.md"
     [[ "$output" != *"Would link: $temp_home/AGENTS.md ->"* ]] ||
         fail "install.sh should not link the root AGENTS.md"
-    [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile"* ]] ||
+    [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zprofile"* ]] ||
         fail "install.sh did not include the current MBP .zprofile starter"
-    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc"* ]] ||
+    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc"* ]] ||
         fail "install.sh did not include the current MBP .zshrc starter"
     [[ "$output" != *"Would link: $temp_home/.config/ghostty/config ->"* ]] ||
         fail "install.sh should not link the legacy Ghostty config filename"
@@ -92,7 +97,7 @@ with_fake_hostname() {
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/uninstall.sh" 2>&1
     )"
-    [[ "$output" == *"[dotfiles] Uninstalling dotfiles for device: Ziyuns-M5-MacBook-Pro"* ]] ||
+    [[ "$output" == *"[dotfiles] Uninstalling dotfiles for device: Ziyuns-M5-MBP"* ]] ||
         fail "uninstall.sh did not default to hostname"
 }
 
@@ -150,7 +155,7 @@ with_local_zshenv() {
     temp_bin="$(mktemp -d)"
     trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
 
-    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MacBook-Pro\\n"\n' > "$temp_bin/hostname"
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MBP\\n"\n' > "$temp_bin/hostname"
     chmod +x "$temp_bin/hostname"
 
     # Fresh install seeds ~/.zshenv as a real local file sourcing the shared env,
@@ -189,7 +194,7 @@ with_local_pi_agents() {
     temp_bin="$(mktemp -d)"
     trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
 
-    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MacBook-Pro\\n"\n' > "$temp_bin/hostname"
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MBP\\n"\n' > "$temp_bin/hostname"
     chmod +x "$temp_bin/hostname"
 
     # Fresh install: ~/.pi/agent/AGENTS.md is a real local file (never a repo
@@ -276,9 +281,6 @@ assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.opencode/bin"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/bin"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/go/bin"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.cargo/bin"'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zprofile" 'source ~/.zprofile.macos'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc" 'DEVICE_PLUGINS=(macos)'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro/.zshrc" 'source ~/.zshrc.common'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zprofile" 'source ~/.zprofile.macos'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" '# MBP zsh configuration'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
@@ -390,5 +392,10 @@ with_local_zshenv
 with_local_pi_agents
 with_work_opencode_overlay
 with_settings_backward_compat
+
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zprofile" 'source ~/.zprofile.macos'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc" 'source ~/.zshrc.common'
+assert_path_not_exists "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro"
 
 echo "ok - dotfiles bootstrap checks passed"
