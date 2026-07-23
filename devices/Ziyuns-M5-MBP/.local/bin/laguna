@@ -1,0 +1,293 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RUNTIME_DIR="${LAGUNA_RUNTIME_DIR:-$HOME/codebase/llama.cpp-laguna}"
+STATE_DIR="${LAGUNA_STATE_DIR:-$HOME/.cache/laguna-s21}"
+RUNTIME_URL="https://github.com/poolsideai/llama.cpp.git"
+RUNTIME_REVISION="04b2b72cb54048ead292884adbe11f284e3ec950"
+MODEL_REPOSITORY="poolside/Laguna-S-2.1-GGUF"
+MODEL_REVISION="e08e1fe855bb2d43f96ad78e24495283f3426c67"
+HF_TOOL_PACKAGE="huggingface-hub==1.24.0"
+Q4_FILE="laguna-s-2.1-Q4_K_M.gguf"
+Q4_SIZE="75173103200"
+Q4_SHA256="7da520c5f44bc3c79d4eeebfd1151ba7114c5d7568e72a995638417093c5753f"
+DFLASH_FILE="laguna-s-2.1-DFlash-BF16.gguf"
+DFLASH_SIZE="2233764224"
+DFLASH_SHA256="2ee8aa30338d6599bc7a8ce008cc57c56f2c2b2fdc21f6db9ecda203c751bfd4"
+MODEL_ALIAS="laguna-s-2.1"
+HOST="127.0.0.1"
+PORT="8000"
+CONTEXT_SIZE="32768"
+
+usage() {
+    cat <<'EOF'
+Usage: laguna <command> [arguments]
+
+Commands:
+  help                    Show this help
+  status                  Show runtime, model, and server state
+  setup                   Clone and build the pinned Poolside runtime
+  download q4|dflash      Download and verify one official model file
+  prompt TEXT             Run one bounded Q4 command-line prompt
+  serve [--dflash]        Start the loopback OpenAI-compatible server
+EOF
+}
+
+log() {
+    printf '[laguna] %s\n' "$*"
+}
+
+die() {
+    printf '[laguna] ERROR: %s\n' "$*" >&2
+    exit 2
+}
+
+require_command() {
+    local command_name="$1" install_help="$2"
+    command -v "$command_name" >/dev/null 2>&1 || die "$command_name is required; $install_help"
+}
+
+file_size() {
+    wc -c < "$1" | tr -d ' '
+}
+
+path_record_for() {
+    case "$1" in
+        q4) printf '%s/q4.path\n' "$STATE_DIR" ;;
+        dflash) printf '%s/dflash.path\n' "$STATE_DIR" ;;
+        *) die "unknown model path target: $1" ;;
+    esac
+}
+
+expected_size_for() {
+    case "$1" in
+        q4) printf '%s\n' "$Q4_SIZE" ;;
+        dflash) printf '%s\n' "$DFLASH_SIZE" ;;
+        *) die "unknown model size target: $1" ;;
+    esac
+}
+
+model_path() {
+    local target="$1" record path expected_size actual_size
+    record="$(path_record_for "$target")"
+    [[ -s "$record" ]] || die "$target model is missing; run: laguna download $target"
+    IFS= read -r path < "$record"
+    [[ -f "$path" ]] || die "$target model path no longer exists: $path"
+    expected_size="$(expected_size_for "$target")"
+    actual_size="$(file_size "$path")"
+    [[ "$actual_size" == "$expected_size" ]] ||
+        die "$target model size is $actual_size bytes; expected $expected_size"
+    printf '%s\n' "$path"
+}
+
+require_runtime() {
+    local head
+    [[ -d "$RUNTIME_DIR/.git" ]] || die "runtime is missing; run: laguna setup"
+    head="$(git -C "$RUNTIME_DIR" rev-parse HEAD)"
+    [[ "$head" == "$RUNTIME_REVISION" ]] ||
+        die "runtime revision is $head; expected $RUNTIME_REVISION; run: laguna setup"
+    [[ -x "$RUNTIME_DIR/build/bin/llama-cli" ]] || die "llama-cli is missing; run: laguna setup"
+    [[ -x "$RUNTIME_DIR/build/bin/llama-server" ]] || die "llama-server is missing; run: laguna setup"
+}
+
+setup_runtime() {
+    local remote jobs
+    require_command git 'install the Xcode command-line tools'
+    require_command cmake 'run: brew install cmake'
+
+    if [[ ! -e "$RUNTIME_DIR" ]]; then
+        mkdir -p "$(dirname "$RUNTIME_DIR")"
+        git clone --branch laguna --single-branch "$RUNTIME_URL" "$RUNTIME_DIR"
+    else
+        [[ -d "$RUNTIME_DIR/.git" ]] || die "$RUNTIME_DIR exists but is not a Git checkout"
+        remote="$(git -C "$RUNTIME_DIR" remote get-url origin)"
+        [[ "$remote" == "$RUNTIME_URL" ]] ||
+            die "$RUNTIME_DIR origin is $remote; expected $RUNTIME_URL"
+        [[ -z "$(git -C "$RUNTIME_DIR" status --porcelain)" ]] ||
+            die "$RUNTIME_DIR has uncommitted changes; clean or move them before setup"
+        git -C "$RUNTIME_DIR" fetch origin laguna
+    fi
+
+    git -C "$RUNTIME_DIR" cat-file -e "$RUNTIME_REVISION^{commit}" 2>/dev/null ||
+        git -C "$RUNTIME_DIR" fetch origin laguna
+    git -C "$RUNTIME_DIR" checkout --detach "$RUNTIME_REVISION"
+
+    jobs="$(sysctl -n hw.logicalcpu 2>/dev/null || printf '8\n')"
+    cmake -S "$RUNTIME_DIR" -B "$RUNTIME_DIR/build" -DCMAKE_BUILD_TYPE=Release
+    cmake --build "$RUNTIME_DIR/build" --parallel "$jobs"
+
+    require_runtime
+    log "runtime ready at $RUNTIME_REVISION"
+}
+
+download_model() {
+    local target file expected_size expected_sha256 record resolved actual_size actual_sha256
+    case "$target" in
+        q4)
+            file="$Q4_FILE"
+            expected_size="$Q4_SIZE"
+            expected_sha256="$Q4_SHA256"
+            ;;
+        dflash)
+            file="$DFLASH_FILE"
+            expected_size="$DFLASH_SIZE"
+            expected_sha256="$DFLASH_SHA256"
+            ;;
+        *) die 'download target must be q4 or dflash' ;;
+    esac
+
+    require_command uv 'run: brew install uv'
+    require_command shasum 'install the macOS command-line tools'
+    mkdir -p "$STATE_DIR"
+    resolved="$(
+        uv tool run --from "$HF_TOOL_PACKAGE" hf download \
+            "$MODEL_REPOSITORY" "$file" --revision "$MODEL_REVISION"
+    )"
+    resolved="${resolved##*$'\n'}"
+    [[ -f "$resolved" ]] || die "Hugging Face did not return a model path: $resolved"
+
+    actual_size="$(file_size "$resolved")"
+    [[ "$actual_size" == "$expected_size" ]] ||
+        die "$file is $actual_size bytes; expected $expected_size"
+    actual_sha256="$(shasum -a 256 "$resolved" | awk '{print $1}')"
+    [[ "$actual_sha256" == "$expected_sha256" ]] ||
+        die "$file SHA-256 is $actual_sha256; expected $expected_sha256"
+
+    record="$(path_record_for "$target")"
+    printf '%s\n' "$resolved" > "$record"
+    log "$target ready: $resolved"
+}
+
+model_state() {
+    local target="$1" label="$2" required="$3" record path expected_size actual_size
+    record="$(path_record_for "$target")"
+    if [[ ! -s "$record" ]]; then
+        if [[ "$required" == "true" ]]; then
+            printf '%s: missing\n' "$label"
+            return 1
+        fi
+        printf '%s: missing (optional)\n' "$label"
+        return 0
+    fi
+    IFS= read -r path < "$record"
+    if [[ ! -f "$path" ]]; then
+        printf '%s: path missing (%s)\n' "$label" "$path"
+        return 1
+    fi
+    expected_size="$(expected_size_for "$target")"
+    actual_size="$(file_size "$path")"
+    if [[ "$actual_size" != "$expected_size" ]]; then
+        printf '%s: invalid size (%s bytes)\n' "$label" "$actual_size"
+        return 1
+    fi
+    printf '%s: ready (%s)\n' "$label" "$path"
+}
+
+show_status() {
+    local ready=0 head
+    if [[ ! -d "$RUNTIME_DIR/.git" ]]; then
+        printf '%s\n' 'runtime: missing'
+        ready=1
+    else
+        head="$(git -C "$RUNTIME_DIR" rev-parse HEAD 2>/dev/null || true)"
+        if [[ "$head" != "$RUNTIME_REVISION" ]] ||
+           [[ ! -x "$RUNTIME_DIR/build/bin/llama-cli" ]] ||
+           [[ ! -x "$RUNTIME_DIR/build/bin/llama-server" ]]; then
+            printf 'runtime: incomplete or wrong revision (%s)\n' "${head:-unknown}"
+            ready=1
+        else
+            printf 'runtime: ready (%s)\n' "$head"
+        fi
+    fi
+
+    model_state q4 q4 true || ready=1
+    model_state dflash dflash false || ready=1
+
+    if command -v curl >/dev/null 2>&1 &&
+       curl -fsS --max-time 1 "http://$HOST:$PORT/health" >/dev/null 2>&1; then
+        printf 'server: running (%s:%s)\n' "$HOST" "$PORT"
+    else
+        printf '%s\n' 'server: stopped'
+    fi
+    return "$ready"
+}
+
+run_prompt() {
+    local model
+    [[ $# -gt 0 ]] || die 'prompt requires text'
+    require_runtime
+    model="$(model_path q4)"
+    exec "$RUNTIME_DIR/build/bin/llama-cli" \
+        --model "$model" \
+        --ctx-size "$CONTEXT_SIZE" \
+        --n-predict 512 \
+        --gpu-layers all \
+        --jinja \
+        --conversation \
+        --single-turn \
+        --prompt "$*"
+}
+
+serve() {
+    local model dflash mode="base"
+    if [[ $# -eq 1 && "$1" == "--dflash" ]]; then
+        mode="dflash"
+    elif [[ $# -ne 0 ]]; then
+        die 'serve accepts only --dflash'
+    fi
+
+    require_runtime
+    model="$(model_path q4)"
+    args=(
+        --model "$model"
+        --ctx-size "$CONTEXT_SIZE"
+        --gpu-layers all
+        --jinja
+        --alias "$MODEL_ALIAS"
+        --host "$HOST"
+        --port "$PORT"
+    )
+    if [[ "$mode" == "dflash" ]]; then
+        dflash="$(model_path dflash)"
+        args+=(
+            -md "$dflash"
+            --spec-type draft-dflash
+            --spec-draft-n-max 7
+            -fa on
+        )
+    fi
+    log "starting $mode server on $HOST:$PORT"
+    exec "$RUNTIME_DIR/build/bin/llama-server" "${args[@]}"
+}
+
+command_name="${1:-help}"
+[[ $# -eq 0 ]] || shift
+case "$command_name" in
+    help|-h|--help)
+        [[ $# -eq 0 ]] || die 'help takes no arguments'
+        usage
+        ;;
+    status)
+        [[ $# -eq 0 ]] || die 'status takes no arguments'
+        show_status
+        ;;
+    setup)
+        [[ $# -eq 0 ]] || die 'setup takes no arguments'
+        setup_runtime
+        ;;
+    download)
+        [[ $# -eq 1 ]] || die 'download target must be q4 or dflash'
+        download_model "$1"
+        ;;
+    prompt)
+        run_prompt "$@"
+        ;;
+    serve)
+        serve "$@"
+        ;;
+    *)
+        printf 'Unknown command: %s\n\n' "$command_name" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
