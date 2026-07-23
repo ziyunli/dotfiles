@@ -12,3 +12,6 @@ settings.local.json
 *.swp
 *.swo
 *~
+
+# Isolated feature worktrees
+.worktrees/
