@@ -100,7 +100,7 @@ setup_runtime() {
         git clone --branch laguna --single-branch "$RUNTIME_URL" "$RUNTIME_DIR"
     else
         [[ -d "$RUNTIME_DIR/.git" ]] || die "$RUNTIME_DIR exists but is not a Git checkout"
-        remote="$(git -C "$RUNTIME_DIR" remote get-url origin)"
+        remote="$(git -C "$RUNTIME_DIR" config --local --get remote.origin.url)"
         [[ "$remote" == "$RUNTIME_URL" ]] ||
             die "$RUNTIME_DIR origin is $remote; expected $RUNTIME_URL"
         [[ -z "$(git -C "$RUNTIME_DIR" status --porcelain)" ]] ||

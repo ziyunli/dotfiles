@@ -103,4 +103,26 @@ set -e
 [[ "$exit_status" == "2" ]] || fail "dirty setup exited $exit_status instead of 2"
 assert_contains "$output" 'has uncommitted changes; clean or move them before setup'
 
+rewritten_origin_runtime="$empty_home/rewritten-origin-runtime"
+git init -q "$rewritten_origin_runtime"
+git -C "$rewritten_origin_runtime" remote add origin https://github.com/poolsideai/llama.cpp.git
+rewrite_config="$empty_home/rewrite.gitconfig"
+git config --file "$rewrite_config" url."git@github.com:".insteadOf https://github.com/
+set +e
+output="$(
+    HOME="$empty_home" \
+    PATH="/usr/bin:/bin" \
+    GIT_CONFIG_GLOBAL="$rewrite_config" \
+    LAGUNA_RUNTIME_DIR="$rewritten_origin_runtime" \
+    LAGUNA_STATE_DIR="$empty_home/state" \
+    "$LAUNCHER" setup 2>&1
+)"
+exit_status=$?
+set -e
+[[ "$exit_status" == "2" ]] || fail "rewritten-origin setup exited $exit_status instead of 2"
+[[ "$output" == *'cmake is required; run: brew install cmake'* ]] ||
+    fail "rewritten-origin setup did not reach CMake prerequisite: $output"
+[[ "$output" != *'origin is git@github.com:poolsideai/llama.cpp.git'* ]] ||
+    fail 'setup validated the transport-rewritten origin instead of the configured origin'
+
 printf '%s\n' 'ok - Laguna launcher checks passed'
