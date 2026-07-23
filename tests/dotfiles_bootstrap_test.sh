@@ -62,6 +62,10 @@ with_fake_hostname() {
         fail "install.sh did not include the current MBP .zprofile starter"
     [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc"* ]] ||
         fail "install.sh did not include the current MBP .zshrc starter"
+    [[ "$output" == *"Would link: $temp_home/.local/bin/laguna -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.local/bin/laguna"* ]] ||
+        fail "install.sh did not include the Laguna launcher"
+    [[ "$output" == *"Would link: $temp_home/.pi/agent/models.json -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.pi/agent/models.json"* ]] ||
+        fail "install.sh did not include the Laguna Pi model configuration"
     [[ "$output" != *"Would link: $temp_home/.config/ghostty/config ->"* ]] ||
         fail "install.sh should not link the legacy Ghostty config filename"
     [[ "$output" != *"Would link: $temp_home/Library/Application Support/com.mitchellh.ghostty/config.ghostty ->"* ]] ||
