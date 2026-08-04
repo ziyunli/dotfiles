@@ -377,6 +377,72 @@ seed_local_pi_agents() {
     fi
 }
 
+# ~/.zshrc must be a real, machine-local file rather than a symlink into this
+# repo. Instacart's setup script (and others) append their own blocks to
+# ~/.zshrc on every run; if it were a repo symlink, that churn -- and any
+# machine-specific absolute paths -- would be written straight back into the
+# tracked file and leak to every other device. Instead the local ~/.zshrc just
+# sources the device config (~/.zshrc.local, symlinked from the repo), and
+# tool-managed blocks accumulate locally where they belong. This mirrors how
+# ~/.zshenv sources ~/.zshenv.shared (see seed_local_zshenv).
+DEVICE_ZSHRC_SOURCE_LINE='source "$HOME/.zshrc.local"'
+
+seed_local_zshrc() {
+    local dst="$HOME/.zshrc"
+    local device_src="$DOTFILES_DIR/devices/$DEVICE/.zshrc.local"
+
+    # Only manage ~/.zshrc as a local shim on devices that ship the split
+    # layout (a tracked .zshrc.local). Devices still shipping a plain .zshrc
+    # keep the legacy behavior (~/.zshrc symlinked by the device pass) untouched.
+    [[ -f "$device_src" ]] || return 0
+
+    # Retire an obsolete repo-owned symlink from the pre-split layout, where
+    # ~/.zshrc pointed straight at the device file (now renamed to .zshrc.local).
+    if [[ -L "$dst" ]]; then
+        local target
+        target="$(readlink "$dst")"
+        if [[ "$target" == "$DOTFILES_DIR/"* ]]; then
+            if [[ -n "$DRY_RUN" ]]; then
+                echo "Would replace obsolete ~/.zshrc symlink with a local seed sourcing ~/.zshrc.local"
+                return
+            fi
+            rm "$dst"
+        else
+            warn "~/.zshrc is a symlink outside this repo; leaving it untouched: $dst -> $target"
+            return
+        fi
+    fi
+
+    if [[ -n "$DRY_RUN" ]]; then
+        if [[ -e "$dst" ]]; then
+            if grep -Fq "$DEVICE_ZSHRC_SOURCE_LINE" "$dst" 2>/dev/null; then
+                echo "Would leave ~/.zshrc as-is (already sources ~/.zshrc.local)"
+            else
+                echo "Would warn: ~/.zshrc exists but does not source ~/.zshrc.local (needs manual migration)"
+            fi
+        else
+            echo "Would seed local ~/.zshrc sourcing ~/.zshrc.local"
+        fi
+        return
+    fi
+
+    if [[ ! -e "$dst" ]]; then
+        printf '%s\n' \
+            '# Machine-local zsh config (not tracked by dotfiles).' \
+            '# Sources the device config (~/.zshrc.local, symlinked from the repo);' \
+            '# tools like Instacart setup append their own blocks below without' \
+            '# churning the dotfiles repo.' \
+            "$DEVICE_ZSHRC_SOURCE_LINE" > "$dst"
+        log "Seeded local ~/.zshrc (sources ~/.zshrc.local)"
+    elif ! grep -Fq "$DEVICE_ZSHRC_SOURCE_LINE" "$dst"; then
+        # A pre-existing local ~/.zshrc likely still holds the inline device
+        # config that now lives in ~/.zshrc.local. Prepending a source line
+        # would double-source it, so leave the file alone and let the user
+        # migrate it deliberately.
+        warn "~/.zshrc exists but does not source ~/.zshrc.local; leaving it untouched. Migrate it to '$DEVICE_ZSHRC_SOURCE_LINE' manually."
+    fi
+}
+
 # Main
 log "Installing dotfiles for device: $DEVICE"
 log "Dotfiles directory: $DOTFILES_DIR"
@@ -398,6 +464,11 @@ seed_local_zshenv
 # Ensure ~/.pi/agent/AGENTS.md is a machine-local file (see above) so pi-config
 # can never write through it into the repo.
 seed_local_pi_agents
+
+# Ensure ~/.zshrc is a machine-local shim sourcing ~/.zshrc.local (see above) so
+# tools appending to it never write through into the repo. No-op on devices that
+# still ship a plain devices/<dev>/.zshrc.
+seed_local_zshrc
 
 # Link device-specific files
 log "Linking device-specific configuration for '$DEVICE'..."

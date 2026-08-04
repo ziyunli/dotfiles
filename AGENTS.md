@@ -13,5 +13,6 @@ Device folders use hostnames (`hostname -s`). Check `devices/` for available dev
 
 Shell config pattern:
 - `shared/.zshrc.common` - shared zsh config (OMZ setup, aliases, FZF, functions). Tracked in git, symlinked to `~/.zshrc.common`
-- `~/.zshrc` - device-specific config. NOT tracked. Sources `~/.zshrc.common`. Sets `DEVICE_PLUGINS` array before sourcing to add device-specific OMZ plugins.
+- `devices/<dev>/.zshrc.local` - device-specific config. Tracked in git, symlinked to `~/.zshrc.local`. Sets `DEVICE_PLUGINS` array before sourcing `~/.zshrc.common`, then adds machine-specific hooks.
+- `~/.zshrc` - machine-local shim. NOT tracked and NOT symlinked; `install.sh` seeds it (see `seed_local_zshrc`) to `source ~/.zshrc.local`. Tools (e.g. Instacart setup) append their own blocks here without churning the repo. Devices that ship a plain `devices/<dev>/.zshrc` instead of `.zshrc.local` fall back to symlinking it directly.
 - Always back up `~/.zshrc` before modifying (it's untracked, so no git safety net)
