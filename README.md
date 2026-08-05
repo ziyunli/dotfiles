@@ -10,6 +10,7 @@ dotfiles/
 │   ├── .gitconfig    # Base git config (includes ~/.gitconfig.local)
 │   ├── .tmux.conf
 │   ├── TMUX_GUIDE.md # Tmux configuration guide
+│   ├── HERDR_GUIDE.md # Herdr configuration guide
 │   ├── .myclirc
 │   └── ...
 ├── devices/          # Machine-specific configuration (one dir per `hostname -s`)
