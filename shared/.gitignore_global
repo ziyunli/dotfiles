@@ -192,3 +192,4 @@ pyrightconfig.json
 
 # Git
 .worktrees
+.remember
