@@ -24,11 +24,18 @@ Only herdr defaults that differ from the tmux bindings are set; every unset key 
 
 ## Agent integrations
 
-Herdr shows each agent pane's state (working / idle / waiting) via a per-agent hook installed with `herdr integration install <agent>`. This is **separate** from installing the agent CLI itself (e.g. via `gohan`): the CLI lets you run the agent in a pane; the integration hook lets herdr track it.
+Herdr shows each agent pane's state via a per-agent hook installed with `herdr integration install <agent>`. The states are `idle`, `working`, `blocked`, `done`, and `unknown` (the canonical list is the `--until` values in `herdr agent wait --help`). `blocked` means the agent is waiting on input — it is the state the sidebar exists to surface, and the one screen detection is worst at, since a blocked agent and an idle one often look identical on screen. This is **separate** from installing the agent CLI itself (e.g. via `gohan`): the CLI lets you run the agent in a pane; the integration hook lets herdr track it.
 
-Installed on this setup: `claude`, `pi`, `opencode`, `codex`. Check with `herdr integration status`; remove with `herdr integration uninstall <agent>`.
+The integrations this repo expects are `claude`, `pi`, `opencode`, and `codex` — the four agent CLIs installed across these machines. Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version. Remove one with `herdr integration uninstall <agent>`.
 
-The hooks live in each agent's own config dir, **not** in this repo, so they are not tracked here — reinstall them on a new machine with `herdr integration install`. Each agent gets a hook script (`herdr integration status` prints the exact path): `~/.claude/hooks/herdr-agent-state.sh`, `~/.pi/agent/extensions/herdr-agent-state.ts`, `~/.config/opencode/plugins/herdr-agent-state.js`, and `~/.codex/herdr-agent-state.sh`. `codex` additionally registers the hook in `~/.codex/hooks.json`.
+The hook scripts themselves live in each agent's own config dir, **not** in this repo, so they are not tracked here — reinstall them on a new machine with `herdr integration install`. Each agent gets a hook script (`herdr integration status` prints the exact path): `~/.claude/hooks/herdr-agent-state.sh`, `~/.pi/agent/extensions/herdr-agent-state.ts`, `~/.config/opencode/plugins/herdr-agent-state.js`, and `~/.codex/herdr-agent-state.sh`. `codex` additionally registers the hook in `~/.codex/hooks.json` and touches `~/.codex/config.toml`.
+
+**`herdr integration install claude` dirties this repo.** It registers the `SessionStart` hook in `~/.claude/settings.json`, which is a symlink to `shared/.claude/settings.json` — so the install shows up as an uncommitted change here. Two things to check after running it:
+
+- It writes the hook command as an **absolute** path (`/Users/<user>/.claude/hooks/...`). That breaks the `shared/` contract of working on all machines, so rewrite it to `~/.claude/hooks/herdr-agent-state.sh` (the `statusLine` entry in the same file is the precedent). Re-verify with `herdr integration status` — it resolves the hook by path on disk, not by the settings entry, so the tilde form still reports `current`.
+- It writes minified JSON into an otherwise pretty-printed file; reformat to match.
+
+Re-check both after any `herdr update`, since a reinstall may reintroduce them.
 
 ## Launching
 
