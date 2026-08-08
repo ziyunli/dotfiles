@@ -30,12 +30,19 @@ The integrations this repo expects are `claude`, `pi`, `opencode`, and `codex` �
 
 The hook scripts themselves live in each agent's own config dir, **not** in this repo, so they are not tracked here — reinstall them on a new machine with `herdr integration install`. Each agent gets a hook script (`herdr integration status` prints the exact path): `~/.claude/hooks/herdr-agent-state.sh`, `~/.pi/agent/extensions/herdr-agent-state.ts`, `~/.config/opencode/plugins/herdr-agent-state.js`, and `~/.codex/herdr-agent-state.sh`. `codex` additionally registers the hook in `~/.codex/hooks.json` and touches `~/.codex/config.toml`.
 
-**`herdr integration install claude` dirties this repo.** It registers the `SessionStart` hook in `~/.claude/settings.json`, which is a symlink to `shared/.claude/settings.json` — so the install shows up as an uncommitted change here. Two things to check after running it:
+**`herdr integration install claude` dirties this repo.** It registers the `SessionStart` hook in `~/.claude/settings.json`, which is a symlink to `shared/.claude/settings.json` — so the install shows up as an uncommitted change here. Three things to check after running it:
 
 - It writes the hook command as an **absolute** path (`/Users/<user>/.claude/hooks/...`). That breaks the `shared/` contract of working on all machines, so rewrite it to `~/.claude/hooks/herdr-agent-state.sh` (the `statusLine` entry in the same file is the precedent). Re-verify with `herdr integration status` — it resolves the hook by path on disk, not by the settings entry, so the tilde form still reports `current`.
+- It writes the command **unguarded**. The registration lives in `shared/` and so reaches every device, but the hook script it points at is per-machine and untracked — so on any machine that has not run the install, an unguarded command fails every session start with a `127`. Wrap it so a missing script is a silent no-op:
+
+  ```
+  if [ -x ~/.claude/hooks/herdr-agent-state.sh ]; then bash ~/.claude/hooks/herdr-agent-state.sh session; fi
+  ```
+
+  The `if` form (rather than `[ -x … ] && …`) exits `0` when the script is absent while still propagating the script's real exit status when it is present, so genuine hook failures are not swallowed. `tests/dotfiles_bootstrap_test.sh` enforces both halves of this in `with_herdr_hook_guard`.
 - It writes minified JSON into an otherwise pretty-printed file; reformat to match.
 
-Re-check both after any `herdr update`, since a reinstall may reintroduce them.
+Re-check all three after any `herdr update`, since a reinstall may reintroduce them.
 
 ## Launching
 

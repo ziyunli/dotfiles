@@ -287,6 +287,54 @@ with_settings_backward_compat() {
     assert_file_contains "$temp_home/.claude/settings.json" 'ANTHROPIC_MODEL'
 }
 
+with_herdr_hook_guard() {
+    local temp_home hook_cmd stderr_file marker status
+
+    temp_home="$(mktemp -d)"
+    trap 'rm -rf "$temp_home"' RETURN
+
+    hook_cmd="$(python3 -c '
+import json, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+data = json.loads((root / "shared/.claude/settings.json").read_text())
+starts = data["hooks"]["SessionStart"]
+cmds = [h["command"] for e in starts for h in e["hooks"]]
+herdr = [c for c in cmds if "herdr-agent-state.sh" in c]
+if len(herdr) != 1:
+    raise SystemExit("expected exactly one herdr SessionStart hook, got %d" % len(herdr))
+print(herdr[0])
+' "$ROOT_DIR")"
+
+    # The hook script is generated per-machine by `herdr integration install
+    # claude` and is deliberately untracked (see shared/HERDR_GUIDE.md), but the
+    # registration lives in shared/ and therefore reaches every device. On a
+    # machine that has not run the install the command must degrade to a silent
+    # no-op instead of failing SessionStart with a 127.
+    stderr_file="$temp_home/stderr"
+    set +e
+    HOME="$temp_home" bash -c "$hook_cmd" >/dev/null 2>"$stderr_file"
+    status=$?
+    set -e
+    [[ $status -eq 0 ]] ||
+        fail "herdr SessionStart hook exited $status with no script installed"
+    [[ ! -s "$stderr_file" ]] ||
+        fail "herdr SessionStart hook wrote to stderr with no script installed: $(cat "$stderr_file")"
+
+    # Where the integration *is* installed the guard must stay out of the way:
+    # the script still runs and still receives the `session` argument.
+    marker="$temp_home/invoked"
+    mkdir -p "$temp_home/.claude/hooks"
+    printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$1" > "%s"\n' "$marker" \
+        > "$temp_home/.claude/hooks/herdr-agent-state.sh"
+    chmod +x "$temp_home/.claude/hooks/herdr-agent-state.sh"
+
+    HOME="$temp_home" bash -c "$hook_cmd" >/dev/null 2>&1 ||
+        fail "herdr SessionStart hook failed with the script installed"
+    [[ -f "$marker" ]] ||
+        fail "herdr SessionStart hook did not run the installed script"
+    assert_file_contains "$marker" 'session'
+}
+
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'eval "$(/opt/homebrew/bin/brew shellenv)"'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" 'typeset -U path'
 assert_file_contains "$ROOT_DIR/shared/.zprofile.macos" '"$HOME/.local/bin"'
@@ -405,6 +453,7 @@ with_local_zshenv
 with_local_pi_agents
 with_work_opencode_overlay
 with_settings_backward_compat
+with_herdr_hook_guard
 
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zprofile" 'source ~/.zprofile.macos'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc.local" 'DEVICE_PLUGINS=(macos)'

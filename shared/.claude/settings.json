@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/herdr-agent-state.sh session",
+            "command": "if [ -x ~/.claude/hooks/herdr-agent-state.sh ]; then bash ~/.claude/hooks/herdr-agent-state.sh session; fi",
             "timeout": 10
           }
         ]
@@ -71,10 +71,10 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "vim",
-  "agentPushNotifEnabled": true,
-  "tui": "fullscreen"
+  "agentPushNotifEnabled": true
 }
