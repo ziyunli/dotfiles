@@ -1,22 +1,20 @@
+onboarding = false
+
 # herdr configuration — mirrors the tmux muscle memory in shared/.tmux.conf.
 # Only Herdr defaults that differ are set here; every unset key keeps its
 # Herdr default (see `herdr --default-config`). Validate with `herdr config check`.
-
 [keys]
 # tmux uses Ctrl-a as the prefix (.tmux.conf: `set -g prefix C-a`).
 # Trade-off: Herdr has no send-prefix, so literal Ctrl-a (beginning-of-line)
 # is not available inside panes — unlike tmux's `bind C-a send-prefix`.
 prefix = "ctrl+a"
-
 # tmux reloads with `prefix r`; Herdr's defaults are reload=prefix+shift+r and
 # resize=prefix+r. Swap them so `prefix r` reloads, matching tmux.
 reload_config = "prefix+r"
 resize_mode = "prefix+shift+r"
-
 # tmux: `bind | split-window -h` opens a side-by-side (left/right) split.
 # Herdr's split_horizontal (top/bottom) already matches tmux's `-` at its
 # default prefix+minus, so only the vertical split is overridden here.
 split_vertical = "prefix+|"
-
 # Pane focus (prefix+h/j/k/l) and tab nav (prefix+n / prefix+p) already match
 # the tmux bindings at Herdr's defaults, so they are intentionally left unset.
