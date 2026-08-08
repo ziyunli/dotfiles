@@ -443,6 +443,16 @@ assert_file_contains "$ROOT_DIR/README.md" 'gh ssh-key add ~/.ssh/id_ed25519.pub
 assert_file_contains "$ROOT_DIR/README.md" 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf'
 assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.com/agkozak/agkozak-zsh-theme ~/.oh-my-zsh/custom/themes/agkozak'
+
+# Herdr hook scripts are per-machine and untracked, so bootstrapping a machine
+# has to reinstall them. Keep the README list in step with the integrations
+# HERDR_GUIDE.md declares this repo expects.
+assert_file_contains "$ROOT_DIR/README.md" '### Install herdr agent integrations'
+for integration in claude pi opencode codex; do
+    assert_file_contains "$ROOT_DIR/README.md" "herdr integration install $integration"
+    assert_file_contains "$ROOT_DIR/shared/HERDR_GUIDE.md" "\`$integration\`"
+done
+assert_file_contains "$ROOT_DIR/README.md" 'herdr integration status'
 assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'Ghostty-launched interactive shells auto-attach to tmux session `main`.'
 assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 'source ~/.zshrc.common'

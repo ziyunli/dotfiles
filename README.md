@@ -143,6 +143,21 @@ cd ~/.dotfiles
 ./install.sh
 ```
 
+### Install herdr agent integrations
+
+[Herdr](https://herdr.dev) tracks each agent pane's state through a per-agent hook script. Those scripts live in each agent's own config directory and are **not** tracked in this repo, so every machine needs its own copy — install one per agent CLI in use here:
+
+```bash
+herdr integration install claude
+herdr integration install pi
+herdr integration install opencode
+herdr integration install codex
+```
+
+Run these *after* `./install.sh`, not before: `herdr integration install claude` registers its hook in `~/.claude/settings.json`, which `install.sh` symlinks into this repo. That install dirties the working tree and needs the fixups described in [`shared/HERDR_GUIDE.md`](shared/HERDR_GUIDE.md) — a portable `~` path, the missing-script guard, and pretty-printed JSON.
+
+Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version.
+
 ### Preview what install/uninstall would do
 
 ```bash
