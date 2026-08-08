@@ -60,8 +60,15 @@ with_fake_hostname() {
         fail "install.sh should not link the root AGENTS.md"
     [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zprofile"* ]] ||
         fail "install.sh did not include the current MBP .zprofile starter"
-    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc"* ]] ||
-        fail "install.sh did not include the current MBP .zshrc starter"
+    # Migrated devices ship .zshrc.local: the repo file is linked to
+    # ~/.zshrc.local and ~/.zshrc is seeded as an untracked shim that sources it,
+    # leaving ~/.zshrc free for tool-appended blocks.
+    [[ "$output" == *"Would link: $temp_home/.zshrc.local -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc.local"* ]] ||
+        fail "install.sh did not include the current MBP .zshrc.local starter"
+    [[ "$output" == *"Would seed local ~/.zshrc sourcing ~/.zshrc.local"* ]] ||
+        fail "install.sh did not plan to seed the local ~/.zshrc shim"
+    [[ "$output" != *"Would link: $temp_home/.zshrc -> "* ]] ||
+        fail "install.sh should not link ~/.zshrc directly on a migrated device"
     [[ "$output" == *"Would link: $temp_home/.local/bin/laguna -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.local/bin/laguna"* ]] ||
         fail "install.sh did not include the Laguna launcher"
     [[ "$output" == *"Would link: $temp_home/.pi/agent/models.json -> $ROOT_DIR/devices/Ziyuns-M5-MBP/.pi/agent/models.json"* ]] ||
@@ -118,8 +125,10 @@ with_explicit_work_devices() {
         fail "install.sh did not accept explicit insta-laptop device"
     [[ "$output" == *"Would link: $temp_home/.zprofile -> $ROOT_DIR/devices/insta-laptop/.zprofile"* ]] ||
         fail "insta-laptop install did not include work laptop .zprofile"
-    [[ "$output" == *"Would link: $temp_home/.zshrc -> $ROOT_DIR/devices/insta-laptop/.zshrc"* ]] ||
-        fail "insta-laptop install did not include work laptop .zshrc"
+    [[ "$output" == *"Would link: $temp_home/.zshrc.local -> $ROOT_DIR/devices/insta-laptop/.zshrc.local"* ]] ||
+        fail "insta-laptop install did not include work laptop .zshrc.local"
+    [[ "$output" == *"Would seed local ~/.zshrc sourcing ~/.zshrc.local"* ]] ||
+        fail "insta-laptop install did not plan to seed the local ~/.zshrc shim"
     [[ "$output" == *"Would link: $temp_home/.claude/CLAUDE.md -> $ROOT_DIR/devices/insta-laptop/.claude/CLAUDE.md"* ]] ||
         fail "insta-laptop install did not override CLAUDE.md with the work overlay"
     [[ "$output" == *"Would link: $temp_home/.claude/instacart-work-context.md -> $ROOT_DIR/devices/insta-laptop/.claude/instacart-work-context.md"* ]] ||
@@ -292,14 +301,14 @@ assert_file_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'source ~/.zshrc.comm
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zprofile" 'source ~/.zprofile.macos'
 assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zprofile" 'source ~/.zprofile.macos'
 assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zprofile" 'source ~/.orbstack/shell/init.zsh 2>/dev/null || :'
-assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'DEVICE_PLUGINS=(macos)'
-assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'source ~/.zshrc.common'
-assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'source "$HOME/.instacart_shell_profile"'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc.local" 'DEVICE_PLUGINS=(macos)'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc.local" 'source ~/.zshrc.common'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.zshrc.local" 'source "$HOME/.instacart_shell_profile"'
 # gohan (Instacart tooling) is sourced from a machine-local, untracked ~/.zshenv
 # that gohan's own installer manages -- never from repo-tracked files. The shared
 # env stays clean, the old redundant interactive-shell source is gone, and the
 # only repo-tracked gohan hook is bento's (its remote env may not auto-inject).
-assert_file_not_contains "$ROOT_DIR/devices/insta-laptop/.zshrc" 'gohan'
+assert_file_not_contains "$ROOT_DIR/devices/insta-laptop/.zshrc.local" 'gohan'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/090_gohan.zsh" 'source "$HOME/.config/gohan/gohan.sh"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshenv.shared" 'gohan'
 assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" '$HOME/.fzf/bin'
@@ -354,9 +363,9 @@ fi
 
 assert_path_not_exists "$ROOT_DIR/shared/.zshenv"
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'brew shellenv'
-assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" 'brew shellenv'
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc.local" 'brew shellenv'
 assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-MBP/.zshrc" 'export PATH='
-assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc" '.opencode/bin'
+assert_file_not_contains "$ROOT_DIR/devices/Ziyuns-Mac-mini/.zshrc.local" '.opencode/bin'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.local/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
@@ -398,8 +407,8 @@ with_work_opencode_overlay
 with_settings_backward_compat
 
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zprofile" 'source ~/.zprofile.macos'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc" 'DEVICE_PLUGINS=(macos)'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc" 'source ~/.zshrc.common'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc.local" 'DEVICE_PLUGINS=(macos)'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.zshrc.local" 'source ~/.zshrc.common'
 assert_path_not_exists "$ROOT_DIR/devices/Ziyuns-M5-MacBook-Pro"
 
 echo "ok - dotfiles bootstrap checks passed"
