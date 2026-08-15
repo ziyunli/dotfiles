@@ -33,7 +33,7 @@
       "Bash(git push:*)",
       "Bash(rm:*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "hooks": {
     "SessionStart": [
