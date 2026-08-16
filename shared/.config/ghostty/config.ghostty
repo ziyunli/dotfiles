@@ -1,7 +1,8 @@
-# Shared Ghostty defaults for tmux-heavy SSH work.
+# Shared Ghostty defaults for tmux/herdr and SSH work.
 #
-# Auto-starting tmux is handled in shared/.zshrc.common instead of `command`.
-# That keeps Ghostty shell integration available to zsh inside tmux panes.
+# Ghostty opens a plain shell; tmux and herdr are launched on demand (never via
+# `command`) so the two multiplexers don't nest. shared/.zshrc.common still
+# sources Ghostty shell integration so it stays available inside tmux panes.
 
 # Keep shell integration enabled so prompt marks, titles, and SSH wrappers work
 # when the zsh integration is loaded.

@@ -420,8 +420,8 @@ assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.cargo/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export TERM="xterm-256color"'
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"'
-assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A -s main'
-assert_file_contains "$ROOT_DIR/shared/.zshrc.common" '-z "${SSH_CONNECTION:-}"'
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A -s main'
+assert_file_contains "$ROOT_DIR/shared/.zshrc.common" "alias tm='tmux new-session -A -s main'"
 
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys on'
 assert_file_contains "$ROOT_DIR/shared/.tmux.conf" 'set -g extended-keys-format csi-u'
@@ -453,7 +453,7 @@ for integration in claude pi opencode codex; do
     assert_file_contains "$ROOT_DIR/shared/HERDR_GUIDE.md" "\`$integration\`"
 done
 assert_file_contains "$ROOT_DIR/README.md" 'herdr integration status'
-assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'Ghostty-launched interactive shells auto-attach to tmux session `main`.'
+assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'it no longer auto-starts tmux'
 assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 'source ~/.zshrc.common'
 

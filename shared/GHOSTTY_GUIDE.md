@@ -34,7 +34,7 @@ trigger cycle detection.
 - `path`: Ghostty adds its binary directory to `PATH` when needed.
 - `no-sudo`: Ghostty does not wrap `sudo` from shared config.
 
-The zsh config sources Ghostty shell integration manually because auto-started tmux panes are not direct child shells of Ghostty.
+The zsh config sources Ghostty shell integration manually because tmux panes are not direct child shells of Ghostty.
 
 ## Keyboard
 

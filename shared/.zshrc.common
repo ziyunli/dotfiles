@@ -96,11 +96,9 @@ if [[ -n "${GHOSTTY_RESOURCES_DIR:-}" && -r "$GHOSTTY_RESOURCES_DIR/shell-integr
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 fi
 
-# Ghostty opens a normal shell; promote that shell into a persistent tmux client.
-# Nested tmux panes and SSH sessions must keep their existing shell process.
-if [[ -o interactive && -n "${GHOSTTY_RESOURCES_DIR:-}" && -z "${TMUX:-}" && -z "${SSH_CONNECTION:-}" ]] && command -v tmux >/dev/null 2>&1; then
-  exec tmux new-session -A -s main
-fi
+# Ghostty opens a plain shell; tmux and herdr are launched on demand so the two
+# multiplexers never nest and fight over the shared C-a prefix. `tm` reattaches
+# or creates the persistent tmux session; herdr is started with `herdr`.
 
 # User configuration
 
@@ -128,6 +126,8 @@ export EDITOR='nvim'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim='nvim'
+# Attach to the persistent tmux session, creating it on first use.
+alias tm='tmux new-session -A -s main'
 alias zshconfig="vim ~/.zshrc"
 alias brewski='bubu; brew doctor'
 
