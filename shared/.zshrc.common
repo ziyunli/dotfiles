@@ -152,6 +152,43 @@ fi
 alias claudegood='claude --model claude-opus-4-8 --effort ultracode --dangerously-skip-permissions'
 alias claudemax='claude --model claude-opus-4-8 --effort max --dangerously-skip-permissions'
 
+# freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass.
+# Each updater runs independently: a missing tool or a failing one never blocks
+# the rest, and a pass/skip/fail summary prints at the end.
+function freshen() {
+  emulate -L zsh
+  local -a summary
+
+  _freshen_run() {  # <label> <probe-binary> <command-string>
+    local label=$1 probe=$2 cmd=$3
+    if ! command -v "$probe" &>/dev/null; then
+      summary+=("  skip  $label (not installed)")
+      return
+    fi
+    print -P "%F{cyan}%B==> $label%b%f"
+    if eval "$cmd"; then
+      summary+=("  ok    $label")
+    else
+      summary+=("  FAIL  $label")
+    fi
+  }
+
+  _freshen_run claude    claude    'claude update'
+  _freshen_run codex     codex     'codex update'
+  _freshen_run pi        pi        'pi update'
+  _freshen_run agy       agy       'agy update'
+  _freshen_run opencode  opencode  'opencode upgrade'
+  _freshen_run amp       amp       'amp update'
+  # exe.dev intentionally omitted: it's a VM host reached via `ssh exe.dev`, not a
+  # locally-installed CLI, so there is nothing here to self-update.
+  _freshen_run omz       omz       'omz update'
+  _freshen_run brew      brew      'brew update && brew upgrade && brew doctor'
+
+  print -P "%F{cyan}%B==> summary%b%f"
+  print -l -- "${summary[@]}"
+  unfunction _freshen_run
+}
+
 ######################################################################################
 # FZF (git-based installation via ~/.fzf)
 ######################################################################################
