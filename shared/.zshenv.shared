@@ -22,3 +22,17 @@ fi
 if [[ -f "$HOME/.config/opencode.personal.json" ]]; then
   export OPENCODE_CONFIG="$HOME/.config/opencode.personal.json"
 fi
+
+# Fall back to a widely available terminfo entry when the inherited TERM has no
+# definition on this host. Ghostty advertises rich values like xterm-ghostty and
+# installs the matching terminfo on remotes through its own SSH wrapper; paths
+# that bypass that wrapper -- e.g. `bento remote ssh` -- forward xterm-ghostty to
+# hosts without the entry, so every terminfo lookup during startup fails. This
+# lives in ~/.zshenv (sourced before ~/.zshrc) rather than in ~/.zshrc.common
+# because ~/.zshrc sources terminfo-touching init before the interactive config:
+# on the bento remote, ~/.shellrc.d/004_devbox.sh runs devbox's shellenv before
+# ~/.shellrc.d/005 sources ~/.zshrc.common, so a guard there runs one file too
+# late. Gated to interactive shells so non-interactive `zsh -c` never forks infocmp.
+if [[ -o interactive && -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then
+  export TERM=xterm-256color
+fi

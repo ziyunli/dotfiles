@@ -36,6 +36,42 @@ trigger cycle detection.
 
 The zsh config sources Ghostty shell integration manually because tmux panes are not direct child shells of Ghostty.
 
+## Remote TERM fallback
+
+Ghostty advertises `TERM=xterm-ghostty` and, via the `ssh-terminfo` / `ssh-env`
+features above, installs that terminfo (or falls back to `xterm-256color`) on
+remotes it opens through its own `ssh` wrapper. Wrappers that bypass that shim --
+notably `bento remote ssh` -- forward `xterm-ghostty` to hosts that lack the
+terminfo entry, so terminfo lookups during shell startup fail with
+`can't find terminal definition for xterm-ghostty`.
+
+The durable fix is a guard in `shared/.zshenv.shared` that swaps an unresolvable
+`TERM` for `xterm-256color`:
+
+```zsh
+if [[ -o interactive && -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then
+  export TERM=xterm-256color
+fi
+```
+
+It lives in `~/.zshenv` (sourced before `~/.zshrc`) rather than in
+`~/.zshrc.common` because `~/.zshrc` sources terminfo-touching init before the
+interactive config does. On the bento remote, `~/.shellrc.d/004_devbox.sh` runs
+`eval "$(devbox global shellenv)"` before `~/.shellrc.d/005_oh-my-zshrc.zsh`
+sources `~/.zshrc.common`, so a guard inside `~/.zshrc.common` would run one file
+too late. Setting the fallback in `~/.zshenv` guarantees it precedes every
+`~/.zshrc` code path (login shells, tmux panes, `zsh -i`).
+
+To install the real `xterm-ghostty` terminfo on a specific host instead (one
+instance only; lost when the box is reprovisioned), run from the Ghostty client:
+
+```sh
+infocmp -x xterm-ghostty | ssh <host> -- tic -x -
+```
+
+`tic` may print `older tic versions may treat the description field as an alias`
+-- a harmless warning; the entry still compiles.
+
 ## Keyboard
 
 `macos-option-as-alt = left` makes left Option behave as terminal Alt/Meta for readline, zsh, Vim, and tmux. Right Option remains available for macOS character input.
