@@ -419,6 +419,7 @@ assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bi
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.cargo/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export TERM="xterm-256color"'
+assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'if [[ -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then'
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A -s main'
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" "alias tm='tmux new-session -A -s main'"

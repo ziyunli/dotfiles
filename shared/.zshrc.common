@@ -88,6 +88,16 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 
+# Fall back to a widely available terminfo entry when the inherited TERM has no
+# definition on this host. Ghostty sets rich values like xterm-ghostty and
+# installs the matching terminfo on remotes through its own SSH wrapper, but
+# paths that bypass that wrapper -- e.g. `bento remote ssh` -- leak the value to
+# hosts without the entry, so every terminfo lookup fails. Runs before oh-my-zsh
+# so its startup (theme, keybindings) sees a resolvable TERM.
+if [[ -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then
+  export TERM=xterm-256color
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # Ghostty auto-injects this only into direct child shells. Source it here so
