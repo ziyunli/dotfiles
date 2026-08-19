@@ -7,6 +7,10 @@
 # Most of these settings can be toggleable, either via the toggle-*
 # actions or via the option menu (bound to `o` by default).
 
+# Wrap long lines in all views (diff, log, blame, pager) instead of
+# truncating them off-screen. Toggle at runtime with `:toggle wrap-lines`.
+set wrap-lines = yes
+
 # View settings
 #
 # Supported column types and their options:
