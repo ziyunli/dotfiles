@@ -89,3 +89,12 @@ bind status P !git push origin	                      # Push to origin
 ## Stash View
 bind stash D !?git stash drop %(stash)                # Drop the selected stash
 bind stash A !?git stash apply %(stash)               # Apply the selected stash
+
+## External tools
+
+# Open the selected commit's diff in delta for syntax highlighting. delta
+# pages fullscreen and tig resumes on exit. When no commit is selected
+# (diff of uncommitted changes, %(commit) is empty or the null OID), diff
+# the worktree against HEAD instead.
+bind main D !@sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta >/dev/tty 2>&1"
+bind diff D !@sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta >/dev/tty 2>&1"
