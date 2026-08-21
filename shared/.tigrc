@@ -95,6 +95,13 @@ bind stash A !?git stash apply %(stash)               # Apply the selected stash
 # Open the selected commit's diff in delta for syntax highlighting. delta
 # pages fullscreen and tig resumes on exit. When no commit is selected
 # (diff of uncommitted changes, %(commit) is empty or the null OID), diff
-# the worktree against HEAD instead.
-bind main D !@sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta >/dev/tty 2>&1"
-bind diff D !@sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta >/dev/tty 2>&1"
+# the worktree against HEAD instead. Flags: ! = run in the foreground with
+# the terminal handed off (required for an interactive pager; @ would run
+# in the background where tig keeps the tty and overdraws delta's screen),
+# > = return to tig without a "Press Enter to continue" prompt.
+# delta --paging=always always opens less: the default (auto) is
+# quit-if-one-screen, so small diffs would print and vanish in a blink.
+# delta --dark skips terminal light/dark detection: the detection query
+# races less for the tty and makes less unresponsive (delta#1880).
+bind main D !>sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta --dark --paging=always >/dev/tty 2>&1"
+bind diff D !>sh -c "if git rev-parse --verify --quiet '%(commit)^{commit}' >/dev/null; then git --no-pager show --color=always '%(commit)'; else git --no-pager diff --color=always HEAD; fi 2>&1 | delta --dark --paging=always >/dev/tty 2>&1"
