@@ -193,3 +193,5 @@ pyrightconfig.json
 # Git
 .worktrees
 .remember
+
+**/.claude/settings.local.json
