@@ -154,8 +154,9 @@ if command -v eza &>/dev/null; then
   alias ls=eza
 fi
 
-alias claudegood='claude --model claude-opus-4-8 --effort ultracode --dangerously-skip-permissions'
-alias claudemax='claude --model claude-opus-4-8 --effort max --dangerously-skip-permissions'
+alias claudegood='claude --effort xhigh --dangerously-skip-permissions'
+alias claudemax='claude --effort max --dangerously-skip-permissions'
+alias claudeultra='claude --effort ultracode --dangerously-skip-permissions'
 
 # freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass.
 # Each updater runs independently: a missing tool or a failing one never blocks
