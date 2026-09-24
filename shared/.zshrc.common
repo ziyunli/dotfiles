@@ -236,26 +236,6 @@ function branches () {
     git checkout "$branch"
   fi
 }
-# Fetch and check out one origin branch without widening the default fetch refspec.
-function carrot-co() {
-  emulate -L zsh
-
-  if (( $# != 1 )); then
-    print -u2 "usage: carrot-co <branch>"
-    return 2
-  fi
-
-  local branch=$1
-  local remote_ref="refs/remotes/origin/$branch"
-
-  git fetch origin "$branch:$remote_ref" || return
-
-  if git show-ref --verify --quiet "refs/heads/$branch"; then
-    git switch "$branch"
-  else
-    git switch -c "$branch" "$remote_ref"
-  fi
-}
 
 
 # from https://seb.jambor.dev/posts/improving-shell-workflows-with-fzf/
