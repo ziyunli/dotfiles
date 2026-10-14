@@ -143,3 +143,26 @@ For complete methodology, see the systematic-debugging skill
 - Document architectural decisions and their outcomes for future reference
 - Track patterns in user feedback to improve collaboration over time
 - When you notice something that should be fixed but is unrelated to your current task, document it in your journal rather than fixing it immediately
+
+# Model routing and delegation
+
+Frontier models (Sol 6.1, Opus 5.5) are for judgment: planning, research, review,
+architectural decisions, and advising. Once a plan exists, implementation is
+baseline-model work — keep expensive lanes out of the execution path.
+
+## Choosing a model
+
+- Default conversation/subagent work: DeepSeek v4.1 Flash or GLM 5.3 Flash.
+- Judgment-heavy but still baseline (long-horizon reasoning, tricky multi-step changes): GPT 6 Luna.
+- GPT 5.6 Luna: last resort only — the others are unavailable or the lane specifically needs GPT behaviour on a baseline budget.
+- Frontier lanes (Sol/Opus): reserved for planning, researching, reviewing, and advising. NEVER use them for mechanical implementation, refactors, or bulk edits with a plan in hand.
+
+## Spawning subagents
+
+- When dispatching a subagent (e.g. via the task tool), pass an explicit model
+  selector in the spawn parameters when the tooling accepts one. Baseline first:
+  DeepSeek v4.1 Flash or GLM 5.3 Flash; GPT 6 Luna when the slice needs more judgment.
+- A subagent that implements an existing plan is a baseline-model job by default.
+  Escalate to a frontier model only for work that genuinely requires it, and say why.
+- Frontline research/scout work that only gathers facts is also baseline-model work;
+  reserve frontier models for synthesis, review, and judgment calls.

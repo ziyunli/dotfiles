@@ -395,6 +395,31 @@ assert_file_contains "$ROOT_DIR/devices/insta-laptop/.dotfiles-merge" '.config/o
     fail "devices/bento/.config/opencode.personal.json should point to ../../insta-laptop/.config/opencode.personal.json"
 assert_file_contains "$ROOT_DIR/devices/bento/.dotfiles-merge" '.config/opencode.personal.json'
 
+# Pi settings tracking: shared personal base + per-device work gateway overlay
+# (deep-merged, arrays union), mirroring the opencode.personal.json pattern.
+assert_file_contains "$ROOT_DIR/shared/.pi/agent/settings.json" '"defaultThinkingLevel"'
+assert_file_not_contains "$ROOT_DIR/shared/.pi/agent/settings.json" 'enabledModels'
+assert_file_contains "$ROOT_DIR/devices/bento/.pi/agent/settings.json" 'instacart-openai/gpt-6.1-sol:high'
+assert_file_contains "$ROOT_DIR/devices/bento/.dotfiles-merge" '.pi/agent/settings.json'
+assert_file_contains "$ROOT_DIR/devices/insta-laptop/.dotfiles-merge" '.pi/agent/settings.json'
+# The Tally gateway baseUrl and user header stay out of the repo entirely.
+if grep -rq "icprivate.com" "$ROOT_DIR/shared" "$ROOT_DIR/devices"; then
+    fail "no repo file may embed the Tally gateway URL (icprivate.com); provider defs are tool-managed"
+fi
+
+# omp config tracking: linked per device (YAML, not jq-merged), not symlinks of
+# one another -- shared is personal ChatGPT, bento is the work gateway.
+assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'openai/gpt-6-luna:high'
+assert_file_not_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'instacart-'
+assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'open-weights/deepseek-v4p1-flash-priority:high'
+assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'modelRoles'
+# Work omp config must not point roles at a provider absent from the gateway.
+if grep -Eq "(^|[^a-z-])openai/gpt" "$ROOT_DIR/devices/bento/.omp/agent/config.yml"; then
+    fail "work omp config must not reference built-in openai/ catalog models"
+fi
+assert_file_contains "$ROOT_DIR/shared/.omp/agent/APPEND_SYSTEM.md" 'Model routing'
+assert_file_contains "$ROOT_DIR/shared/.pi/agent/APPEND_SYSTEM.md" 'Model routing'
+
 # opencode reads OPENCODE_CONFIG and deep-merges it over its global config, so
 # the personal overlay reaches opencode without touching the tool-managed dir.
 assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" 'if [[ -f "$HOME/.config/opencode.personal.json" ]]; then'
@@ -419,7 +444,7 @@ assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/bi
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/go/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export PATH="$HOME/.cargo/bin:$PATH"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'export TERM="xterm-256color"'
-assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'if [[ -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then'
+assert_file_contains "$ROOT_DIR/shared/.zshenv.shared" 'if [[ -o interactive && -n "${TERM:-}" ]] && ! infocmp "$TERM" &>/dev/null; then'
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" 'source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"'
 assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'exec tmux new-session -A -s main'
 assert_file_contains "$ROOT_DIR/shared/.zshrc.common" "alias tm='tmux new-session -A -s main'"

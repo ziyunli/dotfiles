@@ -1,0 +1,54 @@
+# Personal omp config (ChatGPT subscription via the built-in OpenAI catalog).
+# Tracked in dotfiles: linked to ~/.omp/agent/config.yml on personal devices.
+# Work devices (e.g. bento) ship their own devices/<hostname>/.omp/agent/config.yml
+# instead, pointing model roles at the internal Tally gateway.
+
+symbolPreset: unicode
+theme:
+  dark: anthracite
+  light: light
+setupVersion: 3
+startup:
+  setupWizard: false
+  checkUpdate: false
+
+# Personal subscription: ChatGPT models from the built-in catalog. Sol = planner /
+# research / review; Luna = baseline chat + execution lanes (mirrors the work split).
+enabledModels:
+  - openai/gpt-6.1-sol
+  - openai/gpt-6-sol
+  - openai/gpt-6-luna
+  - openai/gpt-5.6-luna
+  - anthropic/claude-opus-5-5
+  - anthropic/claude-sonnet-5-5
+
+modelRoles:
+  default: openai/gpt-6-luna:high
+  smol: openai/gpt-5.6-luna
+  slow: openai/gpt-6.1-sol:max
+  vision: openai/gpt-6.1-sol
+  plan: anthropic/claude-opus-5-5:xhigh
+  designer: openai/gpt-6.1-sol
+  commit: openai/gpt-5.6-luna
+  tiny: openai/gpt-5.6-luna
+  task: openai/gpt-6-luna:high
+  advisor: openai/gpt-6.1-sol:xhigh
+
+hideThinkingBlock: false
+colorBlindMode: false
+composer:
+  shape: box
+statusLine:
+  compactThinkingLevel: false
+  preset: custom
+  leftSegments:
+    - pi
+    - model
+    - mode
+    - collab
+    - path
+    - git
+    - pr
+    - context_pct
+  rightSegments:
+    - session_name

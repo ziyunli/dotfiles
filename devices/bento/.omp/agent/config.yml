@@ -1,0 +1,98 @@
+# Work omp config (Instacart Tally gateway).
+# Tracked in dotfiles and linked to ~/.omp/agent/config.yml on this device only.
+# The gateway itself (providers, endpoints, headers) is Instacart-managed in
+# ~/.omp/agent/models.yml and stays out of this repo.
+#
+# Model policy (baseline-first):
+#   - Sol 6.1 / Opus 5.5: planning, research, review, advising (frontier lanes)
+#   - DeepSeek v4.1 Flash / GLM 5.3 Flash: baseline execution lanes — most
+#     implementation, refactors, subagent workers
+#   - GPT 6 Luna: baseline lane with more judgment / long-horizon reasoning
+#   - GPT 5.6 Luna: last-resort fallback only
+# With a plan in hand, delegate implementation to task subagents: they resolve
+# modelRoles.task (DeepSeek first) instead of the conversation model.
+
+symbolPreset: unicode
+theme:
+  dark: anthracite
+  light: light
+setupVersion: 3
+startup:
+  setupWizard: false
+  checkUpdate: false
+
+enabledModels:
+  - instacart-openai/gpt-5.6-terra
+  - instacart-openai/gpt-5.6-luna
+  - instacart-openai/gpt-5.6-sol
+  - instacart-openai/gpt-6.1-sol
+  - instacart-openai/gpt-6-sol
+  - instacart-openai/gpt-6-luna
+  - open-weights/glm-5.3-priority
+  - open-weights/glm-5.3-flash-priority
+  - open-weights/deepseek-v4p1-flash-priority
+  - open-weights/minimax-latest-priority
+  - open-weights/Griffin/Qwen3.8-27B-NVFP4
+  - open-weights/qwen-latest-priority
+  - vertex-proxy/gemini-3.7-flash
+  - vertex-proxy/gemini-3.8-flash
+  - instacart-anthropic/claude-opus-4-7@default
+  - instacart-anthropic/claude-opus-4-8@default
+  - instacart-anthropic/claude-opus-5-5@default
+  - instacart-anthropic/claude-sonnet-4-6@default
+  - instacart-anthropic/claude-sonnet-5-5@default
+  - instacart-anthropic/claude-haiku-4-5@20251001
+
+# Frontier lanes stay on Sol/Opus; everything executable lands on baseline models.
+modelRoles:
+  # Main conversation model. DeepSeek handles day-to-day work directly.
+  default: open-weights/deepseek-v4p1-flash-priority:high
+  # Cheap/quick lanes: GLM 5.3 (non-flash keeps headroom on tiny workloads).
+  smol: open-weights/glm-5.3-priority:high
+  commit: open-weights/glm-5.3-priority:high
+  tiny: open-weights/glm-5.3-flash-priority:high
+  # Task subagents: planned implementation delegated to baseline. DeepSeek first,
+  # then GLM 5.3 Flash, then GPT 6 Luna for judgment-heavy edits, then GPT 5.6 Luna.
+  task: open-weights/deepseek-v4p1-flash-priority:high,open-weights/glm-5.3-flash-priority:high,instacart-openai/gpt-6-luna:high,instacart-openai/gpt-5.6-luna:high
+  # Frontier lanes: long-horizon reasoning and review stay on Sol/Opus.
+  slow: instacart-openai/gpt-6.1-sol:max
+  vision: instacart-openai/gpt-6.1-sol
+  plan: instacart-anthropic/claude-opus-5-5@default:xhigh
+  designer: instacart-openai/gpt-6.1-sol
+  advisor: instacart-openai/gpt-6.1-sol:xhigh
+
+retry:
+  fallbackChains:
+    task:
+      - open-weights/glm-5.3-flash-priority:high
+      - instacart-openai/gpt-6-luna:high
+      - instacart-openai/gpt-5.6-luna:high
+    smol:
+      - open-weights/glm-5.3-flash-priority:high
+      - instacart-openai/gpt-5.6-luna:high
+    commit:
+      - open-weights/glm-5.3-flash-priority:high
+
+# Consent flag written by omp's automated tool-issue reporting prompt; kept so a
+# relink never re-prompts. Personal devices can set their own value locally.
+dev:
+  autoqaConsent: granted
+
+hideThinkingBlock: false
+colorBlindMode: false
+composer:
+  shape: box
+statusLine:
+  compactThinkingLevel: false
+  preset: custom
+  leftSegments:
+    - pi
+    - model
+    - mode
+    - collab
+    - path
+    - git
+    - pr
+    - context_pct
+  rightSegments:
+    - session_name

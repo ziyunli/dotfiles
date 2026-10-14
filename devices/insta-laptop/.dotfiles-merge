@@ -2,3 +2,4 @@
 # Composed shared -> device -> local (later wins); conflicts reported.
 .claude/settings.json
 .config/opencode.personal.json
+.pi/agent/settings.json

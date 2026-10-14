@@ -298,6 +298,7 @@ Lists paths that should be **deep-merged** instead of symlinked. One path per li
 # Example: devices/insta-laptop/.dotfiles-merge
 .claude/settings.json
 .config/opencode.personal.json
+.pi/agent/settings.json
 ```
 
 For each listed path, `install.sh` composes up to three layers, with later layers winning:
@@ -310,6 +311,34 @@ shared/<path>  ->  devices/<hostname>/<path>  ->  existing ~/<path>
 The result is written as a real file, never a symlink, so an externally-managed local file (e.g. company-injected settings) keeps its own values while your shared and device-specific settings merge in. When no `devices/<hostname>/<path>` fragment exists, this reduces to the original `shared -> local` merge. Merge semantics (`merge-json.sh`): objects merge recursively, arrays union, and scalar conflicts resolve to the later layer; conflicts are reported to stderr.
 
 For example, `.config/opencode.personal.json` is composed from the shared `superpowers` plugin plus a work-device `model` override, then loaded by opencode via `OPENCODE_CONFIG` (exported from `.zshenv.shared`). `.claude/settings.json` has only a shared source, so its device layer is a no-op.
+
+## AI harness configs (Pi and omp)
+
+Both harnesses are tracked with a work/personal split:
+
+| File | Layer | Purpose |
+| ---- | ----- | ------- |
+| `shared/.pi/agent/settings.json` | shared | Personal base (ChatGPT subscription); no `enabledModels`, so the built-in catalog stays available |
+| `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
+| `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
+| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the built-in `openai/*` ChatGPT catalog |
+| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway, baseline-first |
+| `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
+
+Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). The gateway provider definitions themselves (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked.
+
+omp's model policy separates judgment from execution:
+
+- Frontier lanes (`plan`, `slow`, `advisor`, `designer`): Sol 6.1 / Opus 5.5 — planning, research, review, advising.
+- Execution lanes (`default`, `task`, `smol`, `commit`, `tiny`): baseline models — DeepSeek v4.1 Flash first, GLM 5.3 Flash, GPT 6 Luna for judgment-heavy baseline work, GPT 5.6 Luna as last resort.
+- Subagents spawned by the `task` tool resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks), so planned implementation lands on baseline models automatically. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of execution paths.
+
+### Adding a new work device
+
+1. Add `devices/<hostname>/.dotfiles-merge` with `.claude/settings.json`, `.config/opencode.personal.json`, and `.pi/agent/settings.json`.
+2. Copy the gateway `enabledModels` allowlist into `devices/<hostname>/.pi/agent/settings.json` (see `devices/bento/.pi/agent/settings.json`).
+3. Copy `devices/bento/.omp/agent/config.yml` to `devices/<hostname>/.omp/agent/config.yml` (gateway model roles).
+4. Run `./install.sh <hostname>`.
 
 ## How It Works
 
