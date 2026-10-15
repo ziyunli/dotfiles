@@ -332,12 +332,12 @@ The work omp model policy separates judgment from execution:
 
 - Frontier lanes (`plan`, `slow`, `advisor`, `designer`): Sol 6.1 / Opus 5.5 — planning, research, review, advising.
 - Execution lanes (`default`, `task`, `smol`, `commit`, `tiny`): baseline models — DeepSeek v4.1 Flash first, GLM 5.3 Flash, GPT 6 Luna for judgment-heavy baseline work, GPT 5.6 Luna as last resort.
-- Subagents spawned by the `task` tool resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks), so planned implementation lands on baseline models automatically. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of execution paths.
+- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; reviewers use `slow`, unless an agent override is configured. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
 On `Ziyuns-M5-MBP`, the device override keeps `google-antigravity/gemini-3.8-flash`
 as the default. Gemini also handles `smol` and `memory`;
 `ollama/qwen3.5:4b:off` handles `commit` and `tiny`;
-`openai-codex/gpt-6-luna:high` handles `task`; Sol 6.1 handles `slow`,
+`ds4/qwen3.8-flash-next:medium` handles `task`; Sol 6.1 handles `slow`,
 `vision`, `designer`, and `advisor`; `anthropic/claude-opus-5-5:xhigh`
 handles `plan`. These are provider-specific selectors from the installed omp
 catalog, not the shared config's `openai/*` selectors. Credentials stay local.
@@ -348,9 +348,79 @@ the local `tiny` role rather than a fork of the conversation model. Start Ollama
 with the already-installed `qwen3.5:4b` model available; thinking is disabled for
 both lightweight roles. No model download is needed on this device. On a fresh
 machine, run `ollama pull qwen3.5:4b` before using these roles.
-The [pi-ds4](https://github.com/mitsuhiko/pi-ds4) runtime and weights already
-present on this device are not required or modified by this setup: its much
-larger memory footprint is unnecessary for titles and commit messages.
+
+### Local ds4 task workers on the personal device
+
+`devices/Ziyuns-M5-MBP/.local/bin/ds4-serve` is a foreground launcher for
+Qwen3.8 Flash Next Q4. `./install.sh Ziyuns-M5-MBP` links it into `~/.local/bin`.
+Run `ds4-serve` in one terminal, then use omp in another. Ctrl-C stops the
+server and releases its model memory; it is not started at login or by Pi.
+The runtime defaults to `~/codebase/ds4` (`DS4_RUNTIME_DIR` overrides it) and
+must already be built with `make`. The launcher does not build or download.
+
+Download the pinned, self-contained GGUF without changing the checkout's
+existing `ds4flash.gguf` symlink:
+
+```sh
+uv tool run --from huggingface-hub==1.24.0 hf download \
+  antirez/qwen3.8-flash-next-gguf Qwen3.8-Flash-Next-Q4.gguf \
+  --revision d600fe1a43d2e1cdcadb85144ce3142f66f9eefe \
+  --local-dir "$HOME/codebase/ds4/gguf"
+shasum -a 256 "$HOME/codebase/ds4/gguf/Qwen3.8-Flash-Next-Q4.gguf"
+```
+
+Verify SHA-256 `680944460a8cbe93ba8b6d7b6107213ffb7e22320bd913000e563ca0a0f25a8a`
+and size `177280286720` bytes before starting the model. Its n-gram table stays
+on SSD; main/MTP weights occupy about 69.74 GiB of unified memory, plus runtime
+and context buffers.
+
+Merge this provider into the machine-local, untracked `~/.omp/agent/models.yml`;
+do not replace existing providers or add the file to dotfiles:
+
+```yaml
+providers:
+  ds4:
+    baseUrl: http://127.0.0.1:8040/v1
+    api: openai-responses
+    auth: none
+    models:
+      - id: qwen3.8-flash-next
+        name: Qwen3.8 Flash Next Q4 (local ds4)
+        reasoning: true
+        thinking:
+          mode: effort
+          efforts: [low, medium, xhigh]
+          defaultLevel: medium
+          requiresEffort: false
+        input: [text]
+        contextWindow: 32768
+        maxTokens: 8192
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0
+        compat:
+          supportsDeveloperRole: false
+          supportsReasoningEffort: true
+          supportsStrictMode: false
+          supportsForcedToolChoice: false
+          statefulResponses: false
+```
+
+The launcher and provider use the dedicated loopback port `8040`, leaving
+Laguna's port `8000` unchanged. Both cap context at 32768 tokens; change them
+together. The server uses ordinary decoding and one resident session, so
+concurrent workers queue rather than loading additional copies of the model.
+Private KV checkpoints live under `${XDG_CACHE_HOME:-$HOME/.cache}/ds4/qwen38-q4/kv`
+with an 8192 MiB disk budget. Checkpoints contain prompts and model state.
+
+The device's `task` role has an explicit empty fallback chain: stopped or
+unavailable ds4 does not select a cloud fallback for task work. Start the
+server before delegating. Luna remains manually selectable as
+`openai-codex/gpt-6-luna:high`. Main chat, scouts, review, and other roles keep
+their existing providers, so this is a local worker lane, not a fully offline
+omp configuration. Titles and commit messages remain on Ollama, not ds4.
 
 ### omp extensions on the personal device
 

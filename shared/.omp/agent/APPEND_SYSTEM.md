@@ -13,7 +13,7 @@ baseline-model work — keep expensive lanes out of the execution path.
 
 ## Spawning subagents
 
-- Subagents resolve their model from `modelRoles.task` (GPT 6 Luna on personal Gemini-first devices; DeepSeek/GLM first on work devices). Respect that device's configured role and fallback order. Do not override a task spawn to a frontier model unless the slice genuinely requires frontier judgment — and say why.
+- General-purpose task agents resolve `modelRoles.task`; specialist agents keep their configured role (`smol` for bundled scouts/sonic, `slow` for reviewers) unless an agent override is configured. Respect the device's configured roles and fallback order. Do not override a task spawn to a frontier model unless the slice genuinely requires frontier judgment — and say why.
 - A subagent that implements an existing plan is a baseline-model job by default.
 - Fact-gathering scouts are baseline-model work too; reserve frontier models for
   synthesis, review, and judgment calls.

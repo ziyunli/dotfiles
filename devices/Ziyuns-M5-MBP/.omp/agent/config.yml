@@ -8,7 +8,7 @@ modelRoles:
   commit: ollama/qwen3.5:4b:off
   tiny: ollama/qwen3.5:4b:off
   memory: google-antigravity/gemini-3.8-flash:low
-  task: openai-codex/gpt-6-luna:high
+  task: ds4/qwen3.8-flash-next:medium
   advisor: openai-codex/gpt-6.1-sol:xhigh
   web: google-gemini-cli/gemini-2.5-flash
 symbolPreset: unicode
@@ -22,6 +22,8 @@ title:
   generator: tiny
 retry:
   fallbackChains:
+    # Local task failures must not send work to a cloud fallback.
+    task: []
     web:
       - google-antigravity/gemini-2.5-flash
       - google/gemini-2.5-flash

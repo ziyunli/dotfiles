@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -gt 0 ]]; then
+    if [[ $# -eq 1 && ( "$1" == "--help" || "$1" == "-h" ) ]]; then
+        printf '%s\n' \
+            'Usage: ds4-serve [--help]' \
+            '' \
+            'Serve Qwen3.8 Flash Next Q4 on http://127.0.0.1:8040.' \
+            'Runs in the foreground; Ctrl-C stops it and releases model memory.' \
+            'Requires a built ds4 checkout and verified weights in its gguf directory.' \
+            'DS4_RUNTIME_DIR overrides the default ~/codebase/ds4 checkout.'
+        exit 0
+    fi
+    printf 'Usage: ds4-serve [--help]\n' >&2
+    exit 2
+fi
+
+RUNTIME_DIR="${DS4_RUNTIME_DIR:-$HOME/codebase/ds4}"
+
+if [[ ! -x "$RUNTIME_DIR/ds4-server" ]]; then
+    printf 'ds4-server is missing; build the runtime in %s with make.\n' "$RUNTIME_DIR" >&2
+    exit 1
+fi
+
+# Resolve overrides before ds4-server changes its working directory.
+RUNTIME_DIR="$(cd -- "$RUNTIME_DIR" && pwd -P)"
+MODEL_PATH="$RUNTIME_DIR/gguf/Qwen3.8-Flash-Next-Q4.gguf"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ds4/qwen38-q4"
+
+if [[ ! -s "$MODEL_PATH" ]]; then
+    printf 'Qwen Q4 weights are missing: %s\n' "$MODEL_PATH" >&2
+    printf 'Download and verify the qwen38-q4k artifact before starting the server.\n' >&2
+    exit 1
+fi
+
+# KV checkpoints contain prompts and model state; keep newly created files private.
+umask 077
+mkdir -p "$CACHE_DIR"
+exec "$RUNTIME_DIR/ds4-server" \
+    --chdir "$RUNTIME_DIR" \
+    --model "$MODEL_PATH" \
+    --metal \
+    --ctx 32768 \
+    --host 127.0.0.1 \
+    --port 8040 \
+    --kv-disk-dir "$CACHE_DIR/kv" \
+    --kv-disk-space-mb 8192
