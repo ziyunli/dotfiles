@@ -323,15 +323,65 @@ Both harnesses are tracked with a work/personal split:
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
 | `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the built-in `openai/*` ChatGPT catalog |
 | `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway, baseline-first |
+| `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
 
 Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). The gateway provider definitions themselves (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked.
 
-omp's model policy separates judgment from execution:
+The work omp model policy separates judgment from execution:
 
 - Frontier lanes (`plan`, `slow`, `advisor`, `designer`): Sol 6.1 / Opus 5.5 — planning, research, review, advising.
 - Execution lanes (`default`, `task`, `smol`, `commit`, `tiny`): baseline models — DeepSeek v4.1 Flash first, GLM 5.3 Flash, GPT 6 Luna for judgment-heavy baseline work, GPT 5.6 Luna as last resort.
 - Subagents spawned by the `task` tool resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks), so planned implementation lands on baseline models automatically. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of execution paths.
+
+On `Ziyuns-M5-MBP`, the device override keeps `google-antigravity/gemini-3.8-flash`
+as the default. Gemini also handles `smol` and `memory`;
+`ollama/qwen3.5:4b:off` handles `commit` and `tiny`;
+`openai-codex/gpt-6-luna:high` handles `task`; Sol 6.1 handles `slow`,
+`vision`, `designer`, and `advisor`; `anthropic/claude-opus-5-5:xhigh`
+handles `plan`. These are provider-specific selectors from the installed omp
+catalog, not the shared config's `openai/*` selectors. Credentials stay local.
+`./install.sh Ziyuns-M5-MBP` links this override instead of the shared omp config.
+
+The personal device sets `title.generator: tiny` so automatic session titles use
+the local `tiny` role rather than a fork of the conversation model. Start Ollama
+with the already-installed `qwen3.5:4b` model available; thinking is disabled for
+both lightweight roles. No model download is needed on this device. On a fresh
+machine, run `ollama pull qwen3.5:4b` before using these roles.
+The [pi-ds4](https://github.com/mitsuhiko/pi-ds4) runtime and weights already
+present on this device are not required or modified by this setup: its much
+larger memory footprint is unnecessary for titles and commit messages.
+
+### omp extensions on the personal device
+
+Plugins are installed separately from dotfile symlinks. The migrated Pi packages
+live under `~/.omp/plugins`; no Pi configuration or credentials are copied.
+
+```sh
+omp plugin install github:obra/superpowers npm:@ff-labs/pi-fff
+omp plugin install npm:@ollama/pi-web-search npm:pi-web-access
+omp plugin disable @ollama/pi-web-search
+omp plugin disable pi-web-access
+```
+
+- **Superpowers 7.0.0:** enabled; loads its extension and 15 skills, including
+  `/skill:brainstorming`, `/skill:writing-plans`, and `/skill:systematic-debugging`.
+- **pi-fff 0.11.0:** enabled in its default `tools-and-ui` mode. Adds discoverable
+  `fffind` and `ffgrep` tools (`read xd://fffind` / `read xd://ffgrep`), plus
+  `/fff-mode`, `/fff-health`, and `/fff-rescan`. Native `glob` and `grep` stay intact.
+  Pi-specific autocomplete is skipped when the omp UI API does not support it.
+- **@ollama/pi-web-search 0.0.5** and **pi-web-access 0.40.0:** installed but
+  disabled because both register `web_search`, overriding omp's native search.
+  The Ollama package also targets localhost's experimental Ollama web endpoints.
+  `omp plugin enable <package>` restores a package, including that override;
+  do not enable both together.
+- **pi-subagents 0.78.0:** not installed. omp 18.11.0 rejects its `MouseRegion`
+  import from the Pi TUI compatibility module and rolls back installation.
+  Use omp's native `task` tool with the configured `task` model role instead.
+
+Inspect state with `omp plugin list`; update an installed package with
+`omp plugin upgrade <package>`. Package versions above record the verified setup,
+not pins on future installations.
 
 ### Adding a new work device
 
