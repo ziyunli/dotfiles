@@ -415,12 +415,13 @@ concurrent workers queue rather than loading additional copies of the model.
 Private KV checkpoints live under `${XDG_CACHE_HOME:-$HOME/.cache}/ds4/qwen38-q4/kv`
 with an 8192 MiB disk budget. Checkpoints contain prompts and model state.
 
-The device's `task` role has an explicit empty fallback chain: stopped or
-unavailable ds4 does not select a cloud fallback for task work. Start the
-server before delegating. Luna remains manually selectable as
-`openai-codex/gpt-6-luna:high`. Main chat, scouts, review, and other roles keep
-their existing providers, so this is a local worker lane, not a fully offline
-omp configuration. Titles and commit messages remain on Ollama, not ds4.
+The device's `task` role prefers local Qwen and automatically falls back to
+`openai-codex/gpt-6-luna:high` when ds4 is stopped or a local request fails.
+Start `ds4-serve` to use the local worker; falling back sends the task's context
+to the cloud and consumes cloud quota. Main chat, scouts, review, and other
+roles keep their existing providers, so this is a local-first worker lane,
+not a fully offline omp configuration. Titles and commit messages remain on
+Ollama, not ds4.
 
 ### omp extensions on the personal device
 

@@ -22,8 +22,8 @@ title:
   generator: tiny
 retry:
   fallbackChains:
-    # Local task failures must not send work to a cloud fallback.
-    task: []
+    task:
+      - openai-codex/gpt-6-luna:high
     web:
       - google-antigravity/gemini-2.5-flash
       - google/gemini-2.5-flash
