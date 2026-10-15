@@ -324,9 +324,10 @@ Both harnesses are tracked with a work/personal split:
 | `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the built-in `openai/*` ChatGPT catalog |
 | `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway, baseline-first |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
+| `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
 
-Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). The gateway provider definitions themselves (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked.
+Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
 
 The work omp model policy separates judgment from execution:
 
@@ -374,42 +375,13 @@ and size `177280286720` bytes before starting the model. Its n-gram table stays
 on SSD; main/MTP weights occupy about 69.74 GiB of unified memory, plus runtime
 and context buffers.
 
-Merge this provider into the machine-local, untracked `~/.omp/agent/models.yml`;
-do not replace existing providers or add the file to dotfiles:
-
-```yaml
-providers:
-  ds4:
-    baseUrl: http://127.0.0.1:8040/v1
-    api: openai-responses
-    auth: none
-    models:
-      - id: qwen3.8-flash-next
-        name: Qwen3.8 Flash Next Q4 (local ds4)
-        reasoning: true
-        thinking:
-          mode: effort
-          efforts: [low, medium, xhigh]
-          defaultLevel: medium
-          requiresEffort: false
-        input: [text]
-        contextWindow: 32768
-        maxTokens: 8192
-        cost:
-          input: 0
-          output: 0
-          cacheRead: 0
-          cacheWrite: 0
-        compat:
-          supportsDeveloperRole: false
-          supportsReasoningEffort: true
-          supportsStrictMode: false
-          supportsForcedToolChoice: false
-          statefulResponses: false
-```
+The credential-free local provider catalog is tracked at
+[`devices/Ziyuns-M5-MBP/.omp/agent/models.yml`](devices/Ziyuns-M5-MBP/.omp/agent/models.yml).
+`./install.sh Ziyuns-M5-MBP` links it to `~/.omp/agent/models.yml`; edit the tracked
+file to change the local provider. Keep work-device gateway catalogs untracked.
 
 The launcher and provider use the dedicated loopback port `8040`, leaving
-Laguna's port `8000` unchanged. Both cap context at 32768 tokens; change them
+Laguna's port `8000` unchanged. Both cap context at 100000 tokens; change them
 together. The server uses ordinary decoding and one resident session, so
 concurrent workers queue rather than loading additional copies of the model.
 Private KV checkpoints live under `${XDG_CACHE_HOME:-$HOME/.cache}/ds4/qwen38-q4/kv`

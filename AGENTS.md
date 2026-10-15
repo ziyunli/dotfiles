@@ -21,7 +21,8 @@ AI harness configs (Pi and omp) — work/personal split, see README "AI harness 
 - `shared/.pi/agent/settings.json` - personal Pi base (no model allowlist). Work devices overlay `devices/<dev>/.pi/agent/settings.json` (gateway allowlist) via `.dotfiles-merge`; arrays union.
 - `shared/.omp/agent/config.yml` - personal omp config (ChatGPT catalog roles). omp config is YAML, so there is no jq merge: work devices ship their own `devices/<dev>/.omp/agent/config.yml` and `install.sh` links it over the shared one.
 - `shared/.pi/agent/APPEND_SYSTEM.md`, `shared/.omp/agent/APPEND_SYSTEM.md` - personal prompt channels, linked for every device. The omp one is not inherited by task subagents (by design; the `task` role carries subagent routing).
-- The gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`, `~/.pi/agent/AGENTS.md`) are Instacart-managed and MUST stay untracked — never add them to `shared/`.
+- On work devices, gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`, `~/.pi/agent/AGENTS.md`) are Instacart-managed and MUST stay untracked — never add gateway catalogs to `shared/` or a device directory.
+- `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` is the personal device's credential-free local ds4 catalog, linked to `~/.omp/agent/models.yml` by `install.sh`. Keep credentials and work gateway definitions out of this file.
 
 Migrating a device to the `.zshrc.local` shim:
 - Run `./migrate-zshrc.sh [device]` **on the device being migrated** (defaults to `hostname -s`). It renames the tracked `devices/<dev>/.zshrc` → `.zshrc.local` (`git mv`, staged not committed), removes the legacy `~/.zshrc` symlink, links `~/.zshrc.local` into the repo, and seeds the `~/.zshrc` shim — the same end state `install.sh` produces. Preview with `DRY_RUN=1`.
