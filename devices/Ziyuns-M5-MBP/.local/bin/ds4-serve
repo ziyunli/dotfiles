@@ -41,7 +41,7 @@ exec "$RUNTIME_DIR/ds4-server" \
     --chdir "$RUNTIME_DIR" \
     --model "$MODEL_PATH" \
     --metal \
-    --ctx 32768 \
+    --ctx 100000 \
     --host 127.0.0.1 \
     --port 8040 \
     --kv-disk-dir "$CACHE_DIR/kv" \
