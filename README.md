@@ -322,18 +322,22 @@ Both harnesses are tracked with a work/personal split:
 | `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
 | `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the built-in `openai/*` ChatGPT catalog |
-| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway, baseline-first |
+| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (bento ships two named profiles — see [OMP_MODELS.md](OMP_MODELS.md)) |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
 
 Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
 
-The work omp model policy separates judgment from execution:
+The **bento** work-device omp config ships two named model presets —
+`provider-diverse` (active) and `baseline-reasoning` (available) — switchable
+with `/modelpreset switch`. Other work devices are unchanged.
+[`OMP_MODELS.md`](OMP_MODELS.md) documents every role's purpose and trigger, the
+full profile comparison, switching caveats, and the Tally credit economics.
 
-- Frontier lanes (`plan`, `slow`, `advisor`, `designer`): Sol 6.1 / Opus 5.5 — planning, research, review, advising.
-- Execution lanes (`default`, `task`, `smol`, `commit`, `tiny`): baseline models — DeepSeek v4.1 Flash first, GLM 5.3 Flash, GPT 6 Luna for judgment-heavy baseline work, GPT 5.6 Luna as last resort.
-- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; reviewers use `slow`, unless an agent override is configured. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
+- `provider-diverse` spreads roles across providers: DeepSeek v4.1 Flash runs `default`/`task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Sol 6.1 `slow`/`advisor`/`designer`, Gemini 3.8 Flash `vision`.
+- `baseline-reasoning` pushes substantive work onto GPT 6 Luna (`xhigh` for `task`/`vision`) and Sol 6.1 for planning.
+- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; `security-reviewer` has no bundled model and inherits the parent's active model unless overridden. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
 On `Ziyuns-M5-MBP`, the device override keeps `google-antigravity/gemini-3.8-flash`
 as the default. Gemini also handles `smol` and `memory`;

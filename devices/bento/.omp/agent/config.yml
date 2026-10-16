@@ -1,14 +1,15 @@
 # Work omp config (Instacart Tally gateway).
-# Tracked in dotfiles and linked to ~/.omp/agent/config.yml on this device only.
+# Tracked source for ~/.omp/agent/config.yml on this device only.
 # The gateway itself (providers, endpoints, headers) is Instacart-managed in
 # ~/.omp/agent/models.yml and stays out of this repo.
 #
-# Model policy (baseline-first):
-#   - Sol 6.1 / Opus 5.5: planning, research, review, advising (frontier lanes)
-#   - DeepSeek v4.1 Flash / GLM 5.3 Flash: baseline execution lanes — most
-#     implementation, refactors, subagent workers
-#   - GPT 6 Luna: baseline lane with more judgment / long-horizon reasoning
-#   - GPT 5.6 Luna: last-resort fallback only
+# Model policy (provider-diverse baseline roles). Every role's purpose and real
+# session trigger, plus the baseline-reasoning alternative preset, are documented
+# in OMP_MODELS.md at the repository root:
+#   - DeepSeek v4.1 Flash: conversation and task-subagent execution lane
+#   - GLM 5.3 Flash: cheap/quick lane and first availability fallback
+#   - GPT 6 Luna: narrow low-effort lanes (titles, commit) plus task recovery
+#   - Sol 6.1 / Opus 5.5: slow, plan, designer, and advisor lanes
 # With a plan in hand, delegate implementation to task subagents: they resolve
 # modelRoles.task (DeepSeek first) instead of the conversation model.
 
@@ -28,6 +29,7 @@ enabledModels:
   - instacart-openai/gpt-6.1-sol
   - instacart-openai/gpt-6-sol
   - instacart-openai/gpt-6-luna
+  - instacart-openai-decisions/gpt-6-luna
   - open-weights/glm-5.3-priority
   - open-weights/glm-5.3-flash-priority
   - open-weights/deepseek-v4p1-flash-priority
@@ -43,23 +45,53 @@ enabledModels:
   - instacart-anthropic/claude-sonnet-5-5@default
   - instacart-anthropic/claude-haiku-4-5@20251001
 
-# Frontier lanes stay on Sol/Opus; everything executable lands on baseline models.
+# Active roles equal the provider-diverse preset below: one primary selector per
+# role, with request-failure recovery owned by retry.fallbackChains.
 modelRoles:
-  # Main conversation model. DeepSeek handles day-to-day work directly.
   default: open-weights/deepseek-v4p1-flash-priority:high
-  # Cheap/quick lanes: GLM 5.3 (non-flash keeps headroom on tiny workloads).
-  smol: open-weights/glm-5.3-priority:high
-  commit: open-weights/glm-5.3-priority:high
-  tiny: open-weights/glm-5.3-flash-priority:high
-  # Task subagents: planned implementation delegated to baseline. DeepSeek first,
-  # then GLM 5.3 Flash, then GPT 6 Luna for judgment-heavy edits, then GPT 5.6 Luna.
-  task: open-weights/deepseek-v4p1-flash-priority:high,open-weights/glm-5.3-flash-priority:high,instacart-openai/gpt-6-luna:high,instacart-openai/gpt-5.6-luna:high
-  # Frontier lanes: long-horizon reasoning and review stay on Sol/Opus.
-  slow: instacart-openai/gpt-6.1-sol:max
-  vision: instacart-openai/gpt-6.1-sol
-  plan: instacart-anthropic/claude-opus-5-5@default:xhigh
-  designer: instacart-openai/gpt-6.1-sol
-  advisor: instacart-openai/gpt-6.1-sol:xhigh
+  task: open-weights/deepseek-v4p1-flash-priority:high
+  smol: open-weights/glm-5.3-flash-priority:high
+  tiny: instacart-openai/gpt-6-luna:low
+  commit: instacart-openai/gpt-6-luna:low
+  slow: instacart-openai/gpt-6.1-sol:high
+  plan: instacart-anthropic/claude-opus-5-5@default:high
+  designer: instacart-openai/gpt-6.1-sol:high
+  vision: vertex-proxy/gemini-3.8-flash:medium
+  advisor: instacart-openai/gpt-6.1-sol:high
+  judge: instacart-openai-decisions/gpt-6-luna
+
+# Named snapshots for /modelpreset switch. A preset captures modelRoles and
+# defaultThinkingLevel only: retry chains, advisor flags, and title/memory
+# settings are not swapped. provider-diverse is the active mapping above.
+modelPresets:
+  provider-diverse:
+    modelRoles:
+      default: open-weights/deepseek-v4p1-flash-priority:high
+      task: open-weights/deepseek-v4p1-flash-priority:high
+      smol: open-weights/glm-5.3-flash-priority:high
+      tiny: instacart-openai/gpt-6-luna:low
+      commit: instacart-openai/gpt-6-luna:low
+      slow: instacart-openai/gpt-6.1-sol:high
+      plan: instacart-anthropic/claude-opus-5-5@default:high
+      designer: instacart-openai/gpt-6.1-sol:high
+      vision: vertex-proxy/gemini-3.8-flash:medium
+      advisor: instacart-openai/gpt-6.1-sol:high
+      judge: instacart-openai-decisions/gpt-6-luna
+    defaultThinkingLevel: high
+  baseline-reasoning:
+    modelRoles:
+      default: open-weights/deepseek-v4p1-flash-priority:high
+      task: instacart-openai/gpt-6-luna:xhigh
+      smol: open-weights/glm-5.3-flash-priority:high
+      tiny: open-weights/glm-5.3-flash-priority:low
+      commit: instacart-openai/gpt-6-luna:low
+      slow: instacart-openai/gpt-6.1-sol:high
+      plan: instacart-openai/gpt-6.1-sol:high
+      designer: instacart-openai/gpt-6.1-sol:high
+      vision: instacart-openai/gpt-6-luna:xhigh
+      advisor: instacart-openai/gpt-6.1-sol:medium
+      judge: instacart-openai-decisions/gpt-6-luna
+    defaultThinkingLevel: high
 
 retry:
   fallbackChains:
@@ -68,10 +100,17 @@ retry:
       - instacart-openai/gpt-6-luna:high
       - instacart-openai/gpt-5.6-luna:high
     smol:
-      - open-weights/glm-5.3-flash-priority:high
+      - instacart-openai/gpt-6-luna:high
       - instacart-openai/gpt-5.6-luna:high
     commit:
-      - open-weights/glm-5.3-flash-priority:high
+      - open-weights/glm-5.3-flash-priority:low
+    judge: []
+
+# Advisor runtime stays off; enable it per session with /advisor on or --advisor.
+advisor:
+  enabled: false
+
+defaultThinkingLevel: high
 
 # Consent flag written by omp's automated tool-issue reporting prompt; kept so a
 # relink never re-prompts. Personal devices can set their own value locally.
