@@ -1,16 +1,16 @@
 modelRoles:
-  default: google-antigravity/gemini-3.8-flash
+  default: google-antigravity/gemini-4-argon:high
   smol: google-antigravity/gemini-3.8-flash:low
   slow: openai-codex/gpt-6.1-sol:max
-  vision: openai-codex/gpt-6.1-sol
+  vision: openai-codex/gpt-6.1-sol:high
   plan: anthropic/claude-opus-5-5:xhigh
-  designer: openai-codex/gpt-6.1-sol
+  designer: openai-codex/gpt-6.1-sol:high
   commit: ollama/qwen3.5:4b-32k:off
   tiny: ollama/qwen3.5:4b-32k:off
   memory: google-antigravity/gemini-3.8-flash:low
   task: ds4/qwen3.8-flash-next:medium
   advisor: openai-codex/gpt-6.1-sol:xhigh
-  web: google-gemini-cli/gemini-2.5-flash
+  web: google-antigravity/gemini-2.5-flash
 symbolPreset: unicode
 composer:
   shape: box
@@ -20,13 +20,23 @@ theme:
 setupVersion: 2
 title:
   generator: tiny
+defaultThinkingLevel: high
+task:
+  agentModelOverrides:
+    security-reviewer: "@slow"
 retry:
   fallbackChains:
+    default:
+      - google-antigravity/gemini-3.8-flash:high
+    smol:
+      - openai-codex/gpt-6-luna:medium
+    tiny:
+      - google-antigravity/gemini-3.8-flash:low
+    commit:
+      - google-antigravity/gemini-3.8-flash:low
     task:
       - openai-codex/gpt-6-luna:high
     web:
-      - google-antigravity/gemini-2.5-flash
-      - google/gemini-2.5-flash
       - web/perplexity
       - anthropic/claude-haiku-4-5
       - openai-codex/gpt-5.6-luna

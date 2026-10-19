@@ -409,9 +409,11 @@ fi
 
 # omp config tracking: linked per device (YAML, not jq-merged), not symlinks of
 # one another -- shared is personal ChatGPT, bento is the work gateway.
-assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'openai/gpt-6-luna:high'
+assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'openai-codex/gpt-6-luna:high'
+assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'security-reviewer: "@slow"'
 assert_file_not_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'instacart-'
 assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'open-weights/deepseek-v4p1-flash-priority:high'
+assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'security-reviewer: "@slow"'
 assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'modelRoles'
 # Work omp config must not point roles at a provider absent from the gateway.
 if grep -Eq "(^|[^a-z-])openai/gpt" "$ROOT_DIR/devices/bento/.omp/agent/config.yml"; then
@@ -490,6 +492,10 @@ assert_file_contains "$m5_qwen_modelfile" 'PARAMETER num_ctx 32768'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'commit: ollama/qwen3.5:4b-32k:off'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'tiny: ollama/qwen3.5:4b-32k:off'
 assert_file_contains "$ROOT_DIR/README.md" 'ollama create qwen3.5:4b-32k -f ~/.config/ollama/qwen3.5-4b-32k.Modelfile'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'default: google-antigravity/gemini-4-argon:high'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'smol: google-antigravity/gemini-3.8-flash:low'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'web: google-antigravity/gemini-2.5-flash'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'security-reviewer: "@slow"'
 # skillshare's config is the source for every Agent's MCP entries and skill
 # targets on the personal device; keep the Safari definition in it.
 m5_skillshare_config="$ROOT_DIR/devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml"

@@ -1,6 +1,7 @@
 # Local config files (not tracked)
 .gitconfig.local
 settings.local.json
+config.yml.lock
 
 # Private journal (MCP tool)
 .private-journal/

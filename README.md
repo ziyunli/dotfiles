@@ -322,7 +322,7 @@ Both harnesses are tracked with a work/personal split:
 | `shared/.pi/agent/settings.json` | shared | Personal base (ChatGPT subscription); no `enabledModels`, so the built-in catalog stays available |
 | `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
-| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the built-in `openai/*` ChatGPT catalog |
+| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the `openai-codex/*` ChatGPT OAuth catalog |
 | `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (bento ships two named profiles — see [OMP_MODELS.md](OMP_MODELS.md)) |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
@@ -339,15 +339,16 @@ full profile comparison, switching caveats, and the Tally credit economics.
 
 - `provider-diverse` spreads roles across providers: DeepSeek v4.1 Flash runs `default`/`task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Sol 6.1 `slow`/`advisor`/`designer`, Gemini 3.8 Flash `vision`.
 - `baseline-reasoning` pushes substantive work onto GPT 6 Luna (`xhigh` for `task`/`vision`) and Sol 6.1 for planning.
-- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; `security-reviewer` has no bundled model and inherits the parent's active model unless overridden. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
+- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; `security-reviewer` has no bundled model and is overridden to `@slow` via `task.agentModelOverrides`. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
-On `Ziyuns-M5-MBP`, the device override keeps `google-antigravity/gemini-3.8-flash`
-as the default. Gemini also handles `smol` and `memory`;
+On `Ziyuns-M5-MBP`, the device override uses `google-antigravity/gemini-4-argon:high`
+as the default (falling back to `gemini-3.8-flash:high`), with `gemini-3.8-flash:low`
+handling `smol` and `memory` and `gemini-2.5-flash` handling `web`;
 `ollama/qwen3.5:4b-32k:off` handles `commit` and `tiny`;
 `ds4/qwen3.8-flash-next:medium` handles `task`; Sol 6.1 handles `slow`,
 `vision`, `designer`, and `advisor`; `anthropic/claude-opus-5-5:xhigh`
 handles `plan`. These are provider-specific selectors from the installed omp
-catalog, not the shared config's `openai/*` selectors. Credentials stay local.
+catalog, not the shared config's `openai-codex/*` selectors. Credentials stay local.
 `./install.sh Ziyuns-M5-MBP` links this override instead of the shared omp config.
 
 The personal device sets `title.generator: tiny` so automatic session titles use

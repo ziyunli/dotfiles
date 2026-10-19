@@ -93,6 +93,10 @@ modelPresets:
       judge: instacart-openai-decisions/gpt-6-luna
     defaultThinkingLevel: high
 
+
+task:
+  agentModelOverrides:
+    security-reviewer: "@slow"
 retry:
   fallbackChains:
     task:
@@ -103,6 +107,8 @@ retry:
       - instacart-openai/gpt-6-luna:high
       - instacart-openai/gpt-5.6-luna:high
     commit:
+      - open-weights/glm-5.3-flash-priority:low
+    tiny:
       - open-weights/glm-5.3-flash-priority:low
     judge: []
 

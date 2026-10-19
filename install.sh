@@ -255,7 +255,7 @@ link_directory() {
 
     while IFS= read -r -d '' src; do
         local rel="${src#$src_dir/}"
-        [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".dotfiles-merge" || "$(basename "$rel")" == ".gitkeep" ]] && continue
+        [[ "$(basename "$rel")" == ".dotfiles-skip" || "$(basename "$rel")" == ".dotfiles-merge" || "$(basename "$rel")" == ".gitkeep" || "$(basename "$rel")" == "config.yml.lock" ]] && continue
         if [[ "$check_skip" == "true" ]] && is_obsolete_shared_link "$rel"; then
             log "Skipped obsolete shared link: $rel"
             continue

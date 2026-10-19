@@ -231,10 +231,10 @@ Installed bundled agents on this device (verified with `omp agents unpack`):
 | `reviewer` | `@slow` | (unset) |
 | `security-reviewer` | **no model or thinking field** | (unset) |
 
-`security-reviewer` has no frontmatter model, so it **inherits the parent's
-active model**, then the configured/default fallback — it does not use `slow`
-unless you set `task.agentModelOverrides["security-reviewer"]`. (`reviewer` does
-resolve `@slow`.)
+`security-reviewer` has no frontmatter model, so without an override it would
+inherit the parent's active model. The config sets
+`task.agentModelOverrides["security-reviewer"]: "@slow"` so both `reviewer` and
+`security-reviewer` resolve `@slow`.
 
 ### Effort is a role default, not a guaranteed worker effort
 
@@ -261,6 +261,7 @@ from `modelRoles` and **shared by both profiles** (presets do not swap them):
 | `task` | `open-weights/glm-5.3-flash-priority:high` → `instacart-openai/gpt-6-luna:high` → `instacart-openai/gpt-5.6-luna:high` |
 | `smol` | `instacart-openai/gpt-6-luna:high` → `instacart-openai/gpt-5.6-luna:high` |
 | `commit` | `open-weights/glm-5.3-flash-priority:low` |
+| `tiny` | `open-weights/glm-5.3-flash-priority:low` |
 | `judge` | `[]` (no fallbacks) |
 
 These chains exist to survive a provider error or an unavailable model. They are
