@@ -158,12 +158,14 @@ alias claudegood='claude --effort xhigh --dangerously-skip-permissions'
 alias claudemax='claude --effort max --dangerously-skip-permissions'
 alias claudeultra='claude --effort ultracode --dangerously-skip-permissions'
 
-# freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass.
-# Each updater runs independently: a missing tool or a failing one never blocks
-# the rest, and a pass/skip/fail summary prints at the end.
+# freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass,
+# then refresh what those upgrades leave stale: the ollama server and herdr's
+# per-agent hooks. Each updater runs independently: a missing tool or a failing
+# one never blocks the rest, and a pass/skip/fail summary prints at the end.
 function freshen() {
   emulate -L zsh
   local -a summary
+  local line agent
 
   _freshen_run() {  # <label> <probe-binary> <command-string>
     local label=$1 probe=$2 cmd=$3
@@ -192,6 +194,30 @@ function freshen() {
   # locally-installed CLI, so there is nothing here to self-update.
   _freshen_run omz       omz       'omz update'
   _freshen_run brew      brew      'brew update && brew upgrade && brew doctor'
+
+  # brew upgrade replaces the ollama binary but leaves the old server running.
+  # Restart whenever the service runs: the server can be stale from this pass or
+  # from any earlier upgrade made outside freshen.
+  if command -v brew &>/dev/null &&
+     [[ "$(brew services info ollama --json 2>/dev/null)" == *'"running": true'* ]]; then
+    _freshen_run ollama-service brew 'brew services restart ollama'
+  fi
+
+  # herdr upgrades ship newer per-agent hook versions, leaving installed hooks
+  # outdated. claude is report-only: its install rewrites the tracked
+  # settings.json (see shared/HERDR_GUIDE.md).
+  if command -v herdr &>/dev/null; then
+    for line in "${(@f)$(herdr integration status 2>/dev/null)}"; do
+      [[ "$line" == *': outdated '* ]] || continue
+      # Status labels can carry a suffix, e.g. "letta (experimental): outdated ...".
+      agent=${${line%%:*}%% *}
+      if [[ "$agent" == claude ]]; then
+        summary+=("  WARN  herdr-claude (outdated; reinstall per ~/.dotfiles/shared/HERDR_GUIDE.md)")
+      else
+        _freshen_run "herdr-$agent" herdr "herdr integration install ${(q)agent}"
+      fi
+    done
+  fi
 
   print -P "%F{cyan}%B==> summary%b%f"
   print -l -- "${summary[@]}"
@@ -294,6 +320,3 @@ function activate-venv() {
     source "$HOME/.venv/$selected_env/bin/activate"
   fi
 }
-
-# By default, Ollama unloads models after 5 minutes of inactivity.
-export OLLAMA_KEEP_ALIVE="-1"

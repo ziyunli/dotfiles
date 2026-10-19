@@ -23,18 +23,27 @@ printf '#!%s -f\n' "$ZSH_BIN" > "$temp_root/updater"
 printf '%s\n' \
     'call="${0:t} $*"' \
     'print -r -- "$call" >> "$FRESHEN_TEST_CALLS"' \
+    'case "$call" in' \
+    '  "brew services info ollama --json") print -r -- "$FRESHEN_TEST_OLLAMA_SERVICE" ;;' \
+    '  "herdr integration status") print -r -- "$FRESHEN_TEST_HERDR_STATUS" ;;' \
+    'esac' \
     'if [[ "$call" == "$FRESHEN_TEST_FAIL" ]]; then' \
     '  print -u2 -r -- "update failed: $call"' \
     '  exit 1' \
     'fi' >> "$temp_root/updater"
 chmod +x "$temp_root/updater"
-for tool in claude codex pi omp agy opencode amp omz brew; do
+for tool in claude codex pi omp agy opencode amp omz brew herdr; do
     ln -s "$temp_root/updater" "$temp_root/bin/$tool"
 done
+
+# Probe output the fake brew and herdr print; tests override these per scenario.
+ollama_service=''
+herdr_status=''
 
 run_freshen() {
     : > "$temp_root/calls"
     FRESHEN_TEST_CALLS="$temp_root/calls" FRESHEN_TEST_FAIL="${1:-}" \
+        FRESHEN_TEST_OLLAMA_SERVICE="$ollama_service" FRESHEN_TEST_HERDR_STATUS="$herdr_status" \
         PATH="$temp_root/bin" "$ZSH_BIN" -f -c 'source "$1"; freshen' \
         -- "$temp_root/freshen.zsh" > "$temp_root/stdout" 2> "$temp_root/stderr" ||
         fail "freshen exited unsuccessfully: $(<"$temp_root/stderr")"
@@ -59,7 +68,9 @@ amp update
 omz update
 brew update
 brew upgrade
-brew doctor'
+brew doctor
+brew services info ollama --json
+herdr integration status'
 
 run_freshen
 [[ "$calls" == "$expected_calls" ]] || fail "unexpected updater calls: $calls"
@@ -82,7 +93,7 @@ for tool in pi omp; do
     assert_summary "  ok    $other_extensions"
     assert_summary '  ok    brew'
     [[ "$calls" != *"$tool update"* ]] || fail "missing $tool was invoked: $calls"
-    [[ "$calls" == *'brew doctor' ]] || fail 'freshen stopped before the last updater'
+    [[ "$calls" == *'herdr integration status' ]] || fail 'freshen stopped before the last updater'
     [[ -z "$errors" ]] || fail "unexpected stderr: $errors"
     ln -s "$temp_root/updater" "$temp_root/bin/$tool"
     printf 'ok - freshen skips missing %s without blocking other updates\n' "$tool"
@@ -107,3 +118,75 @@ for failed_label in pi pi-extensions omp omp-plugins; do
     assert_summary '  ok    brew'
     printf 'ok - freshen continues after %s fails\n' "$failed_label"
 done
+
+# brew upgrade swaps the ollama binary under a still-running server.
+ollama_service='[{"name": "ollama", "running": true, "status": "started"}]'
+run_freshen
+[[ "$calls" == *$'brew services info ollama --json\nbrew services restart ollama\nherdr integration status' ]] ||
+    fail "running ollama service was not restarted after brew: $calls"
+assert_summary '  ok    ollama-service'
+[[ -z "$errors" ]] || fail "unexpected stderr: $errors"
+printf '%s\n' 'ok - freshen restarts a running ollama brew service after upgrading'
+
+rm "$temp_root/bin/brew"
+run_freshen
+assert_summary '  skip  brew (not installed)'
+[[ "$output" != *ollama-service* ]] || fail "summary reports an ollama service without brew: $output"
+[[ -z "$errors" ]] || fail "unexpected stderr: $errors"
+ln -s "$temp_root/updater" "$temp_root/bin/brew"
+printf '%s\n' 'ok - freshen runs cleanly without brew'
+
+ollama_service='[{"name": "ollama", "running": false, "status": "none"}]'
+run_freshen
+[[ "$calls" == "$expected_calls" ]] || fail "stopped ollama service was touched: $calls"
+[[ "$output" != *ollama-service* ]] || fail "summary reports a stopped ollama service: $output"
+printf '%s\n' 'ok - freshen leaves a stopped ollama service alone'
+ollama_service=''
+
+herdr_status='pi: outdated (v8 < v9) (/home/u/.pi/agent/extensions/herdr-agent-state.ts)
+omp: current (v10) (/home/u/.omp/agent/extensions/herdr-omp-agent-state.ts)
+claude: outdated (v7 < v11) (/home/u/.claude/hooks/herdr-agent-state.sh)
+codex: outdated (v7 < v10) (/home/u/.codex/herdr-agent-state.sh)
+copilot: not installed (/home/u/.copilot/hooks/herdr-agent-state.sh)
+letta (experimental): outdated (v1 < v2) (/home/u/.letta/hooks/herdr-agent-session.sh)'
+run_freshen
+[[ "$calls" == *$'herdr integration status\nherdr integration install pi\nherdr integration install codex\nherdr integration install letta' ]] ||
+    fail "outdated herdr integrations were not reinstalled: $calls"
+for agent in claude omp copilot; do
+    [[ "$calls" != *"herdr integration install $agent"* ]] || fail "herdr $agent integration was reinstalled: $calls"
+done
+assert_summary '  ok    herdr-pi'
+assert_summary '  ok    herdr-codex'
+assert_summary '  ok    herdr-letta'
+assert_summary '  WARN  herdr-claude (outdated; reinstall per ~/.dotfiles/shared/HERDR_GUIDE.md)'
+[[ -z "$errors" ]] || fail "unexpected stderr: $errors"
+printf '%s\n' 'ok - freshen reinstalls outdated herdr integrations and only reports claude'
+
+run_freshen 'herdr integration install pi'
+[[ "$calls" == *$'herdr integration install codex\nherdr integration install letta' ]] ||
+    fail "herdr reinstalls stopped after pi failed: $calls"
+[[ "$errors" == 'update failed: herdr integration install pi' ]] || fail "unexpected stderr: $errors"
+assert_summary '  FAIL  herdr-pi'
+assert_summary '  ok    herdr-codex'
+printf '%s\n' 'ok - freshen continues after a herdr reinstall fails'
+
+# The parsed agent name reaches eval, so it must stay one quoted word.
+herdr_status='x;false: outdated (v1 < v2) (/home/u/.x/herdr-agent-state.sh)'
+run_freshen
+[[ "$calls" == *'herdr integration install x;false' ]] || fail "herdr agent name was split by eval: $calls"
+assert_summary '  ok    herdr-x;false'
+printf '%s\n' 'ok - freshen quotes herdr agent names before eval'
+
+herdr_status='claude: current (v11) (/home/u/.claude/hooks/herdr-agent-state.sh)'
+run_freshen
+[[ "$calls" != *'herdr integration install'* ]] || fail "current herdr integration was reinstalled: $calls"
+[[ "$output" != *herdr-claude* ]] || fail "summary reports a current claude integration: $output"
+printf '%s\n' 'ok - freshen leaves current herdr integrations alone'
+
+rm "$temp_root/bin/herdr"
+run_freshen
+[[ "$calls" != *herdr* ]] || fail "missing herdr was invoked: $calls"
+[[ -z "$errors" ]] || fail "unexpected stderr: $errors"
+ln -s "$temp_root/updater" "$temp_root/bin/herdr"
+printf '%s\n' 'ok - freshen skips herdr integrations when herdr is missing'
+herdr_status=''

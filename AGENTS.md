@@ -6,6 +6,7 @@ Structure:
 - `install.sh` - creates symlinks from repo to $HOME
 - `uninstall.sh` - removes symlinks
 - `migrate.sh` - one-time migration from bare repo pattern
+- `run-tests.sh` - runs every `tests/*_test.{sh,py}`; run it before committing (nothing else runs the suite)
 
 Shell quirk: zsh has issues with `git show ... > file` redirection. Use `/bin/bash -c '...'` for reliable file redirection.
 
@@ -23,6 +24,7 @@ AI harness configs (Pi and omp) — work/personal split, see README "AI harness 
 - `shared/.pi/agent/APPEND_SYSTEM.md`, `shared/.omp/agent/APPEND_SYSTEM.md` - personal prompt channels, linked for every device. The omp one is not inherited by task subagents (by design; the `task` role carries subagent routing).
 - On work devices, gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`, `~/.pi/agent/AGENTS.md`) are Instacart-managed and MUST stay untracked — never add gateway catalogs to `shared/` or a device directory.
 - `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` is the personal device's credential-free local ds4 catalog, linked to `~/.omp/agent/models.yml` by `install.sh`. Keep credentials and work gateway definitions out of this file.
+- `devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml` is skillshare's source config (skill targets plus MCP servers it writes into each Agent's native file). This repo is public and skillshare writes into this file through its symlink, so every MCP `env`, `headers`, and `bearerToken` value MUST be a `{fromEnv: VAR}` reference; `tests/skillshare_config_test.py` enforces it.
 
 Migrating a device to the `.zshrc.local` shim:
 - Run `./migrate-zshrc.sh [device]` **on the device being migrated** (defaults to `hostname -s`). It renames the tracked `devices/<dev>/.zshrc` → `.zshrc.local` (`git mv`, staged not committed), removes the legacy `~/.zshrc` symlink, links `~/.zshrc.local` into the repo, and seeds the `~/.zshrc` shim — the same end state `install.sh` produces. Preview with `DRY_RUN=1`.

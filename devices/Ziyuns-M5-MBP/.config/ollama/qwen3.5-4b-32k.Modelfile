@@ -1,0 +1,5 @@
+# qwen3.5:4b capped at 32K context for omp's commit and tiny roles. Without
+# num_ctx, Ollama sizes the context by VRAM (256K on 128 GB), which nearly
+# triples the model's memory. 32K still fits large commit diffs.
+FROM qwen3.5:4b
+PARAMETER num_ctx 32768

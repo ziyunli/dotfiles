@@ -152,11 +152,12 @@ herdr integration install claude
 herdr integration install pi
 herdr integration install opencode
 herdr integration install codex
+herdr integration install omp
 ```
 
 Run these *after* `./install.sh`, not before: `herdr integration install claude` registers its hook in `~/.claude/settings.json`, which `install.sh` symlinks into this repo. That install dirties the working tree and needs the fixups described in [`shared/HERDR_GUIDE.md`](shared/HERDR_GUIDE.md) — a portable `~` path, the missing-script guard, and pretty-printed JSON.
 
-Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version.
+Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version. `freshen` reinstalls outdated hooks after its updates, except `claude`, which it reports for a manual reinstall.
 
 ### Preview what install/uninstall would do
 
@@ -326,6 +327,7 @@ Both harnesses are tracked with a work/personal split:
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
+| `devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml` | device | skillshare source config: skill targets for every Agent plus the MCP servers it writes into their native files; linked to `~/.config/skillshare/config.yaml` (skillshare writes through the symlink) |
 
 Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
 
@@ -341,7 +343,7 @@ full profile comparison, switching caveats, and the Tally credit economics.
 
 On `Ziyuns-M5-MBP`, the device override keeps `google-antigravity/gemini-3.8-flash`
 as the default. Gemini also handles `smol` and `memory`;
-`ollama/qwen3.5:4b:off` handles `commit` and `tiny`;
+`ollama/qwen3.5:4b-32k:off` handles `commit` and `tiny`;
 `ds4/qwen3.8-flash-next:medium` handles `task`; Sol 6.1 handles `slow`,
 `vision`, `designer`, and `advisor`; `anthropic/claude-opus-5-5:xhigh`
 handles `plan`. These are provider-specific selectors from the installed omp
@@ -349,10 +351,20 @@ catalog, not the shared config's `openai/*` selectors. Credentials stay local.
 `./install.sh Ziyuns-M5-MBP` links this override instead of the shared omp config.
 
 The personal device sets `title.generator: tiny` so automatic session titles use
-the local `tiny` role rather than a fork of the conversation model. Start Ollama
-with the already-installed `qwen3.5:4b` model available; thinking is disabled for
-both lightweight roles. No model download is needed on this device. On a fresh
-machine, run `ollama pull qwen3.5:4b` before using these roles.
+the local `tiny` role rather than a fork of the conversation model. Thinking is
+disabled for both lightweight roles. They use `qwen3.5:4b-32k`, a local build of
+`qwen3.5:4b` capped at a 32K context: without a cap, Ollama sizes the context by
+VRAM (256K on 128 GB), which nearly triples the model's memory. The tracked
+Modelfile is linked to `~/.config/ollama/`. On a fresh machine, after
+`./install.sh`, create it (no download beyond the base model):
+
+```sh
+ollama pull qwen3.5:4b
+ollama create qwen3.5:4b-32k -f ~/.config/ollama/qwen3.5-4b-32k.Modelfile
+```
+
+The derived model is a snapshot: re-run the `ollama create` line after re-pulling
+`qwen3.5:4b` or editing the Modelfile.
 
 ### Local ds4 task workers on the personal device
 
@@ -386,8 +398,12 @@ file to change the local provider. Keep work-device gateway catalogs untracked.
 
 The launcher and provider use the dedicated loopback port `8040`, leaving
 Laguna's port `8000` unchanged. Both cap context at 100000 tokens; change them
-together. The server uses ordinary decoding and one resident session, so
-concurrent workers queue rather than loading additional copies of the model.
+together (`tests/ds4_config_test.py` fails when the launcher and the Pi or omp
+catalogs disagree). The server runs Qwen's built-in MTP speculative decoding with
+`--mtp-exact-sampling`, the mode ds4 documents for non-zero temperature (omp
+samples at 1.0); on the M5 Max it measured about 1.25x faster decode for about
+0.4 GiB more memory. It keeps one resident session, so concurrent workers queue
+rather than loading additional copies of the model.
 Private KV checkpoints live under `${XDG_CACHE_HOME:-$HOME/.cache}/ds4/qwen38-q4/kv`
 with an 8192 MiB disk budget. Checkpoints contain prompts and model state.
 
@@ -453,8 +469,9 @@ not pins on future installations.
 | `install.sh [device]` | Create symlinks to $HOME |
 | `uninstall.sh [device]` | Remove symlinks |
 | `migrate.sh <device>` | Migrate from bare repo pattern |
+| `run-tests.sh` | Run every `tests/*_test.{sh,py}`; fails on a non-zero exit or any stderr output |
 
-All scripts support `DRY_RUN=1` to preview changes.
+`install.sh`, `uninstall.sh`, and `migrate.sh` support `DRY_RUN=1` to preview changes.
 
 ## MCP
 
@@ -463,3 +480,20 @@ From https://github.com/obra/private-journal-mcp:
 ```bash
 claude mcp add-json private-journal '{"type":"stdio","command":"npx","args":["github:obra/private-journal-mcp"]}' -s user
 ```
+
+### Safari MCP
+
+Safari 27 ships a local MCP server inside `safaridriver` (17 tools: tabs, navigation, page text extraction, DOM interactions, screenshots, console and network inspection). From https://webkit.org/blog/18136/introducing-the-safari-mcp-server-for-web-developers/:
+
+1. Safari > Settings > Advanced: enable **Show features for web developers**.
+2. Safari > Settings > Developer: enable **Allow remote automation and external agents**. Until this is on, every tool call fails with `You must enable 'Allow remote automation'`.
+3. Register it for Claude Code, Codex, omp, and Pi through skillshare, which writes each Agent's native MCP file (`~/.claude.json`, `~/.codex/config.toml`, `~/.omp/agent/mcp.json`, `~/.pi/agent/mcp.json`):
+
+```bash
+skillshare mcp add safari-mcp --target claude --target codex --target omp --target pi --sync --no-tui -- /usr/bin/safaridriver --mcp
+skillshare mcp check safari-mcp --live   # expects 17 tools
+```
+
+On `Ziyuns-M5-MBP` the definition is already in the tracked skillshare config, so after `./install.sh` only `skillshare sync mcp` is needed. Then reload running sessions: `/mcp reload` in omp, `/reload` in Pi. If the server was already added with `claude mcp add`, `skillshare mcp import safari-mcp --from claude --target ...` adopts it instead.
+
+The server runs locally and makes no network calls of its own, but page content, screenshots, and console logs it captures go to whichever agent and model you run. It has no access to personal Safari data such as AutoFill or other browser activity.

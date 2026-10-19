@@ -37,10 +37,16 @@ fi
 # KV checkpoints contain prompts and model state; keep newly created files private.
 umask 077
 mkdir -p "$CACHE_DIR"
+# MTP speculative decoding measured ~1.25x faster decode for ~0.4 GiB more memory.
+# omp samples at temperature 1.0, where exact sampling keeps the distribution faithful.
+# Adding --batched-session would quietly drop sampled requests back to ordinary
+# decoding (docs/QWEN38_FLASH_NEXT.md in the ds4 checkout), losing the speedup.
 exec "$RUNTIME_DIR/ds4-server" \
     --chdir "$RUNTIME_DIR" \
     --model "$MODEL_PATH" \
     --metal \
+    --mtp \
+    --mtp-exact-sampling \
     --ctx 100000 \
     --host 127.0.0.1 \
     --port 8040 \

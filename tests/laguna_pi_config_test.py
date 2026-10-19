@@ -44,5 +44,8 @@ expected = {
     }
 }
 
-assert data == expected
+# Pi's local catalog holds exactly Laguna and ds4. Laguna's entry is pinned
+# exactly here; tests/ds4_config_test.py checks ds4 against its launcher.
+assert set(data["providers"]) == {"laguna-local", "ds4"}, sorted(data["providers"])
+assert data["providers"]["laguna-local"] == expected["providers"]["laguna-local"]
 print("ok - Laguna Pi model configuration checks passed")

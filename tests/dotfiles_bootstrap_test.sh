@@ -474,11 +474,31 @@ assert_file_contains "$ROOT_DIR/README.md" 'git clone --depth 1 https://github.c
 # has to reinstall them. Keep the README list in step with the integrations
 # HERDR_GUIDE.md declares this repo expects.
 assert_file_contains "$ROOT_DIR/README.md" '### Install herdr agent integrations'
-for integration in claude pi opencode codex; do
+for integration in claude pi opencode codex omp; do
     assert_file_contains "$ROOT_DIR/README.md" "herdr integration install $integration"
     assert_file_contains "$ROOT_DIR/shared/HERDR_GUIDE.md" "\`$integration\`"
 done
 assert_file_contains "$ROOT_DIR/README.md" 'herdr integration status'
+# The ollama server runs as a launchd brew service, so server settings exported
+# from an interactive shell never reach it.
+assert_file_not_contains "$ROOT_DIR/shared/.zshrc.common" 'OLLAMA_KEEP_ALIVE'
+# omp's commit and tiny roles use a 32K-context build of qwen3.5:4b: Ollama sizes
+# its default context by VRAM (256K on 128 GB), which nearly triples the model's memory.
+m5_qwen_modelfile="$ROOT_DIR/devices/Ziyuns-M5-MBP/.config/ollama/qwen3.5-4b-32k.Modelfile"
+assert_file_contains "$m5_qwen_modelfile" 'FROM qwen3.5:4b'
+assert_file_contains "$m5_qwen_modelfile" 'PARAMETER num_ctx 32768'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'commit: ollama/qwen3.5:4b-32k:off'
+assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'tiny: ollama/qwen3.5:4b-32k:off'
+assert_file_contains "$ROOT_DIR/README.md" 'ollama create qwen3.5:4b-32k -f ~/.config/ollama/qwen3.5-4b-32k.Modelfile'
+# skillshare's config is the source for every Agent's MCP entries and skill
+# targets on the personal device; keep the Safari definition in it.
+m5_skillshare_config="$ROOT_DIR/devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml"
+assert_file_contains "$m5_skillshare_config" '    safari-mcp:'
+assert_file_contains "$m5_skillshare_config" 'command: /usr/bin/safaridriver'
+# The Agent MCP files themselves are untracked, so the README recipe is the
+# record of how to register Safari from scratch.
+assert_file_contains "$ROOT_DIR/README.md" 'skillshare mcp add safari-mcp --target claude --target codex --target omp --target pi --sync --no-tui -- /usr/bin/safaridriver --mcp'
+assert_file_contains "$ROOT_DIR/README.md" 'Allow remote automation and external agents'
 assert_file_contains "$ROOT_DIR/shared/TMUX_GUIDE.md" 'it no longer auto-starts tmux'
 assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 'source ~/.zshrc.common'

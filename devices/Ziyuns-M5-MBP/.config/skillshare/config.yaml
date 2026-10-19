@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/runkids/skillshare/main/schemas/config.schema.json
+
+sources:
+  skills: /Users/ziyunli/codebase/skillshare/skills
+  agents: /Users/ziyunli/codebase/skillshare/agents
+mode: merge
+target_naming: standard
+targets:
+  antigravity:
+    skills:
+      path: /Users/ziyunli/.gemini/skills
+  antigravity-cli:
+    skills:
+      path: /Users/ziyunli/.gemini/antigravity-cli/skills
+  claude:
+    skills:
+      path: /Users/ziyunli/.claude/skills
+  codex:
+    skills:
+      path: /Users/ziyunli/.agents/skills
+  omp:
+    skills:
+      path: /Users/ziyunli/.omp/agent/skills
+  opencode:
+    skills:
+      path: /Users/ziyunli/.config/opencode/skills
+  pi:
+    skills:
+      path: /Users/ziyunli/.pi/agent/skills
+ignore:
+  - '**/.DS_Store'
+  - '**/.git/**'
+audit:
+  block_threshold: CRITICAL
+mcp:
+  servers:
+    safari-mcp:
+      transport: stdio
+      command: /usr/bin/safaridriver
+      args:
+        - --mcp
+      targets:
+        - claude
+        - codex
+        - omp
+        - pi

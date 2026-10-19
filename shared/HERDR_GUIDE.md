@@ -26,9 +26,11 @@ Only herdr defaults that differ from the tmux bindings are set; every unset key 
 
 Herdr shows each agent pane's state via a per-agent hook installed with `herdr integration install <agent>`. The states are `idle`, `working`, `blocked`, `done`, and `unknown` (the canonical list is the `--until` values in `herdr agent wait --help`). `blocked` means the agent is waiting on input — it is the state the sidebar exists to surface, and the one screen detection is worst at, since a blocked agent and an idle one often look identical on screen. This is **separate** from installing the agent CLI itself (e.g. via `gohan`): the CLI lets you run the agent in a pane; the integration hook lets herdr track it.
 
-The integrations this repo expects are `claude`, `pi`, `opencode`, and `codex` — the four agent CLIs installed across these machines. Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version. Remove one with `herdr integration uninstall <agent>`.
+The integrations this repo expects are `claude`, `pi`, `opencode`, `codex`, and `omp` — the five agent CLIs installed across these machines. Hook state is per-machine, so `herdr integration status` is the only authority on what is actually installed here; it lists every supported agent with its hook path and version. Remove one with `herdr integration uninstall <agent>`.
 
-The hook scripts themselves live in each agent's own config dir, **not** in this repo, so they are not tracked here — reinstall them on a new machine with `herdr integration install`. Each agent gets a hook script (`herdr integration status` prints the exact path): `~/.claude/hooks/herdr-agent-state.sh`, `~/.pi/agent/extensions/herdr-agent-state.ts`, `~/.config/opencode/plugins/herdr-agent-state.js`, and `~/.codex/herdr-agent-state.sh`. `codex` additionally registers the hook in `~/.codex/hooks.json` and touches `~/.codex/config.toml`.
+The hook scripts themselves live in each agent's own config dir, **not** in this repo, so they are not tracked here — reinstall them on a new machine with `herdr integration install`. Each agent gets a hook script (`herdr integration status` prints the exact path): `~/.claude/hooks/herdr-agent-state.sh`, `~/.pi/agent/extensions/herdr-agent-state.ts`, `~/.config/opencode/plugins/herdr-agent-state.js`, `~/.codex/herdr-agent-state.sh`, and `~/.omp/agent/extensions/herdr-omp-agent-state.ts`. `codex` additionally registers the hook in `~/.codex/hooks.json` and touches `~/.codex/config.toml`; `opencode` also writes `~/.config/opencode/herdr-tui-session.js`, `~/.config/opencode/tui.jsonc`, `~/.config/opencode/cli.json`, and `~/.config/opencode/herdr-opencode/tui.js`.
+
+Each hook script carries a `HERDR_INTEGRATION_VERSION`, and `herdr integration status` compares it with the version built into the herdr binary, so upgrading herdr (e.g. through `brew upgrade`) leaves installed hooks `outdated`. `freshen` (in `shared/.zshrc.common`) reads `herdr integration status` after its updates and reinstalls every outdated hook except `claude`, which it only reports, because that install needs the manual fixups below.
 
 **`herdr integration install claude` dirties this repo.** It registers the `SessionStart` hook in `~/.claude/settings.json`, which is a symlink to `shared/.claude/settings.json` — so the install shows up as an uncommitted change here. Three things to check after running it:
 
@@ -43,6 +45,8 @@ The hook scripts themselves live in each agent's own config dir, **not** in this
 - It writes minified JSON into an otherwise pretty-printed file; reformat to match.
 
 Re-check all three after any `herdr update`, since a reinstall may reintroduce them.
+
+**Reinstalling over the guarded entry appends a duplicate.** herdr does not recognize the guarded tilde command as its own, so a reinstall (for example the claude hook moving from v7 to v11) adds a second `SessionStart` entry with an absolute, unguarded command and its own matcher (`^(startup|resume|clear|compact|fork)$`), and the hook would fire twice per session. The script on disk is already updated by then and the guarded entry runs it with the same `session` argument, so delete the new entry — `git restore shared/.claude/settings.json` does it in one step, but only when the file had no other uncommitted changes, since it discards those too — and confirm `herdr integration status` still reports claude `current`.
 
 ## Launching
 

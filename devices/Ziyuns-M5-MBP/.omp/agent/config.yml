@@ -5,8 +5,8 @@ modelRoles:
   vision: openai-codex/gpt-6.1-sol
   plan: anthropic/claude-opus-5-5:xhigh
   designer: openai-codex/gpt-6.1-sol
-  commit: ollama/qwen3.5:4b:off
-  tiny: ollama/qwen3.5:4b:off
+  commit: ollama/qwen3.5:4b-32k:off
+  tiny: ollama/qwen3.5:4b-32k:off
   memory: google-antigravity/gemini-3.8-flash:low
   task: ds4/qwen3.8-flash-next:medium
   advisor: openai-codex/gpt-6.1-sol:xhigh
