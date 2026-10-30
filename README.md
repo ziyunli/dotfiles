@@ -78,6 +78,8 @@ Use zsh startup files by responsibility:
 
 Personal Apple device `.zprofile` files should source `~/.zprofile.macos`. Device-specific `.zshrc` files should set `DEVICE_PLUGINS` before sourcing `~/.zshrc.common`. Avoid adding installer PATH snippets to both `.zprofile` and `.zshrc`; put durable entries in `.zprofile` and keep them idempotent.
 
+Bento's `devices/bento/.shellrc.d/000_environment.zsh` loads `~/.shellenv.d/*.sh` and `*.zsh` in lexical order before the interactive NVM and pyenv hooks, for remotes whose `~/.zshrc` only loads `~/.shellrc.d`. `./install.sh bento` links that hook; keep `~/.zshrc` machine-local and do not duplicate the environment loader there.
+
 ## Recipes
 
 ### Install dotfiles on a new system
