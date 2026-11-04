@@ -5,7 +5,8 @@ two named model profiles configured for it, and how to switch between them.
 
 Scope:
 
-- Device: `bento` (work). Other devices and the shared config are unchanged.
+- Device: `bento` (work). Other devices and the shared personal config were not
+  changed by this pass; the personal handoff at the end records the follow-up.
 - Live config: `~/.omp/agent/config.yml` — currently a **regular file**, not a
   symlink, so it stays independently writable at runtime.
 - Repository source of truth: [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml).
@@ -23,27 +24,30 @@ stay as configured and are shared by both profiles.
 
 ### `provider-diverse` — **active**
 
-Reduces concentration on a single model family: roles are spread across
-DeepSeek/GLM (open-weights), GPT (instacart-openai), Claude
-(instacart-anthropic), Gemini (vertex-proxy), and a separate judgment endpoint
-(`instacart-openai-decisions`). This is about spreading work across model
-families, **not** independent availability: every lane still shares the same
-Tally gateway, so a gateway-wide outage can still affect all of them. A Tally
-credit limit is different — it blocks premium models, while the baseline models
+Both profiles put Sol 6.1 at `xhigh` on the main conversation (`default`); the
+difference between them is how the specialist and worker lanes are staffed. This
+one reduces concentration on a single model family for those lanes: DeepSeek v4.1
+Flash runs `task` execution, GLM 5.3 Flash runs `smol`, and the remaining roles
+are spread across GPT (instacart-openai), Claude (instacart-anthropic), and
+Gemini (vertex-proxy). This is about spreading work across model families,
+**not** independent availability: every lane still shares the same Tally
+gateway, so a gateway-wide outage can still affect all of them. A Tally credit
+limit is different — it blocks premium models, while the baseline models
 (DeepSeek v4.1 Flash, GLM 5.3 Flash, GPT 6 Luna) remain usable and accrue usage
 beyond the limit. Keeps Opus on planning and Gemini on vision.
 
 ### `baseline-reasoning` — available, not active
 
-Pushes more work onto GPT 6 Luna (with `xhigh` effort where the work is
-substantive) and Sol 6.1 for planning. Kept for switching when you want the
-baseline-first reasoning allocation instead of provider diversity.
+Same Sol 6.1 `xhigh` main conversation, with the worker lanes pushed onto GPT 6
+Luna (`xhigh` where the work is substantive) and Sol 6.1 for planning. Kept for
+switching when you want the baseline-first reasoning allocation instead of
+provider diversity.
 
 ### Role comparison
 
 | Role | Kind | `provider-diverse` (active) | `baseline-reasoning` |
 | ---- | ---- | --------------------------- | -------------------- |
-| `default` | chat | `open-weights/deepseek-v4p1-flash-priority:high` | `open-weights/deepseek-v4p1-flash-priority:high` |
+| `default` | chat | `instacart-openai/gpt-6.1-sol:xhigh` | `instacart-openai/gpt-6.1-sol:xhigh` |
 | `task` | chat | `open-weights/deepseek-v4p1-flash-priority:high` | `instacart-openai/gpt-6-luna:xhigh` |
 | `smol` | chat | `open-weights/glm-5.3-flash-priority:high` | `open-weights/glm-5.3-flash-priority:high` |
 | `tiny` | chat/tiny | `instacart-openai/gpt-6-luna:low` | `open-weights/glm-5.3-flash-priority:low` |
@@ -53,14 +57,16 @@ baseline-first reasoning allocation instead of provider diversity.
 | `designer` | chat (custom alias) | `instacart-openai/gpt-6.1-sol:high` | `instacart-openai/gpt-6.1-sol:high` |
 | `vision` | chat | `vertex-proxy/gemini-3.8-flash:medium` | `instacart-openai/gpt-6-luna:xhigh` |
 | `advisor` | chat | `instacart-openai/gpt-6.1-sol:high` | `instacart-openai/gpt-6.1-sol:medium` |
-| `judge` | judge | `instacart-openai-decisions/gpt-6-luna` | `instacart-openai-decisions/gpt-6-luna` |
+
+`judge` has **no** row: the work catalog no longer carries the Decisions
+provider, so the role is unassigned (see the judge note and the unassigned
+table below).
 
 Reading a selector:
 
 - `provider/model-id` — the leading segment before `/` is the **provider** on
   the Tally gateway (`open-weights`, `instacart-openai`, `instacart-anthropic`,
-  `vertex-proxy`, `instacart-openai-decisions`). Provider ids are not model
-  names.
+  `vertex-proxy`). Provider ids are not model names.
 - `:high`, `:xhigh`, `:medium`, `:low` — the **thinking/effort suffix** for that
   role's chat requests. Not every model accepts every level; a suffix outside a
   model's supported ladder is clamped to what it supports. The effort column
@@ -69,9 +75,9 @@ Reading a selector:
 - `@default` on `instacart-anthropic/claude-opus-5-5@default` is an **upstream
   routing suffix** (select the provider's default variant), not a role alias and
   not a thinking level.
-- `judge` is a model-kind role; it takes **no** chat thinking suffix. The
-  `instacart-openai-decisions/gpt-6-luna` row is a judgment endpoint (OpenAI
-  Decisions wire), not a chat model.
+- `default` at `xhigh` means a fresh session starts on Sol 6.1 at that effort;
+  `defaultThinkingLevel: high` remains the global fallback thinking level for
+  selections that carry no suffix.
 
 ## Switching profiles
 
@@ -136,7 +142,7 @@ consulted when the corresponding *workload* is invoked.
 
 | Role | Purpose | Concrete session trigger |
 | ---- | ------- | ------------------------ |
-| `default` | The main conversation model. | Initial model selection for a new session when nothing explicit or restored is set, and an explicit `/model` or `/modelpreset switch` selection. Once chosen, ordinary turns run on the **active** model — they do not re-resolve `default` each turn. Changing `default` in `/models` also switches the active model. |
+| `default` | The main conversation model — on both profiles Sol 6.1 at `xhigh`, orchestrating work and delegating implementation to baseline workers. | Initial model selection for a new session when nothing explicit or restored is set, and an explicit `/model` or `/modelpreset switch` selection. Once chosen, ordinary turns run on the **active** model — they do not re-resolve `default` each turn. Changing `default` in `/models` also switches the active model. |
 | `task` | General-purpose subagent workers (implementation, refactors, research with edits). | A `task` tool call whose agent resolves through the task role — i.e. the bundled generic `task` agent, or any agent whose frontmatter/`task.agentModelOverrides` resolves to `@task`. Not used by the main conversation. |
 | `smol` | Cheap/fast lane. | Bundled `scout` and `sonic` agents; the prewalk hand-off target (when prewalk is armed); anything resolving `@smol`. |
 | `tiny` | Lightweight background chat/tiny work. | The one-line labels for task/agent rows (the fire-and-forget UI label), and the **fallback** for session titles (see the title note below). |
@@ -146,15 +152,21 @@ consulted when the corresponding *workload* is invoked.
 | `designer` | UI/design-focused lane. | A **custom alias** with no built-in automatic trigger. Invoke it explicitly, e.g. `omp --model @designer` or by assigning it to an agent/workload. |
 | `vision` | Image **analysis** (chat model with image input). | A `read` of an image with a question, e.g. `read screenshot.png?q=what is wrong here`. |
 | `advisor` | Reviewer that inspects primary turns and injects advice. | Only when the advisor runtime is enabled: `advisor.enabled: true`, `/advisor on`, or `--advisor`. It is **disabled initially** on this device. A `WATCHDOG.yml` roster can override the advisor model per advisor. |
-| `judge` | Judgment/semantic decisions. | `find` semantic relevance; Eval `judge` / `judge_batch`; auto-thinking classification; typed Eval judgments; AI-assisted git staging. See the judge note below. |
 
 ### Judge note
 
-`judge` points at `instacart-openai-decisions/gpt-6-luna`, a **native Decisions**
-judgment endpoint (no chat thinking suffix). How the Tally baseline treats this
-endpoint — its credit/usage treatment compared with the chat GPT 6 Luna lane —
-has **not** been verified, so do not infer it from the chat Luna economics
-below.
+`judge` is **unassigned** on this device. The work catalog no longer carries the
+former `instacart-openai-decisions` provider, so managed configuration refresh
+dropped that provider and its `gpt-6-luna` selector; the tracked config removed
+the dead role entries rather than inventing a replacement endpoint.
+`retry.fallbackChains.judge` remains `[]`.
+
+Judge-triggered work (`find` relevance, Eval `judge`/`judge_batch`,
+auto-thinking classification, typed judgments, AI-assisted staging) therefore
+resolves through omp's built-in judgment behavior. Judge is a model-kind role and
+takes no chat thinking suffix. If an older copy of the config still names the
+removed Decisions selector, that assignment is inert — do not copy it into a new
+config or treat its absence as a broken role.
 
 ### Title note
 
@@ -174,6 +186,7 @@ built-in behavior. Their mere existence does **not** activate the feature:
 
 | Role | Kind | Behavior while unset | Concrete trigger |
 | ---- | ---- | -------------------- | ---------------- |
+| `judge` | judge | Falls back to omp's built-in judgment behavior. `retry.fallbackChains.judge` is `[]`; do not add a replacement endpoint just to fill the row. | `find` semantic relevance; Eval `judge` / `judge_batch`; auto-thinking classification; typed Eval judgments; AI-assisted git staging. |
 | `memory` | chat/tiny | Resolves through `@tiny`. The memory backend is currently **off** (`memory.backend: off`), so no memory work runs regardless. | Extraction and consolidation work of a configured memory backend (e.g. Mnemopi extraction/consolidation in LLM mode, or the local summary pipeline). |
 | `web` | search/grounded chat | Follows its built-in priority list / default runner chains. | The `web_search` tool (which follows `modelRoles.web` and `retry.fallbackChains.web`), and the `omp search` / `omp q` / `omp web-search` CLI commands. |
 | `image` | image generation | Falls back to its built-in priority list. | The `generate_image` tool, when image generation is enabled. Separate workload from `vision`; leaving `image` unset does not enable generation. |
@@ -232,9 +245,13 @@ Installed bundled agents on this device (verified with `omp agents unpack`):
 | `security-reviewer` | **no model or thinking field** | (unset) |
 
 `security-reviewer` has no frontmatter model, so without an override it would
-inherit the parent's active model. The config sets
+inherit the parent's active model. The **tracked** config sets
 `task.agentModelOverrides["security-reviewer"]: "@slow"` so both `reviewer` and
-`security-reviewer` resolve `@slow`.
+`security-reviewer` resolve `@slow`. Treat that as a property of
+[`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml), not
+of the live file: the live regular config currently omits the override, so there
+`security-reviewer` inherits the parent's active model until the tracked setting
+is relinked or copied in.
 
 ### Effort is a role default, not a guaranteed worker effort
 
@@ -254,12 +271,14 @@ defaults. A subagent can end up at a different effort:
 ## Fallback chains are availability recovery, not escalation
 
 Request-failure fallback lives in `retry.fallbackChains`, configured separately
-from `modelRoles` and **shared by both profiles** (presets do not swap them):
+from `modelRoles` and **shared by both profiles** (presets do not swap them).
+The table is the tracked source; see “Live config, tracked source, and managed
+refresh” for known live-file differences.
 
 | Role | Shared fallback chain |
 | ---- | --------------------- |
-| `task` | `open-weights/glm-5.3-flash-priority:high` → `instacart-openai/gpt-6-luna:high` → `instacart-openai/gpt-5.6-luna:high` |
-| `smol` | `instacart-openai/gpt-6-luna:high` → `instacart-openai/gpt-5.6-luna:high` |
+| `task` | `open-weights/glm-5.3-flash-priority:high` → `instacart-openai/gpt-6-luna:high` |
+| `smol` | `instacart-openai/gpt-6-luna:high` |
 | `commit` | `open-weights/glm-5.3-flash-priority:low` |
 | `tiny` | `open-weights/glm-5.3-flash-priority:low` |
 | `judge` | `[]` (no fallbacks) |
@@ -272,24 +291,78 @@ got smarter, only that the primary could not serve the request. Notes:
   active. On the `baseline-reasoning` profile the `task` **primary** is
   `gpt-6-luna:xhigh`, but its recovery entries remain the shared `:high` ones —
   do not read the chain as preserving `xhigh`.
+- The former `instacart-openai/gpt-5.6-luna:high` entries were **removed** from
+  both the `task` and `smol` chains: managed catalog refresh dropped GPT 5.6
+  Luna from the work catalog, so those recovery hops could never serve a
+  request. With the `smol` chain reduced to one real candidate, `smol` has GPT 6
+  Luna as its only recovery hop.
+- Managed configuration refresh rewrites the provider catalog and can re-sync
+  `enabledModels`, but it **preserves user-authored `retry.fallbackChains`**. A
+  stale selector surviving a refresh does not mean the model still exists —
+  check `omp models --kind all --json` before trusting an entry.
 - A comma-separated candidate list in a role value is **not** a retry chain;
   selection uses the first available match. Recovery is the `retry.fallbackChains`
   entry.
 - `retry.fallbackRevertPolicy` (default `cooldown-expiry`) decides whether the
   session returns to the primary once its suppression window ends.
 
+## Live config, tracked source, and managed refresh
+
+- [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml)
+  is the tracked source. `~/.omp/agent/config.yml` is the **live regular file**
+  (not a symlink), so editing tracked source alone does **not** change what the
+  live session reads. To apply tracked settings — including the differences
+  listed below — rerun `./install.sh bento` on that device: it moves the existing
+  live file into `~/.dotfiles-backup-<timestamp>/` and replaces it with a symlink
+  to the tracked source. That relink is a deliberate local action; nothing in
+  this repository does it automatically.
+- Instacart-managed configuration refresh owns the provider catalog and can
+  rewrite `~/.omp/agent/models.yml` plus the `enabledModels` list. It **preserves
+  user-authored role assignments and `retry.fallbackChains`** — which is why a
+  retired selector such as `gpt-5.6-luna` survived in the fallback chains even
+  after the catalog dropped it. Do not read an old fallback entry as proof the
+  model exists.
+- The new `default` (`instacart-openai/gpt-6.1-sol:xhigh`) applies to **fresh,
+  non-restored sessions** and to explicit `/modelpreset switch`. Live reload
+  applies role changes to later subagent launches but does **not** force the
+  current conversation onto the new model; a healthy open session keeps its
+  active model until you switch it deliberately.
+- Known intentional differences right now: the tracked source contains
+  `task.agentModelOverrides.security-reviewer: "@slow"` and a `tiny` fallback
+  (`open-weights/glm-5.3-flash-priority:low`) that the live regular file
+  currently omits. Role and fallback tables in this guide describe the **tracked**
+  config; the live file is authoritative at runtime until it is relinked or
+  updated to match.
+- To check what the gateway actually exposes, run
+  `omp models --kind all --json` rather than trusting a config selector. If a
+  selector is absent there, treat it as unavailable and remove it instead of
+  adding a replacement route by hand.
+
+The user-approved requirement is the split this pass implements: Sol 6.1
+`xhigh` as the main-session orchestrator with cheaper models doing execution.
+Only the retained specialist and worker allocations above — and the profile
+names — are existing/editorial choices rather than new user requirements. The
+dated Tally economics below is the other user-provided material; the rest
+describes what the tracked config now says.
+
 ## Tally credit economics (user-provided guidance, 2026-09-30)
 
 These are the operating notes behind the profile choices. They are **user
-guidance**, not a published rate card:
+guidance**, not a published rate card, and they are historical where the catalog
+has moved on:
 
-- The baseline models — DeepSeek v4.1 Flash, GLM 5.3 Flash, GPT 6 Luna, GPT 5.6
-  Luna — are **not free**. They remain usable and accrue usage beyond the credit
-  limit; **premium** models are blocked once the limit is reached.
+- The baseline models — DeepSeek v4.1 Flash, GLM 5.3 Flash, and GPT 6 Luna —
+  are **not free**. They remain usable and accrue usage beyond the credit limit;
+  **premium** models are blocked once the limit is reached. GPT 5.6 Luna is
+  listed here only as **historical** user guidance: it is no longer in the work
+  catalog and no current role or fallback chain names it.
 - Actual per-model Tally credit rates (per 1M tokens) are not reproduced here.
   Read them in the Tally console under **My usage → Models used**. No OMP
   dollar-cost estimate is a Tally credit price.
-- Preference for substantive/difficult work: GPT 6 Luna at `xhigh`.
+- Preference for substantive/difficult work: GPT 6 Luna at `xhigh` — historical
+  user guidance from before Sol 6.1 became the profile default. The current
+  `default` instead spends Sol 6.1 `xhigh` on orchestration and keeps execution
+  on baseline workers.
 - DeepSeek and GLM expose `high`/`max` (not `xhigh`) — use their supported levels.
 - Sol 6.1: Medium/High/`xhigh` for ambiguity and plans; try Sol at `low` for
   simple high-level questions (a suggestion, not a guaranteed-sufficient level).
@@ -301,6 +374,37 @@ guidance**, not a published rate card:
   not benchmark conclusions.
 
 These model recommendations are **not** empirically benchmarked locally.
+
+## Personal-device handoff (2026-11-04)
+
+Not yet applied. This records the desired follow-up and the constraints; no
+personal config was changed in this pass, and the personal runtime is unverified.
+
+- **Desired shape:** Sol 6.1 at `xhigh` as the main-session `default`, with the
+  existing cheaper specialist/worker lanes kept for delegated work — the same
+  orchestrate-on-frontier, execute-on-cheaper-models split used here. Do not
+  import the work device's DeepSeek/GLM worker choices if the personal catalog
+  does not carry them.
+- **Where it would live:** the shared personal config
+  [`shared/.omp/agent/config.yml`](shared/.omp/agent/config.yml) uses the
+  `openai-codex/*` ChatGPT OAuth catalog and is the base for every device. On
+  `Ziyuns-M5-MBP`, [`devices/Ziyuns-M5-MBP/.omp/agent/config.yml`](devices/Ziyuns-M5-MBP/.omp/agent/config.yml)
+  overrides it: `./install.sh Ziyuns-M5-MBP` links the device file instead of the
+  shared one, and the device file is currently **Gemini-first**
+  (`google-antigravity/gemini-4-argon:high` as `default`). Confirm the device
+  override still wins before editing either layer — a change to the shared file
+  alone would not take effect on that Mac.
+- **Provider ids are not interchangeable:** `openai-codex/gpt-6.1-sol` is a
+  different provider entry from `instacart-openai/gpt-6.1-sol`. Never copy a
+  work selector or its `models.yml` endpoint/credential into personal config.
+- **Verify locally first:** on the personal device run
+  `omp models --kind all --json` and confirm the catalog actually exposes a
+  Sol 6.1 entry and that ChatGPT auth/subscription access still covers it. If it
+  does not, leave the current Gemini-first default alone rather than inventing a
+  route.
+- Keep this section in `OMP_MODELS.md`; do not create a device doc file for it —
+  the installer links arbitrary device files, which is why the handoff lives
+  here.
 
 ## Sources
 

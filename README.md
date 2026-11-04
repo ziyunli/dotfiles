@@ -324,8 +324,8 @@ Both harnesses are tracked with a work/personal split:
 | `shared/.pi/agent/settings.json` | shared | Personal base (ChatGPT subscription); no `enabledModels`, so the built-in catalog stays available |
 | `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
-| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the `openai-codex/*` ChatGPT OAuth catalog |
-| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (bento ships two named profiles — see [OMP_MODELS.md](OMP_MODELS.md)) |
+| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the `openai-codex/*` ChatGPT OAuth catalog (unchanged by the bento work routing pass) |
+| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (bento ships two named profiles, both defaulting to Sol 6.1 `xhigh` — see [OMP_MODELS.md](OMP_MODELS.md)) |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
@@ -335,13 +335,19 @@ Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: s
 
 The **bento** work-device omp config ships two named model presets —
 `provider-diverse` (active) and `baseline-reasoning` (available) — switchable
-with `/modelpreset switch`. Other work devices are unchanged.
+with `/modelpreset switch`. Both now default the main conversation to
+`instacart-openai/gpt-6.1-sol:xhigh` with `defaultThinkingLevel: high`; the
+presets differ only in how the specialist/worker lanes are staffed. Other work
+devices are unchanged.
 [`OMP_MODELS.md`](OMP_MODELS.md) documents every role's purpose and trigger, the
-full profile comparison, switching caveats, and the Tally credit economics.
+full profile comparison, switching caveats, the Tally credit economics, and the
+[personal-device handoff](OMP_MODELS.md#personal-device-handoff-2026-11-04).
 
-- `provider-diverse` spreads roles across providers: DeepSeek v4.1 Flash runs `default`/`task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Sol 6.1 `slow`/`advisor`/`designer`, Gemini 3.8 Flash `vision`.
-- `baseline-reasoning` pushes substantive work onto GPT 6 Luna (`xhigh` for `task`/`vision`) and Sol 6.1 for planning.
-- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; `security-reviewer` has no bundled model and is overridden to `@slow` via `task.agentModelOverrides`. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
+- `provider-diverse` keeps provider diversity for the workers: Sol 6.1 `xhigh` orchestrates the main conversation, DeepSeek v4.1 Flash runs `task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Gemini 3.8 Flash `vision`.
+- `baseline-reasoning` keeps the same Sol 6.1 `xhigh` main session and pushes worker work onto GPT 6 Luna (`xhigh` for `task`/`vision`), with Sol 6.1 for planning.
+- `judge` is unassigned: the work catalog no longer carries the old Decisions provider, and `retry.fallbackChains.judge` stays `[]`.
+- GPT 5.6 Luna was dropped from the catalog, so it is gone from both the `task` and `smol` fallback chains. Managed config refresh preserves user-authored fallback chains, which is why such a stale entry can outlive its model.
+- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; the tracked bento config overrides `security-reviewer` to `@slow` via `task.agentModelOverrides` (the live config currently omits that override). `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
 On `Ziyuns-M5-MBP`, the device override uses `google-antigravity/gemini-4-argon:high`
 as the default (falling back to `gemini-3.8-flash:high`), with `gemini-3.8-flash:low`

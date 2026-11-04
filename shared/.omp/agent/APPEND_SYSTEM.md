@@ -6,10 +6,23 @@ baseline-model work — keep expensive lanes out of the execution path.
 
 ## Choosing a model
 
-- Default conversation work: use the configured `default` role (Gemini 4 Argon / Gemini Flash on personal Gemini-first devices; DeepSeek v4.1 Flash or GLM 5.3 Flash on work devices).
-- Judgment-heavy but still baseline (long-horizon reasoning, tricky multi-step changes): GPT 6 Luna.
-- GPT 5.6 Luna: last resort only — the others are unavailable or the lane specifically needs GPT behaviour on a baseline budget.
-- Frontier lanes (`slow`, `plan`, `advisor`, `designer`): reserved for planning, researching, reviewing, and advising. NEVER use them for mechanical implementation, refactors, or bulk edits with a plan in hand.
+- Default conversation work: use the configured `default` role. On the **bento**
+  work device both presets default to Sol 6.1 at `xhigh`, so the main session
+  orchestrates and delegates implementation to the baseline `task` workers. On
+  personal devices follow whatever `default` the active config sets — the
+  personal device override is Gemini-first, the shared config is
+  `openai-codex/*` — and never substitute work-gateway selectors
+  (`instacart-openai/*`, `open-weights/*`) there.
+- Judgment-heavy but still baseline (long-horizon reasoning, tricky multi-step
+  changes): GPT 6 Luna.
+- GPT 5.6 Luna: only where the active catalog still exposes it. It is absent
+  from the bento work catalog (and was removed from its fallback chains), so
+  treat it as unavailable there; on any device, check catalog availability
+  rather than assuming the old personal guidance still holds.
+- Frontier lanes (`slow`, `plan`, `advisor`, `designer`, plus `default` on
+  bento): reserved for planning, researching, reviewing, advising, and
+  orchestration. NEVER use them for mechanical implementation, refactors, or
+  bulk edits with a plan in hand — hand those to `task` workers.
 
 ## Spawning subagents
 
