@@ -1,15 +1,21 @@
-# omp model roles and profiles (bento work device)
+# omp model roles and profiles (work devices)
 
-This guide explains every model role omp uses on the **bento** work device, the
-two named model profiles configured for it, and how to switch between them.
+This guide explains every model role omp uses on the **bento** work device and
+the **insta-laptop** work laptop, their two named model profiles, and switching.
 
 Scope:
 
-- Device: `bento` (work). Other devices and the shared personal config were not
-  changed by this pass; the personal handoff at the end records the follow-up.
-- Live config: `~/.omp/agent/config.yml` — currently a **regular file**, not a
-  symlink, so it stays independently writable at runtime.
-- Repository source of truth: [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml).
+- Devices: `bento` and `insta-laptop` (work). Other devices and the shared
+  personal config are unchanged; the personal handoff records the follow-up.
+- Live config: `~/.omp/agent/config.yml` — currently a **regular file** on both
+  work devices, independently writable at runtime.
+- Repository sources: [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml)
+  and [`devices/insta-laptop/.omp/agent/config.yml`](devices/insta-laptop/.omp/agent/config.yml).
+- This laptop's hostname is `Stephen-CFL6GJN2YR`; its installed dotfiles profile
+  is `insta-laptop`. Use `./install.sh insta-laptop` when reinstalling its links.
+  Installation links the tracked config; runtime writes can make it a regular
+  file again. Both tracked work configs share the model policy; laptop UI,
+  expanded model catalog, and compaction settings are preserved separately.
 - The gateway itself (providers, endpoints, headers, credentials) is
   Instacart-managed in `~/.omp/agent/models.yml` and is **not** tracked here.
   This document names model selectors only; it contains no endpoints or secrets.
