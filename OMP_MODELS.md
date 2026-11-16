@@ -5,8 +5,8 @@ the **insta-laptop** work laptop, their two named model profiles, and switching.
 
 Scope:
 
-- Devices: `bento` and `insta-laptop` (work). Other devices and the shared
-  personal config are unchanged; the personal handoff records the follow-up.
+- This guide focuses on the work profiles; personal-device routing is documented
+  in the section below.
 - Live config: `~/.omp/agent/config.yml` — currently a **regular file** on both
   work devices, independently writable at runtime.
 - Repository sources: [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml)
@@ -381,36 +381,36 @@ has moved on:
 
 These model recommendations are **not** empirically benchmarked locally.
 
-## Personal-device handoff (2026-11-04)
+## Personal-device routing (2026-11-15)
 
-Not yet applied. This records the desired follow-up and the constraints; no
-personal config was changed in this pass, and the personal runtime is unverified.
+All non-work devices use OpenAI Codex/ChatGPT OAuth for their main models; work
+gateway selectors and credentials are not part of the personal configuration.
+The shared [`shared/.omp/agent/config.yml`](shared/.omp/agent/config.yml)
+defaults to `openai-codex/gpt-6.1-sol:xhigh`, uses Luna for lightweight and
+worker roles, and uses Sol for planning and review. Its model allowlist contains
+no Gemini selectors.
 
-- **Desired shape:** Sol 6.1 at `xhigh` as the main-session `default`, with the
-  existing cheaper specialist/worker lanes kept for delegated work — the same
-  orchestrate-on-frontier, execute-on-cheaper-models split used here. Do not
-  import the work device's DeepSeek/GLM worker choices if the personal catalog
-  does not carry them.
-- **Where it would live:** the shared personal config
-  [`shared/.omp/agent/config.yml`](shared/.omp/agent/config.yml) uses the
-  `openai-codex/*` ChatGPT OAuth catalog and is the base for every device. On
-  `Ziyuns-M5-MBP`, [`devices/Ziyuns-M5-MBP/.omp/agent/config.yml`](devices/Ziyuns-M5-MBP/.omp/agent/config.yml)
-  overrides it: `./install.sh Ziyuns-M5-MBP` links the device file instead of the
-  shared one, and the device file is currently **Gemini-first**
-  (`google-antigravity/gemini-4-argon:high` as `default`). Confirm the device
-  override still wins before editing either layer — a change to the shared file
-  alone would not take effect on that Mac.
-- **Provider ids are not interchangeable:** `openai-codex/gpt-6.1-sol` is a
-  different provider entry from `instacart-openai/gpt-6.1-sol`. Never copy a
-  work selector or its `models.yml` endpoint/credential into personal config.
-- **Verify locally first:** on the personal device run
-  `omp models --kind all --json` and confirm the catalog actually exposes a
-  Sol 6.1 entry and that ChatGPT auth/subscription access still covers it. If it
-  does not, leave the current Gemini-first default alone rather than inventing a
-  route.
-- Keep this section in `OMP_MODELS.md`; do not create a device doc file for it —
-  the installer links arbitrary device files, which is why the handoff lives
-  here.
+On `Ziyuns-M5-MBP`, [`devices/Ziyuns-M5-MBP/.omp/agent/config.yml`](devices/Ziyuns-M5-MBP/.omp/agent/config.yml)
+overrides the shared omp file: Sol 6.1 runs the main session, Luna handles
+`smol` and `memory`, local Ollama handles `tiny` and `commit`, and local ds4
+handles `task`. Sol handles `slow`, `vision`, `plan`, `designer`, and
+`advisor`. No role or retry fallback selects `google-antigravity/*`; `web` is
+unassigned and uses omp's built-in search routing. `web/google` in the web
+fallback chain is a search backend, not a Gemini chat model.
+
+Pi's [`shared/.pi/agent/settings.json`](shared/.pi/agent/settings.json) has no
+model allowlist or startup model. Each non-work device (`Ziyuns-M5-MBP`,
+`Ziyuns-Mac-mini`, `Ziyuns-MBP`, and `popos`) merges a small device setting
+that selects `openai-codex/gpt-6.1-sol` with the shared `xhigh` thinking level.
+This keeps local Pi models available and leaves the work-device settings
+unchanged. Installer merge precedence is shared < device < existing local:
+clear an older local default if it overrides the tracked device setting.
+`./install.sh <device>` activates the device setting; it has been applied on
+`Ziyuns-M5-MBP`, and the other devices need installation when next used.
+
+Google AI Pro grants quota in Google's Antigravity products, but does not by
+itself grant Gemini API access in a third-party harness. The personal routing
+does not depend on the `google-antigravity` connector.
 
 ## Sources
 

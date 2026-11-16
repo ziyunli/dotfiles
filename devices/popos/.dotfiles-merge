@@ -1,0 +1,2 @@
+# Keep shared Pi settings while applying this device's model default.
+.pi/agent/settings.json

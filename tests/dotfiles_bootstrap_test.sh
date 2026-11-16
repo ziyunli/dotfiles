@@ -105,11 +105,31 @@ with_fake_hostname() {
     assert_file_contains "$temp_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
     assert_file_not_contains "$temp_home/.config/opencode.personal.json" '"model"'
 
+    jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.1-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/.pi/agent/settings.json" >/dev/null ||
+        fail "personal Pi install must select Sol while preserving shared settings"
+    assert_file_contains "$temp_home/.omp/agent/config.yml" 'default: openai-codex/gpt-6.1-sol:xhigh'
+    assert_file_not_contains "$temp_home/.omp/agent/config.yml" 'google-antigravity/'
+
     output="$(
         PATH="$temp_bin:$PATH" HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/uninstall.sh" 2>&1
     )"
     [[ "$output" == *"[dotfiles] Uninstalling dotfiles for device: Ziyuns-M5-MBP"* ]] ||
         fail "uninstall.sh did not default to hostname"
+}
+
+with_other_personal_devices() {
+    local temp_home device
+
+    temp_home="$(mktemp -d)"
+    trap 'rm -rf "$temp_home"' RETURN
+
+    for device in Ziyuns-Mac-mini Ziyuns-MBP popos; do
+        mkdir -p "$temp_home/$device"
+        HOME="$temp_home/$device" "$ROOT_DIR/install.sh" "$device" >/dev/null
+        jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.1-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/$device/.pi/agent/settings.json" >/dev/null ||
+            fail "$device Pi install must select Sol while preserving shared settings"
+        assert_file_contains "$temp_home/$device/.omp/agent/config.yml" 'default: openai-codex/gpt-6.1-sol:xhigh'
+    done
 }
 
 with_explicit_work_devices() {
@@ -409,7 +429,6 @@ fi
 
 # omp config tracking: linked per device (YAML, not jq-merged), not symlinks of
 # one another -- shared is personal ChatGPT, bento is the work gateway.
-assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'openai-codex/gpt-6-luna:high'
 assert_file_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'security-reviewer: "@slow"'
 assert_file_not_contains "$ROOT_DIR/shared/.omp/agent/config.yml" 'instacart-'
 assert_file_contains "$ROOT_DIR/devices/bento/.omp/agent/config.yml" 'open-weights/deepseek-v4p1-flash-priority:high'
@@ -492,9 +511,6 @@ assert_file_contains "$m5_qwen_modelfile" 'PARAMETER num_ctx 32768'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'commit: ollama/qwen3.5:4b-32k:off'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'tiny: ollama/qwen3.5:4b-32k:off'
 assert_file_contains "$ROOT_DIR/README.md" 'ollama create qwen3.5:4b-32k -f ~/.config/ollama/qwen3.5-4b-32k.Modelfile'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'default: google-antigravity/gemini-4-argon:high'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'smol: google-antigravity/gemini-3.8-flash:low'
-assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'web: google-antigravity/gemini-2.5-flash'
 assert_file_contains "$ROOT_DIR/devices/Ziyuns-M5-MBP/.omp/agent/config.yml" 'security-reviewer: "@slow"'
 # skillshare's config is the source for every Agent's MCP entries and skill
 # targets on the personal device; keep the Safari definition in it.
@@ -510,6 +526,7 @@ assert_file_contains "$ROOT_DIR/shared/GHOSTTY_GUIDE.md" '`ssh-env`'
 assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 'source ~/.zshrc.common'
 
 with_fake_hostname
+with_other_personal_devices
 with_explicit_work_devices
 with_local_zshenv
 with_local_pi_agents

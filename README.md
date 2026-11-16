@@ -321,17 +321,18 @@ Both harnesses are tracked with a work/personal split:
 
 | File | Layer | Purpose |
 | ---- | ----- | ------- |
-| `shared/.pi/agent/settings.json` | shared | Personal base (ChatGPT subscription); no `enabledModels`, so the built-in catalog stays available |
+| `shared/.pi/agent/settings.json` | shared | Pi base settings with no model allowlist; personal devices merge in their own OpenAI default |
 | `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
+| `devices/<personal-host>/.pi/agent/settings.json` | device | Personal Pi default: `openai-codex/gpt-6.1-sol` at the shared `xhigh` thinking level; merged with shared settings |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
 | `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the `openai-codex/*` ChatGPT OAuth catalog (unchanged by the bento work routing pass) |
 | `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (`bento` and `insta-laptop` ship two named profiles, both defaulting to Sol 6.1 `xhigh` — see [OMP_MODELS.md](OMP_MODELS.md)) |
-| `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Gemini-first omp roles; preserves the local theme and web-search order |
+| `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Sol-first omp roles with local `task`, `tiny`, and `commit` models; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
 | `devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml` | device | skillshare source config: skill targets for every Agent plus the MCP servers it writes into their native files; linked to `~/.config/skillshare/config.yaml` (skillshare writes through the symlink) |
 
-Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
+Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). The four non-work device profiles also merge their Pi defaults with the shared base; local values take precedence, so an existing local model override may need clearing. On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
 
 The **bento** and **insta-laptop** work-device omp configs ship two named model
 presets — `provider-diverse` (active) and `baseline-reasoning` (available) —
@@ -340,10 +341,10 @@ switchable with `/modelpreset switch`. Both default the main conversation to
 presets differ only in how the specialist/worker lanes are staffed. The laptop
 keeps its own UI, expanded catalog, and compaction settings. Its hostname is
 `Stephen-CFL6GJN2YR`, but its installed profile is `insta-laptop`; reinstall with
-`./install.sh insta-laptop`. Other devices are unchanged.
+`./install.sh insta-laptop`. Personal-device routing is described below.
 [`OMP_MODELS.md`](OMP_MODELS.md) documents every role's purpose and trigger, the
 full profile comparison, switching caveats, the Tally credit economics, and the
-[personal-device handoff](OMP_MODELS.md#personal-device-handoff-2026-11-04).
+[personal-device routing](OMP_MODELS.md#personal-device-routing-2026-11-15).
 
 - `provider-diverse` keeps provider diversity for the workers: Sol 6.1 `xhigh` orchestrates the main conversation, DeepSeek v4.1 Flash runs `task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Gemini 3.8 Flash `vision`.
 - `baseline-reasoning` keeps the same Sol 6.1 `xhigh` main session and pushes worker work onto GPT 6 Luna (`xhigh` for `task`/`vision`), with Sol 6.1 for planning.
@@ -351,15 +352,17 @@ full profile comparison, switching caveats, the Tally credit economics, and the
 - GPT 5.6 Luna was dropped from the catalog, so it is gone from both the `task` and `smol` fallback chains. Managed config refresh preserves user-authored fallback chains, which is why such a stale entry can outlive its model.
 - General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; both tracked work configs and the live laptop config override `security-reviewer` to `@slow` via `task.agentModelOverrides` (the bento live config previously omitted that override). `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
-On `Ziyuns-M5-MBP`, the device override uses `google-antigravity/gemini-4-argon:high`
-as the default (falling back to `gemini-3.8-flash:high`), with `gemini-3.8-flash:low`
-handling `smol` and `memory` and `gemini-2.5-flash` handling `web`;
-`ollama/qwen3.5:4b-32k:off` handles `commit` and `tiny`;
-`ds4/qwen3.8-flash-next:medium` handles `task`; Sol 6.1 handles `slow`,
-`vision`, `designer`, and `advisor`; `anthropic/claude-opus-5-5:xhigh`
-handles `plan`. These are provider-specific selectors from the installed omp
-catalog, not the shared config's `openai-codex/*` selectors. Credentials stay local.
-`./install.sh Ziyuns-M5-MBP` links this override instead of the shared omp config.
+On personal devices, the shared omp config defaults to
+`openai-codex/gpt-6.1-sol:xhigh`; the `Ziyuns-M5-MBP` override uses that same
+default and assigns `openai-codex/gpt-6-luna` to `smol` and `memory`.
+`ollama/qwen3.5:4b-32k:off` handles `commit` and `tiny`, and
+`ds4/qwen3.8-flash-next:medium` handles `task`. Sol 6.1 handles `slow`,
+`vision`, `plan`, `designer`, and `advisor`. No personal omp role or retry
+fallback selects `google-antigravity/*`. Pi on each non-work device merges
+its `openai-codex/gpt-6.1-sol` default with the shared settings; it does not
+change work-device routing. These are built-in OpenAI selectors, not
+work-gateway selectors; credentials remain local. Run `./install.sh <device>`
+on each other personal device to apply its tracked Pi override.
 
 The personal device sets `title.generator: tiny` so automatic session titles use
 the local `tiny` role rather than a fork of the conversation model. Thinking is

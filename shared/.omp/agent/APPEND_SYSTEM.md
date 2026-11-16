@@ -9,10 +9,10 @@ baseline-model work — keep expensive lanes out of the execution path.
 - Default conversation work: use the configured `default` role. On the **bento**
   work device both presets default to Sol 6.1 at `xhigh`, so the main session
   orchestrates and delegates implementation to the baseline `task` workers. On
-  personal devices follow whatever `default` the active config sets — the
-  personal device override is Gemini-first, the shared config is
-  `openai-codex/*` — and never substitute work-gateway selectors
-  (`instacart-openai/*`, `open-weights/*`) there.
+  personal devices the default is `openai-codex/gpt-6.1-sol:xhigh`; the M5
+  MacBook retains local `task`, `tiny`, and `commit` roles. Never substitute
+  work-gateway selectors (`instacart-openai/*`, `open-weights/*`) on personal
+  devices.
 - Judgment-heavy but still baseline (long-horizon reasoning, tricky multi-step
   changes): GPT 6 Luna.
 - GPT 5.6 Luna: only where the active catalog still exposes it. It is absent

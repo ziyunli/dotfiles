@@ -12,8 +12,8 @@ startup:
   setupWizard: false
   checkUpdate: false
 
-# Personal subscription: ChatGPT models from the built-in catalog. Sol = planner /
-# research / review; Luna = baseline chat + execution lanes (mirrors the work split).
+# Personal subscription: ChatGPT models from the built-in OpenAI catalog.
+# Sol handles orchestration and judgment; Luna handles lighter execution.
 enabledModels:
   - openai-codex/gpt-6.1-sol
   - openai-codex/gpt-6-sol
@@ -23,11 +23,11 @@ enabledModels:
   - anthropic/claude-sonnet-5-5
 
 modelRoles:
-  default: openai-codex/gpt-6-luna:high
+  default: openai-codex/gpt-6.1-sol:xhigh
   smol: openai-codex/gpt-6-luna:medium
   slow: openai-codex/gpt-6.1-sol:max
   vision: openai-codex/gpt-6.1-sol:high
-  plan: anthropic/claude-opus-5-5:xhigh
+  plan: openai-codex/gpt-6.1-sol:high
   designer: openai-codex/gpt-6.1-sol:high
   commit: openai-codex/gpt-6-luna:low
   tiny: openai-codex/gpt-6-luna:low
