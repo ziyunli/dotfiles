@@ -17,7 +17,7 @@ composer:
 theme:
   dark: titanium
   light: light
-setupVersion: 2
+setupVersion: 3
 title:
   generator: tiny
 defaultThinkingLevel: high
@@ -62,3 +62,5 @@ retry:
       - web/hosted
 dev:
   autoqaConsent: granted
+update:
+  auto: false
