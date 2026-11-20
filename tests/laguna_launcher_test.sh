@@ -108,10 +108,14 @@ git init -q "$rewritten_origin_runtime"
 git -C "$rewritten_origin_runtime" remote add origin https://github.com/poolsideai/llama.cpp.git
 rewrite_config="$empty_home/rewrite.gitconfig"
 git config --file "$rewrite_config" url."git@github.com:".insteadOf https://github.com/
+tool_bin="$empty_home/tool-bin"
+mkdir -p "$tool_bin"
+ln -s "$(command -v bash)" "$tool_bin/bash"
+ln -s "$(command -v git)" "$tool_bin/git"
 set +e
 output="$(
     HOME="$empty_home" \
-    PATH="/usr/bin:/bin" \
+    PATH="$tool_bin" \
     GIT_CONFIG_GLOBAL="$rewrite_config" \
     LAGUNA_RUNTIME_DIR="$rewritten_origin_runtime" \
     LAGUNA_STATE_DIR="$empty_home/state" \

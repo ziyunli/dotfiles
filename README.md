@@ -494,7 +494,7 @@ not pins on future installations.
 | `migrate.sh <device>` | Migrate from bare repo pattern |
 | `run-tests.sh` | Run every `tests/*_test.{sh,py}`; fails on a non-zero exit or any stderr output |
 
-`install.sh`, `uninstall.sh`, and `migrate.sh` support `DRY_RUN=1` to preview changes.
+`install.sh`, `uninstall.sh`, and `migrate.sh` support `DRY_RUN=1` to preview changes. Laguna launcher checks isolate optional build-tool availability and do not download runtime or model files.
 
 ## MCP
 

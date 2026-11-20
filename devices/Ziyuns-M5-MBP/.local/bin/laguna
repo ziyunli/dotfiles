@@ -122,7 +122,7 @@ setup_runtime() {
 }
 
 download_model() {
-    local target file expected_size expected_sha256 record resolved actual_size actual_sha256
+    local target="$1" file expected_size expected_sha256 record resolved actual_size actual_sha256
     case "$target" in
         q4)
             file="$Q4_FILE"
