@@ -105,9 +105,9 @@ with_fake_hostname() {
     assert_file_contains "$temp_home/.config/opencode.personal.json" 'superpowers@git+https://github.com/obra/superpowers.git'
     assert_file_not_contains "$temp_home/.config/opencode.personal.json" '"model"'
 
-    jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.1-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/.pi/agent/settings.json" >/dev/null ||
+    jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.2-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/.pi/agent/settings.json" >/dev/null ||
         fail "personal Pi install must select Sol while preserving shared settings"
-    assert_file_contains "$temp_home/.omp/agent/config.yml" 'default: openai-codex/gpt-6.1-sol:xhigh'
+    assert_file_contains "$temp_home/.omp/agent/config.yml" 'default: openai-codex/gpt-6.2-sol:xhigh'
     assert_file_not_contains "$temp_home/.omp/agent/config.yml" 'google-antigravity/'
 
     output="$(
@@ -126,9 +126,9 @@ with_other_personal_devices() {
     for device in Ziyuns-Mac-mini Ziyuns-MBP popos; do
         mkdir -p "$temp_home/$device"
         HOME="$temp_home/$device" "$ROOT_DIR/install.sh" "$device" >/dev/null
-        jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.1-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/$device/.pi/agent/settings.json" >/dev/null ||
+        jq -e '.defaultProvider == "openai-codex" and .defaultModel == "gpt-6.2-sol" and .defaultThinkingLevel == "xhigh" and (.packages | index("npm:pi-subagents") != null)' "$temp_home/$device/.pi/agent/settings.json" >/dev/null ||
             fail "$device Pi install must select Sol while preserving shared settings"
-        assert_file_contains "$temp_home/$device/.omp/agent/config.yml" 'default: openai-codex/gpt-6.1-sol:xhigh'
+        assert_file_contains "$temp_home/$device/.omp/agent/config.yml" 'default: openai-codex/gpt-6.2-sol:xhigh'
     done
 }
 
@@ -254,6 +254,61 @@ with_local_pi_agents() {
     PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
     [[ -f "$temp_home/.pi/agent/AGENTS.md" && ! -L "$temp_home/.pi/agent/AGENTS.md" ]] ||
         fail "install.sh did not replace the obsolete ~/.pi/agent/AGENTS.md symlink with a local file"
+}
+
+with_local_codex_config() {
+    local temp_home temp_bin target
+
+    temp_home="$(mktemp -d)"
+    temp_bin="$(mktemp -d)"
+    trap 'rm -rf "$temp_home" "$temp_bin"' RETURN
+
+    printf '#!/usr/bin/env bash\nprintf "Ziyuns-M5-MBP\\n"\n' > "$temp_bin/hostname"
+    chmod +x "$temp_bin/hostname"
+    target="$temp_home/.codex/config.toml"
+
+    # Fresh install seeds a real config with only the requested defaults.
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -f "$target" && ! -L "$target" ]] ||
+        fail "install.sh did not seed a real local ~/.codex/config.toml"
+    [[ "$(cat "$target")" == $'model = "gpt-6.2-sol"\nmodel_reasoning_effort = "xhigh"' ]] ||
+        fail "seeded Codex config does not contain exactly the requested defaults"
+
+    # Existing local edits and additional settings survive reinstall byte-for-byte.
+    printf '\n[ mcp_servers.personal ]\ncommand = "local-tool"\n' >> "$target"
+    cp "$target" "$temp_home/config.expected"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    cmp -s "$temp_home/config.expected" "$target" ||
+        fail "install.sh changed existing local Codex config"
+
+    # Dry-run does not create the local config.
+    rm "$target"
+    HOME="$temp_home" DRY_RUN=1 "$ROOT_DIR/install.sh" Ziyuns-M5-MBP >/dev/null
+    [[ ! -e "$target" && ! -L "$target" ]] ||
+        fail "dry-run created ~/.codex/config.toml"
+
+    # Existing and dangling symlinks are never replaced or followed.
+    mkdir -p "$temp_home/elsewhere" "$temp_home/.codex"
+    printf 'outside target\n' > "$temp_home/elsewhere/config.toml"
+    ln -s "$temp_home/elsewhere/config.toml" "$target"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -L "$target" && "$(readlink "$target")" == "$temp_home/elsewhere/config.toml" ]] ||
+        fail "install.sh replaced existing Codex config symlink"
+    [[ "$(cat "$temp_home/elsewhere/config.toml")" == "outside target" ]] ||
+        fail "install.sh followed existing Codex config symlink"
+    rm "$target"
+    ln -s "$temp_home/missing/config.toml" "$target"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    [[ -L "$target" && "$(readlink "$target")" == "$temp_home/missing/config.toml" ]] ||
+        fail "install.sh replaced dangling Codex config symlink"
+
+    # Uninstall leaves the real local config in place.
+    rm "$target"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/install.sh" >/dev/null
+    cp "$target" "$temp_home/config.expected"
+    PATH="$temp_bin:$PATH" HOME="$temp_home" "$ROOT_DIR/uninstall.sh" Ziyuns-M5-MBP >/dev/null
+    cmp -s "$temp_home/config.expected" "$target" ||
+        fail "uninstall.sh removed or changed local Codex config"
 }
 
 with_work_opencode_overlay() {
@@ -530,6 +585,8 @@ with_other_personal_devices
 with_explicit_work_devices
 with_local_zshenv
 with_local_pi_agents
+with_local_codex_config
+
 with_work_opencode_overlay
 with_settings_backward_compat
 with_herdr_hook_guard

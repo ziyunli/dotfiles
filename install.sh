@@ -264,6 +264,10 @@ link_directory() {
             log "Skipped: $rel (listed in .dotfiles-skip)"
             continue
         fi
+        if [[ "$check_skip" == "true" && "$rel" == ".codex/config.toml" ]]; then
+            log "Deferred: $rel (will be seeded locally)"
+            continue
+        fi
         if is_merged "$rel"; then
             log "Deferred: $rel (will be merged)"
             continue
@@ -377,6 +381,34 @@ seed_local_pi_agents() {
     fi
 }
 
+# ~/.codex/config.toml is seeded locally once so Codex's machine-managed
+# settings remain local instead of being overwritten by the shared template.
+seed_local_codex_config() {
+    local rel=".codex/config.toml"
+    local dst="$HOME/$rel"
+
+    if is_skipped "$rel"; then
+        log "Skipped: $rel (listed in .dotfiles-skip)"
+        return
+    fi
+
+    if [[ -n "$DRY_RUN" ]]; then
+        if [[ -e "$dst" || -L "$dst" ]]; then
+            echo "Would leave ~/.codex/config.toml as-is (already exists)"
+        else
+            echo "Would seed local ~/.codex/config.toml"
+        fi
+        return
+    fi
+
+    if [[ ! -e "$dst" && ! -L "$dst" ]]; then
+        mkdir -p "$(dirname "$dst")"
+        cp "$DOTFILES_DIR/shared/$rel" "$dst"
+        log "Seeded local ~/.codex/config.toml"
+    fi
+}
+
+
 # ~/.zshrc must be a real, machine-local file rather than a symlink into this
 # repo. Instacart's setup script (and others) append their own blocks to
 # ~/.zshrc on every run; if it were a repo symlink, that churn -- and any
@@ -464,6 +496,9 @@ seed_local_zshenv
 # Ensure ~/.pi/agent/AGENTS.md is a machine-local file (see above) so pi-config
 # can never write through it into the repo.
 seed_local_pi_agents
+
+# Ensure ~/.codex/config.toml is a machine-local, fresh-install-only seed.
+seed_local_codex_config
 
 # Ensure ~/.zshrc is a machine-local shim sourcing ~/.zshrc.local (see above) so
 # tools appending to it never write through into the repo. No-op on devices that

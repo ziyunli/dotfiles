@@ -15,6 +15,7 @@ startup:
 # Personal subscription: ChatGPT models from the built-in OpenAI catalog.
 # Sol handles orchestration and judgment; Luna handles lighter execution.
 enabledModels:
+  - openai-codex/gpt-6.2-sol
   - openai-codex/gpt-6.1-sol
   - openai-codex/gpt-6-sol
   - openai-codex/gpt-6-luna
@@ -23,7 +24,7 @@ enabledModels:
   - anthropic/claude-sonnet-5-5
 
 modelRoles:
-  default: openai-codex/gpt-6.1-sol:xhigh
+  default: openai-codex/gpt-6.2-sol:xhigh
   smol: openai-codex/gpt-6-luna:medium
   slow: openai-codex/gpt-6.1-sol:max
   vision: openai-codex/gpt-6.1-sol:high

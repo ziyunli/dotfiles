@@ -381,17 +381,17 @@ has moved on:
 
 These model recommendations are **not** empirically benchmarked locally.
 
-## Personal-device routing (2026-11-15)
+## Personal-device routing (2026-11-19)
 
 All non-work devices use OpenAI Codex/ChatGPT OAuth for their main models; work
 gateway selectors and credentials are not part of the personal configuration.
 The shared [`shared/.omp/agent/config.yml`](shared/.omp/agent/config.yml)
-defaults to `openai-codex/gpt-6.1-sol:xhigh`, uses Luna for lightweight and
+defaults to `openai-codex/gpt-6.2-sol:xhigh`, uses Luna for lightweight and
 worker roles, and uses Sol for planning and review. Its model allowlist contains
 no Gemini selectors.
 
 On `Ziyuns-M5-MBP`, [`devices/Ziyuns-M5-MBP/.omp/agent/config.yml`](devices/Ziyuns-M5-MBP/.omp/agent/config.yml)
-overrides the shared omp file: Sol 6.1 runs the main session, Luna handles
+overrides the shared omp file: Sol 6.2 runs the main session, Luna handles
 `smol` and `memory`, local Ollama handles `tiny` and `commit`, and local ds4
 handles `task`. Sol handles `slow`, `vision`, `plan`, `designer`, and
 `advisor`. No role or retry fallback selects `google-antigravity/*`; `web` is
@@ -401,12 +401,14 @@ fallback chain is a search backend, not a Gemini chat model.
 Pi's [`shared/.pi/agent/settings.json`](shared/.pi/agent/settings.json) has no
 model allowlist or startup model. Each non-work device (`Ziyuns-M5-MBP`,
 `Ziyuns-Mac-mini`, `Ziyuns-MBP`, and `popos`) merges a small device setting
-that selects `openai-codex/gpt-6.1-sol` with the shared `xhigh` thinking level.
+that selects `openai-codex/gpt-6.2-sol` with the shared `xhigh` thinking level.
 This keeps local Pi models available and leaves the work-device settings
 unchanged. Installer merge precedence is shared < device < existing local:
-clear an older local default if it overrides the tracked device setting.
-`./install.sh <device>` activates the device setting; it has been applied on
-`Ziyuns-M5-MBP`, and the other devices need installation when next used.
+clear an older local default if it overrides the tracked device setting. Pi
+devices that do not yet list Sol 6.2 need to run `pi update --models` before
+using it. `./install.sh <device>` activates the device setting; it has been
+applied on `Ziyuns-M5-MBP`, and the other devices need installation when next
+used.
 
 Google AI Pro grants quota in Google's Antigravity products, but does not by
 itself grant Gemini API access in a third-party harness. The personal routing

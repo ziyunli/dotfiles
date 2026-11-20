@@ -92,6 +92,9 @@ cd ~/.dotfiles
 ./install.sh <device>     # Specify device explicitly
 ```
 
+`shared/.codex/config.toml` provides the Codex CLI defaults (`gpt-6.2-sol` with `xhigh` reasoning). `install.sh` copies it to `~/.codex/config.toml` only when that local path is absent; this is a fresh-install-only seed, not a symlink or ongoing sync. Existing Codex configuration and overrides remain local and untouched, and uninstall leaves the local file in place.
+
+
 ### Bootstrap a new Mac
 
 Install Homebrew first:
@@ -323,9 +326,9 @@ Both harnesses are tracked with a work/personal split:
 | ---- | ----- | ------- |
 | `shared/.pi/agent/settings.json` | shared | Pi base settings with no model allowlist; personal devices merge in their own OpenAI default |
 | `devices/<work-host>/.pi/agent/settings.json` | device | Work overlay: Tally gateway `enabledModels` allowlist (merged, arrays union) |
-| `devices/<personal-host>/.pi/agent/settings.json` | device | Personal Pi default: `openai-codex/gpt-6.1-sol` at the shared `xhigh` thinking level; merged with shared settings |
+| `devices/<personal-host>/.pi/agent/settings.json` | device | Personal Pi default: `openai-codex/gpt-6.2-sol` at the shared `xhigh` thinking level; merged with shared settings |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
-| `shared/.omp/agent/config.yml` | shared | Personal omp config: model roles on the `openai-codex/*` ChatGPT OAuth catalog (unchanged by the bento work routing pass) |
+| `shared/.omp/agent/config.yml` | shared | Personal omp defaults to `openai-codex/gpt-6.2-sol:xhigh`; model roles use the personal OpenAI catalog (work routing is separate) |
 | `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (`bento` and `insta-laptop` ship two named profiles, both defaulting to Sol 6.1 `xhigh` — see [OMP_MODELS.md](OMP_MODELS.md)) |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Sol-first omp roles with local `task`, `tiny`, and `commit` models; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
