@@ -27,6 +27,10 @@ printf '%s\n' \
     '  "brew services info ollama --json") print -r -- "$FRESHEN_TEST_OLLAMA_SERVICE" ;;' \
     '  "herdr integration status") print -r -- "$FRESHEN_TEST_HERDR_STATUS" ;;' \
     'esac' \
+    'if [[ "$call" == "brew upgrade" && "$HOMEBREW_NO_ASK" != 1 ]]; then' \
+    '  print -u2 -r -- "brew upgrade requires HOMEBREW_NO_ASK=1"' \
+    '  exit 42' \
+    'fi' \
     'if [[ "$call" == "$FRESHEN_TEST_FAIL" ]]; then' \
     '  print -u2 -r -- "update failed: $call"' \
     '  exit 1' \
@@ -44,7 +48,7 @@ run_freshen() {
     : > "$temp_root/calls"
     FRESHEN_TEST_CALLS="$temp_root/calls" FRESHEN_TEST_FAIL="${1:-}" \
         FRESHEN_TEST_OLLAMA_SERVICE="$ollama_service" FRESHEN_TEST_HERDR_STATUS="$herdr_status" \
-        PATH="$temp_root/bin" "$ZSH_BIN" -f -c 'source "$1"; freshen' \
+        HOMEBREW_NO_ASK='' PATH="$temp_root/bin" "$ZSH_BIN" -f -c 'source "$1"; freshen' \
         -- "$temp_root/freshen.zsh" > "$temp_root/stdout" 2> "$temp_root/stderr" ||
         fail "freshen exited unsuccessfully: $(<"$temp_root/stderr")"
     output="$(<"$temp_root/stdout")"

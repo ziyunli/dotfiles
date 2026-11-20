@@ -158,6 +158,14 @@ alias claudegood='claude --effort xhigh --dangerously-skip-permissions'
 alias claudemax='claude --effort max --dangerously-skip-permissions'
 alias claudeultra='claude --effort ultracode --dangerously-skip-permissions'
 
+# Opt-in YOLO aliases skip approvals where supported; Pi only sets xhigh thinking.
+alias codexgood='codex --dangerously-bypass-approvals-and-sandbox'
+alias ompgood='omp --approval-mode yolo'
+alias pigood='pi --thinking xhigh'
+alias agygood='agy --dangerously-skip-permissions'
+alias opencodegood='opencode --auto'
+alias ampgood='amp --dangerously-allow-all'
+
 # freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass,
 # then refresh what those upgrades leave stale: the ollama server and herdr's
 # per-agent hooks. Each updater runs independently: a missing tool or a failing
@@ -193,7 +201,7 @@ function freshen() {
   # exe.dev intentionally omitted: it's a VM host reached via `ssh exe.dev`, not a
   # locally-installed CLI, so there is nothing here to self-update.
   _freshen_run omz       omz       'omz update'
-  _freshen_run brew      brew      'brew update && brew upgrade && brew doctor'
+  _freshen_run brew      brew      'brew update && HOMEBREW_NO_ASK=1 brew upgrade && brew doctor'
 
   # brew upgrade replaces the ollama binary but leaves the old server running.
   # Restart whenever the service runs: the server can be stale from this pass or

@@ -148,6 +148,12 @@ cd ~/.dotfiles
 ./install.sh
 ```
 
+### Shell shortcuts for coding agents
+
+`freshen` updates the installed coding CLIs and runs Homebrew upgrades without asking for confirmation. Standalone `brew upgrade` keeps its usual behavior.
+
+`claudegood`, `codexgood`, `ompgood`, `agygood`, `opencodegood`, and `ampgood` opt into skipping tool approvals. `codexgood` also disables the Codex sandbox; `opencodegood` still honors explicit denials. `pigood` starts Pi at `xhigh` without changing project trust; Pi already runs ordinary tools without approval prompts.
+
 ### Install herdr agent integrations
 
 [Herdr](https://herdr.dev) tracks each agent pane's state through a per-agent hook script. Those scripts live in each agent's own config directory and are **not** tracked in this repo, so every machine needs its own copy — install one per agent CLI in use here:
