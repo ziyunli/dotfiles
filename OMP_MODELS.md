@@ -7,15 +7,17 @@ Scope:
 
 - This guide focuses on the work profiles; personal-device routing is documented
   in the section below.
-- Live config: `~/.omp/agent/config.yml` — currently a **regular file** on both
-  work devices, independently writable at runtime.
+- Live config: `~/.omp/agent/config.yml` — on **bento** this is a symlink to
+  the tracked [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml),
+  so tracked edits are live. The laptop's live deployment is managed on that
+  device (`./install.sh insta-laptop`); this repository asserts only its tracked
+  source, not what the laptop currently runs.
 - Repository sources: [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml)
   and [`devices/insta-laptop/.omp/agent/config.yml`](devices/insta-laptop/.omp/agent/config.yml).
 - This laptop's hostname is `Stephen-CFL6GJN2YR`; its installed dotfiles profile
   is `insta-laptop`. Use `./install.sh insta-laptop` when reinstalling its links.
-  Installation links the tracked config; runtime writes can make it a regular
-  file again. Both tracked work configs share the model policy; laptop UI,
-  expanded model catalog, and compaction settings are preserved separately.
+  Both tracked work configs share the model policy; laptop UI, expanded model
+  catalog, and compaction settings are preserved separately.
 - The gateway itself (providers, endpoints, headers, credentials) is
   Instacart-managed in `~/.omp/agent/models.yml` and is **not** tracked here.
   This document names model selectors only; it contains no endpoints or secrets.
@@ -30,38 +32,51 @@ stay as configured and are shared by both profiles.
 
 ### `provider-diverse` — **active**
 
-Both profiles put Sol 6.1 at `xhigh` on the main conversation (`default`); the
+Both profiles put Sol 6.2 at `xhigh` on the main conversation (`default`); the
 difference between them is how the specialist and worker lanes are staffed. This
 one reduces concentration on a single model family for those lanes: DeepSeek v4.1
-Flash runs `task` execution, GLM 5.3 Flash runs `smol`, and the remaining roles
-are spread across GPT (instacart-openai), Claude (instacart-anthropic), and
-Gemini (vertex-proxy). This is about spreading work across model families,
-**not** independent availability: every lane still shares the same Tally
-gateway, so a gateway-wide outage can still affect all of them. A Tally credit
-limit is different — it blocks premium models, while the baseline models
-(DeepSeek v4.1 Flash, GLM 5.3 Flash, GPT 6 Luna) remain usable and accrue usage
-beyond the limit. Keeps Opus on planning and Gemini on vision.
+Flash runs `task` execution, GLM 5.3 Flash runs `smol`, Gemini 4 Carbon runs the
+`slow` and `designer` specialist lanes, Gemini 4 Hydrogen runs `vision`, and the
+remaining roles sit on GPT (instacart-openai) and Claude (instacart-anthropic).
+This is about spreading work across model families, **not** independent
+availability: every lane still shares the same Tally gateway, so a
+gateway-wide outage can still affect all of them. A Tally credit limit is
+different — it blocks premium models, while the baseline models (DeepSeek v4.1
+Flash, GLM 5.3 Flash, GPT 6 Luna) remain usable and accrue usage beyond the
+limit. Opus stays on planning.
+
+Why those Gemini lanes: in this Tally catalog both Gemini 4 entries accept text
+and image input, expose a 1M-token context window, and advertise reasoning
+effort at `low`/`medium`/`high` only (no `xhigh`). Carbon is the current
+`slow`/`designer` specialist; Hydrogen, whose catalog default effort is `high`,
+is the `vision` analyst. Those are catalog capability statements, not native
+Gemini marketing claims, and no local benchmark is implied. The `vision` role
+still checks image-input support at request time; assigning Hydrogen there does
+not by itself make some other model image-capable.
 
 ### `baseline-reasoning` — available, not active
 
-Same Sol 6.1 `xhigh` main conversation, with the worker lanes pushed onto GPT 6
+Same Sol 6.2 `xhigh` main conversation, with the worker lanes pushed onto GPT 6
 Luna (`xhigh` where the work is substantive) and Sol 6.1 for planning. Kept for
 switching when you want the baseline-first reasoning allocation instead of
-provider diversity.
+provider diversity. Apart from the user-approved Sol 6.2 default upgrade, this
+preset's assignments are unchanged by the Gemini 4 specialist switch:
+`slow`/`designer` remain Sol 6.1, `vision` remains Luna, and the shared fallback
+chains (including the new `slow`/`designer`/`vision` hops) still apply to it.
 
 ### Role comparison
 
 | Role | Kind | `provider-diverse` (active) | `baseline-reasoning` |
 | ---- | ---- | --------------------------- | -------------------- |
-| `default` | chat | `instacart-openai/gpt-6.1-sol:xhigh` | `instacart-openai/gpt-6.1-sol:xhigh` |
+| `default` | chat | `instacart-openai/gpt-6.2-sol:xhigh` | `instacart-openai/gpt-6.2-sol:xhigh` |
 | `task` | chat | `open-weights/deepseek-v4p1-flash-priority:high` | `instacart-openai/gpt-6-luna:xhigh` |
 | `smol` | chat | `open-weights/glm-5.3-flash-priority:high` | `open-weights/glm-5.3-flash-priority:high` |
 | `tiny` | chat/tiny | `instacart-openai/gpt-6-luna:low` | `open-weights/glm-5.3-flash-priority:low` |
 | `commit` | chat | `instacart-openai/gpt-6-luna:low` | `instacart-openai/gpt-6-luna:low` |
-| `slow` | chat | `instacart-openai/gpt-6.1-sol:high` | `instacart-openai/gpt-6.1-sol:high` |
+| `slow` | chat | `vertex-proxy/gemini-4-carbon:high` | `instacart-openai/gpt-6.1-sol:high` |
 | `plan` | chat | `instacart-anthropic/claude-opus-5-5@default:high` | `instacart-openai/gpt-6.1-sol:high` |
-| `designer` | chat (custom alias) | `instacart-openai/gpt-6.1-sol:high` | `instacart-openai/gpt-6.1-sol:high` |
-| `vision` | chat | `vertex-proxy/gemini-3.8-flash:medium` | `instacart-openai/gpt-6-luna:xhigh` |
+| `designer` | chat (custom alias) | `vertex-proxy/gemini-4-carbon:high` | `instacart-openai/gpt-6.1-sol:high` |
+| `vision` | chat | `vertex-proxy/gemini-4-hydrogen:high` | `instacart-openai/gpt-6-luna:xhigh` |
 | `advisor` | chat | `instacart-openai/gpt-6.1-sol:high` | `instacart-openai/gpt-6.1-sol:medium` |
 
 `judge` has **no** row: the work catalog no longer carries the Decisions
@@ -81,7 +96,7 @@ Reading a selector:
 - `@default` on `instacart-anthropic/claude-opus-5-5@default` is an **upstream
   routing suffix** (select the provider's default variant), not a role alias and
   not a thinking level.
-- `default` at `xhigh` means a fresh session starts on Sol 6.1 at that effort;
+- `default` at `xhigh` means a fresh session starts on Sol 6.2 at that effort;
   `defaultThinkingLevel: high` remains the global fallback thinking level for
   selections that carry no suffix.
 
@@ -148,16 +163,16 @@ consulted when the corresponding *workload* is invoked.
 
 | Role | Purpose | Concrete session trigger |
 | ---- | ------- | ------------------------ |
-| `default` | The main conversation model — on both profiles Sol 6.1 at `xhigh`, orchestrating work and delegating implementation to baseline workers. | Initial model selection for a new session when nothing explicit or restored is set, and an explicit `/model` or `/modelpreset switch` selection. Once chosen, ordinary turns run on the **active** model — they do not re-resolve `default` each turn. Changing `default` in `/models` also switches the active model. |
+| `default` | The main conversation model — on both profiles Sol 6.2 at `xhigh`, orchestrating work and delegating implementation to baseline workers. | Initial model selection for a new session when nothing explicit or restored is set, and an explicit `/model` or `/modelpreset switch` selection. Once chosen, ordinary turns run on the **active** model — they do not re-resolve `default` each turn. Changing `default` in `/models` also switches the active model. |
 | `task` | General-purpose subagent workers (implementation, refactors, research with edits). | A `task` tool call whose agent resolves through the task role — i.e. the bundled generic `task` agent, or any agent whose frontmatter/`task.agentModelOverrides` resolves to `@task`. Not used by the main conversation. |
 | `smol` | Cheap/fast lane. | Bundled `scout` and `sonic` agents; the prewalk hand-off target (when prewalk is armed); anything resolving `@smol`. |
 | `tiny` | Lightweight background chat/tiny work. | The one-line labels for task/agent rows (the fire-and-forget UI label), and the **fallback** for session titles (see the title note below). |
 | `commit` | Commit-message generation. | The `omp commit` CLI workflow, which generates a commit message and updates changelogs. **Not** every `git commit` you type and not agent-authored messages. |
-| `slow` | Thorough analysis / review. | Bundled `reviewer` agent (see the security-reviewer note below); anything resolving `@slow`. Also the fallback source for an unset `advisor`. |
-| `plan` | Architectural planning. | Plan mode. See “Entering plan mode” below. Assigning `plan` does **not** itself enter plan mode, and calling `todo` does **not** select the plan model. While plan mode is active, changing the `plan` role reapplies its model. |
-| `designer` | UI/design-focused lane. | A **custom alias** with no built-in automatic trigger. Invoke it explicitly, e.g. `omp --model @designer` or by assigning it to an agent/workload. |
-| `vision` | Image **analysis** (chat model with image input). | A `read` of an image with a question, e.g. `read screenshot.png?q=what is wrong here`. |
-| `advisor` | Reviewer that inspects primary turns and injects advice. | Only when the advisor runtime is enabled: `advisor.enabled: true`, `/advisor on`, or `--advisor`. It is **disabled initially** on this device. A `WATCHDOG.yml` roster can override the advisor model per advisor. |
+| `slow` | Thorough analysis / review; on the active preset, Gemini 4 Carbon at `high` (Sol 6.1 is its availability fallback). | Bundled `reviewer` agent and the overridden `security-reviewer` agent (see the security-reviewer note below); anything resolving `@slow`. Also the fallback source for an unset `advisor`. |
+| `plan` | Architectural planning; Opus 5.5 on the active preset and Sol 6.1 on `baseline-reasoning`. | Plan mode. See “Entering plan mode” below. Assigning `plan` does **not** itself enter plan mode, and calling `todo` does **not** select the plan model. While plan mode is active, changing the `plan` role reapplies its model. |
+| `designer` | UI/design-focused lane; Gemini 4 Carbon at `high` on the active preset. | A **custom alias** with no built-in automatic trigger. Invoke it explicitly, e.g. `omp --model @designer` or by assigning it to an agent/workload. |
+| `vision` | Image **analysis** (chat model with image input); Gemini 4 Hydrogen at `high` on the active preset. | A `read` of an image with a question, e.g. `read screenshot.png?q=what is wrong here`. |
+| `advisor` | Reviewer that inspects primary turns and injects advice; Sol 6.1 on both presets. | Only when the advisor runtime is enabled: `advisor.enabled: true`, `/advisor on`, or `--advisor`. It is **disabled on both tracked work configs** (`advisor.enabled: false`). A `WATCHDOG.yml` roster can override the advisor model per advisor. |
 
 ### Judge note
 
@@ -251,13 +266,13 @@ Installed bundled agents on this device (verified with `omp agents unpack`):
 | `security-reviewer` | **no model or thinking field** | (unset) |
 
 `security-reviewer` has no frontmatter model, so without an override it would
-inherit the parent's active model. The **tracked** config sets
-`task.agentModelOverrides["security-reviewer"]: "@slow"` so both `reviewer` and
-`security-reviewer` resolve `@slow`. Treat that as a property of
-[`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml), not
-of the live file: the live regular config currently omits the override, so there
-`security-reviewer` inherits the parent's active model until the tracked setting
-is relinked or copied in.
+inherit the parent's active model. **Both tracked work configs** set
+`task.agentModelOverrides["security-reviewer"]: "@slow"`, so both `reviewer` and
+`security-reviewer` resolve `@slow`. On **bento** the live config is a symlink to
+the tracked file, so the running config carries that override; on the active
+preset both agents therefore run on Gemini 4 Carbon (falling back to Sol 6.1 on
+request failure). The laptop's live deployment is managed on that device and is
+not asserted here.
 
 ### Effort is a role default, not a guaranteed worker effort
 
@@ -278,8 +293,7 @@ defaults. A subagent can end up at a different effort:
 
 Request-failure fallback lives in `retry.fallbackChains`, configured separately
 from `modelRoles` and **shared by both profiles** (presets do not swap them).
-The table is the tracked source; see “Live config, tracked source, and managed
-refresh” for known live-file differences.
+The table is the tracked source for both work devices.
 
 | Role | Shared fallback chain |
 | ---- | --------------------- |
@@ -287,16 +301,26 @@ refresh” for known live-file differences.
 | `smol` | `instacart-openai/gpt-6-luna:high` |
 | `commit` | `open-weights/glm-5.3-flash-priority:low` |
 | `tiny` | `open-weights/glm-5.3-flash-priority:low` |
+| `slow` | `instacart-openai/gpt-6.1-sol:high` |
+| `designer` | `instacart-openai/gpt-6.1-sol:high` |
+| `vision` | `vertex-proxy/gemini-3.8-flash:medium` |
 | `judge` | `[]` (no fallbacks) |
 
 These chains exist to survive a provider error or an unavailable model. They are
 **not** a cognitive-escalation ladder: walking a fallback does not mean the work
 got smarter, only that the primary could not serve the request. Notes:
 
-- The chains keep their configured `:high` / `:low` entries whichever profile is
-  active. On the `baseline-reasoning` profile the `task` **primary** is
-  `gpt-6-luna:xhigh`, but its recovery entries remain the shared `:high` ones —
-  do not read the chain as preserving `xhigh`.
+- `slow` and `designer` recover onto Sol 6.1 `high`, which was their primary
+  before the Gemini 4 Carbon assignment. `vision` recovers onto Gemini 3.8
+  Flash `medium`, the previous `provider-diverse` `vision` primary. These are
+  recovery hops, not an upgrade on failure.
+- The chains keep their configured `:high` / `:medium` / `:low` entries
+  whichever profile is active. On the `baseline-reasoning` profile the `task`
+  **primary** is `gpt-6-luna:xhigh`, but its recovery entries remain the shared
+  `:high` ones — do not read the chain as preserving `xhigh`. Likewise,
+  `baseline-reasoning` already uses Sol 6.1 for `slow`/`designer` and Luna
+  `xhigh` for `vision`; their newly shared recovery chains still apply
+  unchanged.
 - The former `instacart-openai/gpt-5.6-luna:high` entries were **removed** from
   both the `task` and `smol` chains: managed catalog refresh dropped GPT 5.6
   Luna from the work catalog, so those recovery hops could never serve a
@@ -315,41 +339,45 @@ got smarter, only that the primary could not serve the request. Notes:
 ## Live config, tracked source, and managed refresh
 
 - [`devices/bento/.omp/agent/config.yml`](devices/bento/.omp/agent/config.yml)
-  is the tracked source. `~/.omp/agent/config.yml` is the **live regular file**
-  (not a symlink), so editing tracked source alone does **not** change what the
-  live session reads. To apply tracked settings — including the differences
-  listed below — rerun `./install.sh bento` on that device: it moves the existing
-  live file into `~/.dotfiles-backup-<timestamp>/` and replaces it with a symlink
-  to the tracked source. That relink is a deliberate local action; nothing in
-  this repository does it automatically.
+  is the tracked source, and on **bento** `~/.omp/agent/config.yml` is a
+  **symlink** to it. Editing the tracked file is therefore a live edit: the
+  running session reloads it. If that path is ever a local regular file again
+  (for example after a tool rewrote it in place), rerun `./install.sh bento`:
+  when a regular file is present, install moves it into
+  `~/.dotfiles-backup-<timestamp>/` and replaces it with a symlink to the
+  tracked source. That relink is a deliberate local action; nothing in this
+  repository does it automatically.
 - Instacart-managed configuration refresh owns the provider catalog and can
-  rewrite `~/.omp/agent/models.yml` plus the `enabledModels` list. It **preserves
-  user-authored role assignments and `retry.fallbackChains`** — which is why a
-  retired selector such as `gpt-5.6-luna` survived in the fallback chains even
-  after the catalog dropped it. Do not read an old fallback entry as proof the
-  model exists.
-- The new `default` (`instacart-openai/gpt-6.1-sol:xhigh`) applies to **fresh,
+  rewrite `~/.omp/agent/models.yml` plus the `enabledModels` list. The tracked
+  work configs' allowlist includes the Gemini 4 Carbon and Hydrogen selectors
+  used by the active preset. Refresh **preserves user-authored role assignments
+  and `retry.fallbackChains`** — which is why a retired selector such as
+  `gpt-5.6-luna` survived in the fallback chains even after the catalog dropped
+  it. Do not read an old fallback entry as proof the model exists.
+- The new `default` (`instacart-openai/gpt-6.2-sol:xhigh`) applies to **fresh,
   non-restored sessions** and to explicit `/modelpreset switch`. Live reload
   applies role changes to later subagent launches but does **not** force the
   current conversation onto the new model; a healthy open session keeps its
   active model until you switch it deliberately.
-- Known intentional differences right now: the tracked source contains
-  `task.agentModelOverrides.security-reviewer: "@slow"` and a `tiny` fallback
-  (`open-weights/glm-5.3-flash-priority:low`) that the live regular file
-  currently omits. Role and fallback tables in this guide describe the **tracked**
-  config; the live file is authoritative at runtime until it is relinked or
-  updated to match.
+- On bento there is no tracked-vs-live gap: the symlink means the live config
+  includes `task.agentModelOverrides.security-reviewer: "@slow"`, the `tiny`
+  fallback (`open-weights/glm-5.3-flash-priority:low`), and `advisor.enabled:
+  false`. Role and fallback tables in this guide describe that tracked config.
+  The laptop's live deployment is not asserted here.
 - To check what the gateway actually exposes, run
   `omp models --kind all --json` rather than trusting a config selector. If a
   selector is absent there, treat it as unavailable and remove it instead of
   adding a replacement route by hand.
 
-The user-approved requirement is the split this pass implements: Sol 6.1
-`xhigh` as the main-session orchestrator with cheaper models doing execution.
-Only the retained specialist and worker allocations above — and the profile
-names — are existing/editorial choices rather than new user requirements. The
-dated Tally economics below is the other user-provided material; the rest
-describes what the tracked config now says.
+The user-approved requirements this pass implements are: Sol 6.2 `xhigh` as the
+main-session orchestrator in both presets with cheaper models doing execution,
+Gemini 4 Carbon on `slow`/`designer`, Gemini 4 Hydrogen `high` on `vision`, and
+the advisor runtime disabled. The rest of the specialist and worker allocations,
+the other `baseline-reasoning` assignments (retained unchanged apart from that
+user-approved default upgrade), and the profile names are retained/editorial
+choices rather than new user requirements. The dated Tally economics below is
+the other user-provided material; the rest describes what the tracked config now
+says.
 
 ## Tally credit economics (user-provided guidance, 2026-09-30)
 
@@ -366,8 +394,8 @@ has moved on:
   Read them in the Tally console under **My usage → Models used**. No OMP
   dollar-cost estimate is a Tally credit price.
 - Preference for substantive/difficult work: GPT 6 Luna at `xhigh` — historical
-  user guidance from before Sol 6.1 became the profile default. The current
-  `default` instead spends Sol 6.1 `xhigh` on orchestration and keeps execution
+  user guidance from before Sol became the profile default. The current
+  `default` instead spends Sol 6.2 `xhigh` on orchestration and keeps execution
   on baseline workers.
 - DeepSeek and GLM expose `high`/`max` (not `xhigh`) — use their supported levels.
 - Sol 6.1: Medium/High/`xhigh` for ambiguity and plans; try Sol at `low` for

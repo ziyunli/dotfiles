@@ -335,7 +335,7 @@ Both harnesses are tracked with a work/personal split:
 | `devices/<personal-host>/.pi/agent/settings.json` | device | Personal Pi default: `openai-codex/gpt-6.2-sol` at the shared `xhigh` thinking level; merged with shared settings |
 | `shared/.pi/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every Pi session (both work and personal) |
 | `shared/.omp/agent/config.yml` | shared | Personal omp defaults to `openai-codex/gpt-6.2-sol:xhigh`; model roles use the personal OpenAI catalog (work routing is separate) |
-| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (`bento` and `insta-laptop` ship two named profiles, both defaulting to Sol 6.1 `xhigh` — see [OMP_MODELS.md](OMP_MODELS.md)) |
+| `devices/<work-host>/.omp/agent/config.yml` | device | Work omp config: model roles on the internal Tally gateway (`bento` and `insta-laptop` ship two named profiles, both defaulting to Sol 6.2 `xhigh` — see [OMP_MODELS.md](OMP_MODELS.md)) |
 | `devices/Ziyuns-M5-MBP/.omp/agent/config.yml` | device | Personal Sol-first omp roles with local `task`, `tiny`, and `commit` models; preserves the local theme and web-search order |
 | `devices/Ziyuns-M5-MBP/.omp/agent/models.yml` | device | Credential-free local ds4 provider catalog; linked to `~/.omp/agent/models.yml` |
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
@@ -346,20 +346,22 @@ When a device's Pi overlay declares both `defaultProvider` and `defaultModel`, `
 The **bento** and **insta-laptop** work-device omp configs ship two named model
 presets — `provider-diverse` (active) and `baseline-reasoning` (available) —
 switchable with `/modelpreset switch`. Both default the main conversation to
-`instacart-openai/gpt-6.1-sol:xhigh` with `defaultThinkingLevel: high`; the
+`instacart-openai/gpt-6.2-sol:xhigh` with `defaultThinkingLevel: high`; the
 presets differ only in how the specialist/worker lanes are staffed. The laptop
 keeps its own UI, expanded catalog, and compaction settings. Its hostname is
 `Stephen-CFL6GJN2YR`, but its installed profile is `insta-laptop`; reinstall with
 `./install.sh insta-laptop`. Personal-device routing is described below.
 [`OMP_MODELS.md`](OMP_MODELS.md) documents every role's purpose and trigger, the
 full profile comparison, switching caveats, the Tally credit economics, and the
-[personal-device routing](OMP_MODELS.md#personal-device-routing-2026-11-15).
+[personal-device routing](OMP_MODELS.md#personal-device-routing-2026-11-19).
 
-- `provider-diverse` keeps provider diversity for the workers: Sol 6.1 `xhigh` orchestrates the main conversation, DeepSeek v4.1 Flash runs `task`, GLM 5.3 Flash `smol`, Opus 5.5 planning, Gemini 3.8 Flash `vision`.
-- `baseline-reasoning` keeps the same Sol 6.1 `xhigh` main session and pushes worker work onto GPT 6 Luna (`xhigh` for `task`/`vision`), with Sol 6.1 for planning.
+- `provider-diverse` keeps provider diversity for the workers: Sol 6.2 `xhigh` orchestrates the main conversation, DeepSeek v4.1 Flash runs `task`, GLM 5.3 Flash `smol`, Gemini 4 Carbon `slow`/`designer`, Gemini 4 Hydrogen at `high` runs `vision`, and Opus 5.5 runs `plan`.
+- `baseline-reasoning` keeps the same Sol 6.2 `xhigh` main session, with its other assignments unchanged: worker work on GPT 6 Luna (`xhigh` for `task`/`vision`), and Sol 6.1 for planning and `slow`/`designer`.
+- Specialist fallbacks are shared by both presets: `slow`/`designer` fail over to `instacart-openai/gpt-6.1-sol:high`, and `vision` fails over to `vertex-proxy/gemini-3.8-flash:medium`. They are availability recovery, not escalation, and presets never swap them.
+- The advisor runtime stays off (`advisor.enabled: false`) even though the `advisor` role is assigned to Sol 6.1.
 - `judge` is unassigned: the work catalog no longer carries the old Decisions provider, and `retry.fallbackChains.judge` stays `[]`.
 - GPT 5.6 Luna was dropped from the catalog, so it is gone from both the `task` and `smol` fallback chains. Managed config refresh preserves user-authored fallback chains, which is why such a stale entry can outlive its model.
-- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; both tracked work configs and the live laptop config override `security-reviewer` to `@slow` via `task.agentModelOverrides` (the bento live config previously omitted that override). `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
+- General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow` (Gemini 4 Carbon on the active preset); both tracked work configs override `security-reviewer` to `@slow` via `task.agentModelOverrides`. On bento the live config is a symlink to its tracked file, so that override and the `tiny` fallback are active there; the laptop's live deployment is managed on that device. `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
 On personal devices, the shared omp config defaults to
 `openai-codex/gpt-6.2-sol:xhigh`; the `Ziyuns-M5-MBP` override uses that same

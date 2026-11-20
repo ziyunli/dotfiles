@@ -1,14 +1,14 @@
 # Model routing and delegation
 
-Frontier models (Sol 6.1, Sol 6.2, Opus 5.5) are for judgment: planning,
-research, review, architectural decisions, and advising. Once a plan exists,
-implementation is baseline-model work — keep expensive lanes out of the
+Frontier models (Sol 6.1, Sol 6.2, Opus 5.5, Gemini 4 Carbon) are for judgment:
+planning, research, review, architectural decisions, and advising. Once a plan
+exists, implementation is baseline-model work — keep expensive lanes out of the
 execution path.
 
 ## Choosing a model
 
 - Default conversation work: use the configured `default` role. On the **bento**
-  work device both presets default to Sol 6.1 at `xhigh`, so the main session
+  work device both presets default to Sol 6.2 at `xhigh`, so the main session
   orchestrates and delegates implementation to the baseline `task` workers. On
   personal devices the default is `openai-codex/gpt-6.2-sol:xhigh`; the M5
   MacBook retains local `task`, `tiny`, and `commit` roles. Never substitute

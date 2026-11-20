@@ -6,7 +6,10 @@
 # Model policy (provider-diverse baseline roles). Every role's purpose and real
 # session trigger, plus the baseline-reasoning alternative preset, are documented
 # in OMP_MODELS.md at the repository root:
-#   - Sol 6.1: main-session orchestrator, plus slow/designer/advisor lanes
+#   - Sol 6.2: main-session orchestrator (conversation default)
+#   - Sol 6.1: advisor lane and request-failure fallback for slow/designer
+#   - Gemini 4 Carbon: slow/designer lanes
+#   - Gemini 4 Hydrogen: vision lane
 #   - DeepSeek v4.1 Flash: task-subagent execution lane
 #   - GLM 5.3 Flash: cheap/quick lane and first availability fallback
 #   - GPT 6 Luna: narrow low-effort lanes (titles, commit) plus task recovery
@@ -25,6 +28,7 @@ startup:
 
 enabledModels:
   - instacart-openai/gpt-6.1-sol
+  - instacart-openai/gpt-6.2-sol
   - instacart-openai/gpt-6-luna
   - open-weights/glm-5.3-priority
   - open-weights/glm-5.3-flash-priority
@@ -34,6 +38,8 @@ enabledModels:
   - open-weights/qwen-latest-priority
   - vertex-proxy/gemini-3.7-flash
   - vertex-proxy/gemini-3.8-flash
+  - vertex-proxy/gemini-4-carbon
+  - vertex-proxy/gemini-4-hydrogen
   - instacart-anthropic/claude-opus-5-5@default
   - instacart-anthropic/claude-sonnet-5-5@default
   - instacart-anthropic/claude-haiku-4-5@20251001
@@ -41,15 +47,15 @@ enabledModels:
 # Active roles equal the provider-diverse preset below: one primary selector per
 # role, with request-failure recovery owned by retry.fallbackChains.
 modelRoles:
-  default: instacart-openai/gpt-6.1-sol:xhigh
+  default: instacart-openai/gpt-6.2-sol:xhigh
   task: open-weights/deepseek-v4p1-flash-priority:high
   smol: open-weights/glm-5.3-flash-priority:high
   tiny: instacart-openai/gpt-6-luna:low
   commit: instacart-openai/gpt-6-luna:low
-  slow: instacart-openai/gpt-6.1-sol:high
+  slow: vertex-proxy/gemini-4-carbon:high
   plan: instacart-anthropic/claude-opus-5-5@default:high
-  designer: instacart-openai/gpt-6.1-sol:high
-  vision: vertex-proxy/gemini-3.8-flash:medium
+  designer: vertex-proxy/gemini-4-carbon:high
+  vision: vertex-proxy/gemini-4-hydrogen:high
   advisor: instacart-openai/gpt-6.1-sol:high
 
 # Named snapshots for /modelpreset switch. A preset captures modelRoles and
@@ -58,20 +64,20 @@ modelRoles:
 modelPresets:
   provider-diverse:
     modelRoles:
-      default: instacart-openai/gpt-6.1-sol:xhigh
+      default: instacart-openai/gpt-6.2-sol:xhigh
       task: open-weights/deepseek-v4p1-flash-priority:high
       smol: open-weights/glm-5.3-flash-priority:high
       tiny: instacart-openai/gpt-6-luna:low
       commit: instacart-openai/gpt-6-luna:low
-      slow: instacart-openai/gpt-6.1-sol:high
+      slow: vertex-proxy/gemini-4-carbon:high
       plan: instacart-anthropic/claude-opus-5-5@default:high
-      designer: instacart-openai/gpt-6.1-sol:high
-      vision: vertex-proxy/gemini-3.8-flash:medium
+      designer: vertex-proxy/gemini-4-carbon:high
+      vision: vertex-proxy/gemini-4-hydrogen:high
       advisor: instacart-openai/gpt-6.1-sol:high
     defaultThinkingLevel: high
   baseline-reasoning:
     modelRoles:
-      default: instacart-openai/gpt-6.1-sol:xhigh
+      default: instacart-openai/gpt-6.2-sol:xhigh
       task: instacart-openai/gpt-6-luna:xhigh
       smol: open-weights/glm-5.3-flash-priority:high
       tiny: open-weights/glm-5.3-flash-priority:low
@@ -99,6 +105,12 @@ retry:
     tiny:
       - open-weights/glm-5.3-flash-priority:low
     judge: []
+    slow:
+      - instacart-openai/gpt-6.1-sol:high
+    designer:
+      - instacart-openai/gpt-6.1-sol:high
+    vision:
+      - vertex-proxy/gemini-3.8-flash:medium
 
 # Advisor runtime stays off; enable it per session with /advisor on or --advisor.
 advisor:
