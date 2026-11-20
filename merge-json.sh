@@ -8,11 +8,12 @@
 #   - Scalars: overlay value wins (conflicts reported to stderr)
 #
 # Usage:
-#   ./merge-json.sh <base> <overlay>
+#   ./merge-json.sh <base> <overlay> [ignore-overlay-key ...]
 #
 # Arguments:
 #   base      Path to the base JSON file (e.g., shared dotfiles settings)
 #   overlay   Path to the overlay JSON file (e.g., existing local settings)
+#   ignore-overlay-key  Top-level overlay key to omit (repeatable)
 #
 # Output:
 #   stdout    Merged JSON
@@ -26,12 +27,13 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <base> <overlay>" >&2
+    echo "Usage: $0 <base> <overlay> [ignore-overlay-key ...]" >&2
     exit 1
 fi
 
 BASE="$1"
 OVERLAY="$2"
+shift 2
 
 if [[ ! -f "$BASE" ]]; then
     echo "Error: base file not found: $BASE" >&2
@@ -79,9 +81,10 @@ def deepmerge(base; overlay; path):
     overlay
   end;
 
-. as $overlay | null | deepmerge($base[0]; $overlay; "")
+delpaths($ARGS.positional | map([.])) as $overlay |
+null | deepmerge($base[0]; $overlay; "")
 
-' "$OVERLAY" 2> >(
+' "$OVERLAY" --args "$@" 2> >(
     # Transform jq debug output into readable conflict lines
     while IFS= read -r line; do
         # jq debug outputs: ["DEBUG:","message"]

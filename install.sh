@@ -176,6 +176,7 @@ remove_obsolete_shared_links() {
 
 merge_file() {
     local src="$1" dst="$2"
+    shift 2
     local dst_dir
     dst_dir="$(dirname "$dst")"
 
@@ -196,7 +197,7 @@ merge_file() {
     fi
 
     if [[ -f "$dst" ]]; then
-        "$DOTFILES_DIR/merge-json.sh" "$src" "$dst" > "$dst.merged.tmp"
+        "$DOTFILES_DIR/merge-json.sh" "$src" "$dst" "$@" > "$dst.merged.tmp"
         mv "$dst.merged.tmp" "$dst"
         log "Merged: $src + $dst -> $dst"
     else
@@ -207,10 +208,8 @@ merge_file() {
 
 # merge_path composes a single .dotfiles-merge entry from up to three layers --
 # shared/<rel> (base), devices/<DEVICE>/<rel> (optional device overlay), and the
-# existing local file at $HOME/<rel> (optional) -- with later layers winning
-# (local > device > shared). With no device overlay this is exactly the original
-# shared -> local merge, so paths merged only against shared (e.g.
-# .claude/settings.json) are unaffected.
+# existing local file at $HOME/<rel> (optional). Local values normally win.
+# A Pi device overlay that declares both provider and model owns that pair.
 merge_path() {
     local rel="$1"
     local shared_src="$DOTFILES_DIR/shared/$rel"
@@ -237,7 +236,12 @@ merge_path() {
     local base_tmp="$HOME/$rel.base.tmp"
     mkdir -p "$(dirname "$base_tmp")"
     "$DOTFILES_DIR/merge-json.sh" "$shared_src" "$device_src" > "$base_tmp"
-    merge_file "$base_tmp" "$HOME/$rel"
+    if [[ "$rel" == .pi/agent/settings.json ]] &&
+        jq -e 'has("defaultProvider") and has("defaultModel")' "$device_src" >/dev/null; then
+        merge_file "$base_tmp" "$HOME/$rel" defaultProvider defaultModel
+    else
+        merge_file "$base_tmp" "$HOME/$rel"
+    fi
     rm -f "$base_tmp"
 }
 
@@ -509,7 +513,7 @@ seed_local_zshrc
 log "Linking device-specific configuration for '$DEVICE'..."
 link_directory "$DOTFILES_DIR/devices/$DEVICE"
 
-# Merge files listed in .dotfiles-merge (shared -> device -> local; later wins)
+# Merge files listed in .dotfiles-merge.
 if [[ -n "$MERGE_FILES" ]]; then
     log "Merging configuration files..."
     while IFS= read -r rel; do

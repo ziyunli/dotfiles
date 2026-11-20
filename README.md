@@ -313,7 +313,7 @@ Lists paths that should be **deep-merged** instead of symlinked. One path per li
 .pi/agent/settings.json
 ```
 
-For each listed path, `install.sh` composes up to three layers, with later layers winning:
+For each listed path, `install.sh` composes up to three layers, normally with later layers winning:
 
 ```
 shared/<path>  ->  devices/<hostname>/<path>  ->  existing ~/<path>
@@ -341,7 +341,7 @@ Both harnesses are tracked with a work/personal split:
 | `shared/.omp/agent/APPEND_SYSTEM.md` | shared | Personal prompt appended to every omp session (task subagents don't inherit it) |
 | `devices/Ziyuns-M5-MBP/.config/skillshare/config.yaml` | device | skillshare source config: skill targets for every Agent plus the MCP servers it writes into their native files; linked to `~/.config/skillshare/config.yaml` (skillshare writes through the symlink) |
 
-Work devices list `.pi/agent/settings.json` in `.dotfiles-merge` (deep-merged: shared base + device allowlist + local). The four non-work device profiles also merge their Pi defaults with the shared base; local values take precedence, so an existing local model override may need clearing. On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
+When a device's Pi overlay declares both `defaultProvider` and `defaultModel`, `./install.sh <device>` reapplies that pair, even over a model previously saved by Pi. Other local settings keep their usual merge precedence, including `defaultThinkingLevel`. Work overlays only supply an `enabledModels` allowlist, so work-device model defaults remain local. On work devices, the gateway provider definitions (`~/.omp/agent/models.yml`, `~/.pi/agent/models.json`) and `~/.pi/agent/AGENTS.md` are Instacart-managed and intentionally not tracked. The personal device's credential-free local catalogs are tracked only in its device directory, never in `shared/`.
 
 The **bento** and **insta-laptop** work-device omp configs ship two named model
 presets — `provider-diverse` (active) and `baseline-reasoning` (available) —
@@ -362,16 +362,14 @@ full profile comparison, switching caveats, the Tally credit economics, and the
 - General-purpose task agents resolve `modelRoles.task` (with `retry.fallbackChains.task` as fallbacks). Bundled scouts and sonic use `smol`; `reviewer` uses `slow`; both tracked work configs and the live laptop config override `security-reviewer` to `@slow` via `task.agentModelOverrides` (the bento live config previously omitted that override). `APPEND_SYSTEM.md` tells both harnesses to keep frontier models out of implementation paths.
 
 On personal devices, the shared omp config defaults to
-`openai-codex/gpt-6.1-sol:xhigh`; the `Ziyuns-M5-MBP` override uses that same
+`openai-codex/gpt-6.2-sol:xhigh`; the `Ziyuns-M5-MBP` override uses that same
 default and assigns `openai-codex/gpt-6-luna` to `smol` and `memory`.
 `ollama/qwen3.5:4b-32k:off` handles `commit` and `tiny`, and
 `ds4/qwen3.8-flash-next:medium` handles `task`. Sol 6.1 handles `slow`,
 `vision`, `plan`, `designer`, and `advisor`. No personal omp role or retry
-fallback selects `google-antigravity/*`. Pi on each non-work device merges
-its `openai-codex/gpt-6.1-sol` default with the shared settings; it does not
-change work-device routing. These are built-in OpenAI selectors, not
-work-gateway selectors; credentials remain local. Run `./install.sh <device>`
-on each other personal device to apply its tracked Pi override.
+fallback selects `google-antigravity/*`. Personal Pi uses the built-in
+`openai-codex/gpt-6.2-sol` selector, not the work gateway. Credentials remain
+local. Run `./install.sh <device>` to apply the tracked Pi model on each device.
 
 The personal device sets `title.generator: tiny` so automatic session titles use
 the local `tiny` role rather than a fork of the conversation model. Thinking is

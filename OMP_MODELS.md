@@ -402,13 +402,10 @@ Pi's [`shared/.pi/agent/settings.json`](shared/.pi/agent/settings.json) has no
 model allowlist or startup model. Each non-work device (`Ziyuns-M5-MBP`,
 `Ziyuns-Mac-mini`, `Ziyuns-MBP`, and `popos`) merges a small device setting
 that selects `openai-codex/gpt-6.2-sol` with the shared `xhigh` thinking level.
-This keeps local Pi models available and leaves the work-device settings
-unchanged. Installer merge precedence is shared < device < existing local:
-clear an older local default if it overrides the tracked device setting. Pi
-devices that do not yet list Sol 6.2 need to run `pi update --models` before
-using it. `./install.sh <device>` activates the device setting; it has been
-applied on `Ziyuns-M5-MBP`, and the other devices need installation when next
-used.
+Running `./install.sh <device>` reapplies the tracked provider/model pair over
+any Pi-saved selection on these devices. Other settings still merge with local
+values taking precedence, and work-device model defaults stay local. If Pi
+does not yet list Sol 6.2, run `pi update --models`.
 
 Google AI Pro grants quota in Google's Antigravity products, but does not by
 itself grant Gemini API access in a third-party harness. The personal routing

@@ -132,6 +132,41 @@ with_other_personal_devices() {
     done
 }
 
+with_pi_default_precedence() {
+    local temp_home personal_settings work_settings output
+
+    temp_home="$(mktemp -d)"
+    trap 'rm -rf "$temp_home"' RETURN
+    personal_settings="$temp_home/personal/.pi/agent/settings.json"
+    work_settings="$temp_home/work/.pi/agent/settings.json"
+    mkdir -p "$(dirname "$personal_settings")" "$(dirname "$work_settings")"
+    cat > "$personal_settings" <<'JSON'
+{
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "medium",
+  "packages": ["npm:local-pi-plugin"]
+}
+JSON
+    output="$(HOME="$temp_home/personal" "$ROOT_DIR/install.sh" Ziyuns-Mac-mini 2>&1)"
+    [[ "$output" != *"CONFLICT at .defaultProvider:"* && "$output" != *"CONFLICT at .defaultModel:"* ]] ||
+        fail "personal Pi model updates must not report a local-precedence conflict"
+    jq -e '
+        .defaultProvider == "openai-codex" and .defaultModel == "gpt-6.2-sol" and
+        .defaultThinkingLevel == "medium" and
+        (.packages | index("npm:local-pi-plugin") != null and index("npm:pi-subagents") != null)
+    ' "$personal_settings" >/dev/null ||
+        fail "personal Pi upgrade must apply the tracked model without replacing other local settings"
+
+    printf '{"defaultProvider":"instacart-openai","defaultModel":"gpt-6-luna"}\n' > "$work_settings"
+    HOME="$temp_home/work" "$ROOT_DIR/install.sh" bento >/dev/null
+    jq -e '
+        .defaultProvider == "instacart-openai" and .defaultModel == "gpt-6-luna" and
+        (.enabledModels | index("instacart-openai/gpt-6.1-sol:high") != null)
+    ' "$work_settings" >/dev/null ||
+        fail "work Pi install must keep the local model when the overlay only declares an allowlist"
+}
+
 with_explicit_work_devices() {
     local temp_home output
 
@@ -582,6 +617,7 @@ assert_file_contains "$ROOT_DIR/devices/bento/.shellrc.d/005_oh-my-zshrc.zsh" 's
 
 with_fake_hostname
 with_other_personal_devices
+with_pi_default_precedence
 with_explicit_work_devices
 with_local_zshenv
 with_local_pi_agents
