@@ -158,13 +158,15 @@ alias claudegood='claude --effort xhigh --dangerously-skip-permissions'
 alias claudemax='claude --effort max --dangerously-skip-permissions'
 alias claudeultra='claude --effort ultracode --dangerously-skip-permissions'
 
-# Opt-in YOLO aliases skip approvals where supported; Pi only sets xhigh thinking.
-alias codexgood='codex --dangerously-bypass-approvals-and-sandbox'
-alias ompgood='omp --approval-mode yolo'
+# Opt-in YOLO aliases skip approvals where supported.
+alias codexyolo='codex --dangerously-bypass-approvals-and-sandbox'
+alias ompyolo='omp --approval-mode yolo'
+alias agyyolo='agy --dangerously-skip-permissions'
+alias opencodeyolo='opencode --auto'
+alias ampyolo='amp --dangerously-allow-all'
+
+# Pi already runs tools without prompting; this only sets thinking effort.
 alias pigood='pi --thinking xhigh'
-alias agygood='agy --dangerously-skip-permissions'
-alias opencodegood='opencode --auto'
-alias ampgood='amp --dangerously-allow-all'
 
 # freshen — update every AI coding CLI plus oh-my-zsh and Homebrew in one pass,
 # then refresh what those upgrades leave stale: the ollama server and herdr's
