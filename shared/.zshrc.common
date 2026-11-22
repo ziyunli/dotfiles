@@ -154,11 +154,8 @@ if command -v eza &>/dev/null; then
   alias ls=eza
 fi
 
-alias claudegood='claude --effort xhigh --dangerously-skip-permissions'
-alias claudemax='claude --effort max --dangerously-skip-permissions'
-alias claudeultra='claude --effort ultracode --dangerously-skip-permissions'
-
 # Opt-in YOLO aliases skip approvals where supported.
+alias claudeyolo='claude --dangerously-skip-permissions'
 alias codexyolo='codex --dangerously-bypass-approvals-and-sandbox'
 alias ompyolo='omp --approval-mode yolo'
 alias agyyolo='agy --dangerously-skip-permissions'

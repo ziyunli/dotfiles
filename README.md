@@ -152,7 +152,7 @@ cd ~/.dotfiles
 
 `freshen` updates the installed coding CLIs and runs Homebrew upgrades without asking for confirmation. Standalone `brew upgrade` keeps its usual behavior.
 
-`claudegood`, `codexyolo`, `ompyolo`, `agyyolo`, `opencodeyolo`, and `ampyolo` opt into skipping tool approvals. `codexyolo` also disables the Codex sandbox; `opencodeyolo` still honors explicit denials. `pigood` starts Pi at `xhigh` without changing project trust; Pi already runs ordinary tools without approval prompts.
+`claudeyolo`, `codexyolo`, `ompyolo`, `agyyolo`, `opencodeyolo`, and `ampyolo` opt into skipping tool approvals. `claudeyolo` leaves Claude's effort unchanged; `codexyolo` also disables the Codex sandbox; `opencodeyolo` still honors explicit denials. `pigood` starts Pi at `xhigh` without changing project trust; Pi already runs ordinary tools without approval prompts.
 
 ### Install herdr agent integrations
 
